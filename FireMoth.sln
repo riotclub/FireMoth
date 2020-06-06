@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FireMothConsole", "FireMoth
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FireMothConsole.Tests", "FireMothConsole.Tests\FireMothConsole.Tests.csproj", "{DCEF8C2F-B64A-4D46-8969-320A4E143A61}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FireMothServices", "FireMothServices\FireMothServices.csproj", "{AE104B2C-0186-4415-9421-E0CA2022CE76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FireMothServices.Tests", "FireMothServices.Tests\FireMothServices.Tests.csproj", "{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{DCEF8C2F-B64A-4D46-8969-320A4E143A61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCEF8C2F-B64A-4D46-8969-320A4E143A61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCEF8C2F-B64A-4D46-8969-320A4E143A61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE104B2C-0186-4415-9421-E0CA2022CE76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE104B2C-0186-4415-9421-E0CA2022CE76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE104B2C-0186-4415-9421-E0CA2022CE76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE104B2C-0186-4415-9421-E0CA2022CE76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
