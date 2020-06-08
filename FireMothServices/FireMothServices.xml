@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FireMothServices</name>
+    </assembly>
+    <members>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider">
+            <summary>
+            Implementation of a data access provider that persists data to a stream in CSV format.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> class.
+            </summary>
+            <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.
+            </param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.IsBase64String(System.String)">
+            <summary>
+            Determines if the provided string is a valid base 64 string.
+            </summary>
+            <param name="base64">A <see cref="T:System.String"/> to check for base 64 validity.</param>
+            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
+            <summary>
+            Defines the public interface for a class that implements data access and persistence operations.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
+            <summary>
+            Adds a file and its hash value to the backing store.
+            </summary>
+            <param name="fileInfo">A <see cref="T:Microsoft.Extensions.FileProviders.IFileInfo"/> containing the properties of the file to store.</param>
+            <param name="base64Hash">The hash value of the file represented by <paramref name="fileInfo"/> in base 64.
+            </param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.FileScanning.FileScanner">
+            <summary>
+            Directory scanner implementation that reads the files in a directory and writes the file
+            and hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/>.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,System.Security.Cryptography.HashAlgorithm,System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/> class.
+            </summary>
+            <param name="dataAccessProvider">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/> that provides
+            access to the application backing store.</param>
+            <param name="hasher">A <see cref="T:System.Security.Cryptography.HashAlgorithm"/> that is used to compute hash values
+            for scanned files.</param>
+            <param name="outputWriter">A <see cref="T:System.IO.TextWriter"/> used for status output.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.String)">
+            <summary>
+            Scans the provided directory, generates hash data for each file, and writes the file and
+            hash data to a stream.
+            </summary>
+            <param name="directory">The directory to scan.</param>
+            <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> inticating the result of the scanning operation.
+            </returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(Microsoft.Extensions.FileProviders.IDirectoryContents)">
+            <summary>
+            Hashes a set of files and records the filename and hash string.
+            </summary>
+            <param name="files">The set of files to hash and record.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.GetBase64HashFromStream(System.IO.Stream)">
+            <summary>
+            Calculates a hash of the provided stream's data and returns a base 64 encoded string of
+            the hash.
+            </summary>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> containing the data to hash.</param>
+            <returns>A base 64 encoded <see cref="T:System.String"/> of the hash.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.FileScanning.IFileScanner">
+            <summary>
+            Defines the public interface for a class that implements a directory scanner. A directory scanner is responsible
+            for reading, analyzing, and persisting a hash or other signature that uniquely identifies a file and its
+            contents.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.IFileScanner.ScanDirectory(System.String)">
+            <summary>
+            Scans the provided directory, analyzing and storing hashes or signatures that uniquely identify the files
+            contained within.
+            </summary>
+            <param name="directory">The path of the directory to scan.</param>
+            <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the directory scanning operation.
+            </returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanResult">
+            <summary>
+            Specifies the result of a file scan operation.
+            </summary>
+        </member>
+        <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanSuccess">
+            <summary>
+            Inidicates the file scan operation was successful.
+            </summary>
+        </member>
+        <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanFailure">
+            <summary>
+            Indicates the file scan operation encountered a problem that prevented it from completing successfully.
+            </summary>
+        </member>
+    </members>
+</doc>
