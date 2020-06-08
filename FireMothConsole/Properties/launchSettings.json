@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FireMothConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "--directory D:\\FireMothTestData"
+    }
+  }
+}
