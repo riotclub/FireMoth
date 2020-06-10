@@ -29,6 +29,5 @@ namespace FireMothServices.DataAccess
         /// </summary>
         [Index(2)]
         public string Base64Hash { get; set; }
-
     }
 }
