@@ -69,10 +69,13 @@ namespace RiotClub.FireMoth.Services.DataAccess
             fingerprint.FileName = fileInfo.Name;
             fingerprint.Base64Hash = base64Hash;
 
-            using (var csvHelperOut = new CsvWriter(this.csvWriter, CultureInfo.InvariantCulture, true))
+            using (var csvHelper = new CsvWriter(this.csvWriter, CultureInfo.InvariantCulture, true))
             {
-                csvHelperOut.WriteRecord(fingerprint);
+                csvHelper.WriteRecord(fingerprint);
+                csvHelper.Flush();
             }
+
+            this.csvWriter.WriteLine();
         }
 
         /// <summary>
