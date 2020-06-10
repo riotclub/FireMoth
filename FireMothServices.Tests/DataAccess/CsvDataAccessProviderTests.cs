@@ -35,8 +35,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
         private readonly Mock<IFileInfo> mockFileInfo;
         private readonly Mock<TextWriter> mockDefaultStreamWriter;
         private readonly string testBase64Hash = "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=";
-        private readonly string testFilePhysicalPath = @"C:\TestDir\TestFile.txt";
-
+        private readonly string testFilePath = @"C:\TestDir";
+        private readonly string testFileName = "TestFile.txt";
         private bool disposed;
 
         public CsvDataAccessProviderTests()
@@ -44,7 +44,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
             this.mockFileInfo = new Mock<Microsoft.Extensions.FileProviders.IFileInfo>();
             this.mockFileInfo
                 .SetupGet(mock => mock.PhysicalPath)
-                .Returns(this.testFilePhysicalPath);
+                .Returns(this.testFilePath + Path.DirectorySeparatorChar + this.testFileName);
+            this.mockFileInfo
+                .SetupGet(mock => mock.Name)
+                .Returns(this.testFileName);
 
             this.mockDefaultStreamWriter = new Mock<TextWriter>();
             this.mockDefaultStreamWriter.Setup(mock => mock.WriteLine("result from test"));
@@ -130,19 +133,35 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public void AddFileRecord_ValidFileInfoAndHash_AddsRecordToStore()
         {
             // Arrange
-            var mockStreamWriter = new Mock<TextWriter>();
+            var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Strict);
+            var callSequence = new MockSequence();
             mockStreamWriter
-                .Setup(writer =>
-                    writer.WriteLine("{0},{1}", this.testFilePhysicalPath, this.testBase64Hash))
-                .Verifiable();
+                .InSequence(callSequence)
+                .Setup(writer => writer.Write(this.testFilePath));
+            mockStreamWriter
+                .InSequence(callSequence)
+                .Setup(writer => writer.Write(","));
+            mockStreamWriter
+                .InSequence(callSequence)
+                .Setup(writer => writer.Write(this.testFileName));
+            mockStreamWriter
+                .InSequence(callSequence)
+                .Setup(writer => writer.Write(","));
+            mockStreamWriter
+                .InSequence(callSequence)
+                .Setup(writer => writer.Write(this.testBase64Hash));
+
             CsvDataAccessProvider testObject = new CsvDataAccessProvider(mockStreamWriter.Object);
 
             // Act
             testObject.AddFileRecord(this.mockFileInfo.Object, this.testBase64Hash);
 
             // Assert
-            mockStreamWriter.Verify(writer =>
-                writer.WriteLine("{0},{1}", this.testFilePhysicalPath, this.testBase64Hash));
+            mockStreamWriter.Verify(writer => writer.Write(this.testFilePath));
+            mockStreamWriter.Verify(writer => writer.Write(","));
+            mockStreamWriter.Verify(writer => writer.Write(this.testFileName));
+            mockStreamWriter.Verify(writer => writer.Write(","));
+            mockStreamWriter.Verify(writer => writer.Write(this.testBase64Hash));
         }
 
         /// <inheritdoc/>

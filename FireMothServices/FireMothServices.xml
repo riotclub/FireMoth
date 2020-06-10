@@ -7,6 +7,12 @@
         <member name="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider">
             <summary>
             Implementation of a data access provider that persists data to a stream in CSV format.
+            TODO:
+            - Should support buffering of FileFingerprintRecord instances before writing to the physical
+              file.
+            - Add Flush method to immediately flush buffer to file.
+            - Split IDataAccessProvider interface into IDataAccessProvider and
+              IBufferedDataAccessProvider?
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.TextWriter)">
@@ -107,6 +113,26 @@
         <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanFailure">
             <summary>
             Indicates the file scan operation encountered a problem that prevented it from completing successfully.
+            </summary>
+        </member>
+        <member name="T:FireMothServices.DataAccess.FileFingerprint">
+            <summary>
+            Conatins data that uniquely identifies a file and its data.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.FileFingerprint.FilePath">
+            <summary>
+            Gets or sets the path to the file.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.FileFingerprint.FileName">
+            <summary>
+            Gets or sets the name of the file.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.FileFingerprint.Base64Hash">
+            <summary>
+            Gets or sets the base-64 hash of the file's data.
             </summary>
         </member>
     </members>

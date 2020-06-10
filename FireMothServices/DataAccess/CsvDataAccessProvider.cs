@@ -6,15 +6,23 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
+    using System.Globalization;
     using System.IO;
+    using CsvHelper;
+    using FireMothServices.DataAccess;
     using Microsoft.Extensions.FileProviders;
 
     /// <summary>
     /// Implementation of a data access provider that persists data to a stream in CSV format.
+    /// TODO:
+    /// - Should support buffering of FileFingerprintRecord instances before writing to the physical
+    ///   file.
+    /// - Add Flush method to immediately flush buffer to file.
+    /// - Split IDataAccessProvider interface into IDataAccessProvider and
+    ///   IBufferedDataAccessProvider?
     /// </summary>
     public class CsvDataAccessProvider : IDataAccessProvider
     {
-        private const string RecordFormat = "{0},{1}";
         private TextWriter csvWriter;
 
         /// <summary>
@@ -56,7 +64,18 @@ namespace RiotClub.FireMoth.Services.DataAccess
                 throw new ArgumentException("Not a valid base 64 string.", nameof(base64Hash));
             }
 
-            this.csvWriter.WriteLine(RecordFormat, fileInfo.PhysicalPath, base64Hash);
+            FileFingerprint fingerprint = new FileFingerprint();
+            fingerprint.FilePath = Path.GetDirectoryName(fileInfo.PhysicalPath);
+            fingerprint.FileName = fileInfo.Name;
+            fingerprint.Base64Hash = base64Hash;
+
+            using (var csvHelper = new CsvWriter(this.csvWriter, CultureInfo.InvariantCulture, true))
+            {
+                csvHelper.WriteRecord(fingerprint);
+                csvHelper.Flush();
+            }
+
+            this.csvWriter.WriteLine();
         }
 
         /// <summary>
