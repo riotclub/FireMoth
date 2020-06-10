@@ -13,7 +13,6 @@
             - Add Flush method to immediately flush buffer to file.
             - Split IDataAccessProvider interface into IDataAccessProvider and
               IBufferedDataAccessProvider?
-            - 
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.TextWriter)">
