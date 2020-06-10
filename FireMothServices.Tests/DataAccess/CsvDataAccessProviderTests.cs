@@ -37,7 +37,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
         private readonly string testBase64Hash = "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=";
         private readonly string testFilePath = @"C:\TestDir";
         private readonly string testFileName = "TestFile.txt";
-
         private bool disposed;
 
         public CsvDataAccessProviderTests()
