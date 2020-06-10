@@ -11,6 +11,13 @@ namespace RiotClub.FireMoth.Services.DataAccess
 
     /// <summary>
     /// Implementation of a data access provider that persists data to a stream in CSV format.
+    /// TODO:
+    /// - Should support buffering of FileFingerprintRecord instances before writing to the physical
+    ///   file.
+    /// - Add Flush method to immediately flush buffer to file.
+    /// - Split IDataAccessProvider interface into IDataAccessProvider and
+    ///   IBufferedDataAccessProvider?
+    /// - 
     /// </summary>
     public class CsvDataAccessProvider : IDataAccessProvider
     {
