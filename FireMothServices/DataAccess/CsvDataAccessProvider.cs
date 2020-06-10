@@ -6,7 +6,10 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
+    using System.Globalization;
     using System.IO;
+    using CsvHelper;
+    using FireMothServices.DataAccess;
     using Microsoft.Extensions.FileProviders;
 
     /// <summary>
@@ -17,11 +20,9 @@ namespace RiotClub.FireMoth.Services.DataAccess
     /// - Add Flush method to immediately flush buffer to file.
     /// - Split IDataAccessProvider interface into IDataAccessProvider and
     ///   IBufferedDataAccessProvider?
-    /// - 
     /// </summary>
     public class CsvDataAccessProvider : IDataAccessProvider
     {
-        private const string RecordFormat = "{0},{1}";
         private TextWriter csvWriter;
 
         /// <summary>
@@ -63,7 +64,15 @@ namespace RiotClub.FireMoth.Services.DataAccess
                 throw new ArgumentException("Not a valid base 64 string.", nameof(base64Hash));
             }
 
-            this.csvWriter.WriteLine(RecordFormat, fileInfo.PhysicalPath, base64Hash);
+            FileFingerprint fingerprint = new FileFingerprint();
+            fingerprint.FilePath = fileInfo.PhysicalPath;
+            fingerprint.FileName = fileInfo.Name;
+            fingerprint.Base64Hash = base64Hash;
+
+            using (var csvHelperOut = new CsvWriter(this.csvWriter, CultureInfo.InvariantCulture))
+            {
+                csvHelperOut.WriteRecord(fingerprint);
+            }
         }
 
         /// <summary>
