@@ -130,38 +130,79 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         [Fact]
-        public void AddFileRecord_ValidFileInfoAndHash_AddsRecordToStore()
+        public void AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile()
         {
+            var testFullPath = @"C:\dir, with, commas\file, with, commas.dat";
+            var testHash = "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=";
+
+            var testPath = Path.GetDirectoryName(testFullPath);
+            var testPathWithQuotes = '"' + testPath + '"';
+            var testFileName = Path.GetFileName(testFullPath);
+            var testFileNameWithQuotes = '"' + testFileName + '"';
+
             // Arrange
+            var mockFileInfo = new Mock<IFileInfo>();
+            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(testFullPath);
+            mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
+
+            var mockStreamWriter = new Mock<TextWriter>();
+
+            CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object);
+
+            // Act
+            testobject.AddFileRecord(mockFileInfo.Object, testHash);
+
+            // Assert
+            mockStreamWriter.Verify(writer => writer.Write(testPathWithQuotes));
+            mockStreamWriter.Verify(writer => writer.Write(testFileNameWithQuotes));
+        }
+
+        [Theory]
+        [InlineData(@"C:\somedir\somefile.txt", "CyA2DbkxG5oPUX/flw2v4RZDvHmdzSQL0jKAWlrsMVY=")]
+        [InlineData(@"\\NETWORK\LOCATION\networkfile", "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=")]
+        public void AddFileRecord_ValidFileInfoAndHash_AddsRecordToStore(string file, string hash)
+        {
+            var testPath = Path.GetDirectoryName(file);
+            var testFileName = Path.GetFileName(file);
+
+            // Arrange
+            var mockFileInfo = new Mock<IFileInfo>();
+            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(file);
+            mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
+
             var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Strict);
             var callSequence = new MockSequence();
             mockStreamWriter
                 .InSequence(callSequence)
-                .Setup(writer => writer.Write(this.testFilePath));
+                .Setup(writer => writer.Write(testPath));
             mockStreamWriter
                 .InSequence(callSequence)
                 .Setup(writer => writer.Write(","));
             mockStreamWriter
                 .InSequence(callSequence)
-                .Setup(writer => writer.Write(this.testFileName));
+                .Setup(writer => writer.Write(testFileName));
             mockStreamWriter
                 .InSequence(callSequence)
                 .Setup(writer => writer.Write(","));
             mockStreamWriter
                 .InSequence(callSequence)
-                .Setup(writer => writer.Write(this.testBase64Hash));
+                .Setup(writer => writer.Write(hash));
+            mockStreamWriter
+                .InSequence(callSequence)
+                .Setup(writer => writer.WriteLine());
 
             CsvDataAccessProvider testObject = new CsvDataAccessProvider(mockStreamWriter.Object);
 
             // Act
-            testObject.AddFileRecord(this.mockFileInfo.Object, this.testBase64Hash);
+            testObject.AddFileRecord(mockFileInfo.Object, hash);
 
             // Assert
-            mockStreamWriter.Verify(writer => writer.Write(this.testFilePath));
+            mockStreamWriter.Verify(writer => writer.Write(testPath));
             mockStreamWriter.Verify(writer => writer.Write(","));
-            mockStreamWriter.Verify(writer => writer.Write(this.testFileName));
+            mockStreamWriter.Verify(writer => writer.Write(testFileName));
             mockStreamWriter.Verify(writer => writer.Write(","));
-            mockStreamWriter.Verify(writer => writer.Write(this.testBase64Hash));
+            mockStreamWriter.Verify(writer => writer.Write(hash));
+            mockStreamWriter.Verify(writer => writer.WriteLine());
         }
 
         /// <inheritdoc/>
