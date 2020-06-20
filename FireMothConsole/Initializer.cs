@@ -44,23 +44,47 @@ namespace RiotClub.FireMoth.Console
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the application has been initialized and is
+        /// ready for startup.
+        /// </summary>
+        public bool Initialized { get; set; } = false;
+
+        /// <summary>
+        /// Performs initialization tasks to prepare application for startup. This must be called
+        /// before the call to the <see cref="Start"/> method.
+        /// </summary>
+        /// <returns><c>true</c> if initialization was successful and the application is ready for
+        /// startup.</returns>
+        public bool Initialize()
+        {
+            if (!this.ValidateStartupArguments(this.processArguments))
+            {
+                this.DisplayUsageMessage();
+                return false;
+            }
+
+            this.Initialized = true;
+            return true;
+        }
+
+        /// <summary>
         /// Begins scanning the directory specified during application startup.
         /// </summary>
         /// <returns>An <see cref="ExitState"/> indicating the result of the directory scan
         /// operation.</returns>
         public ExitState Start()
         {
-            if (!this.ValidateStartupArguments(this.processArguments))
+            if (!this.Initialize())
             {
-                this.DisplayUsageMessage();
                 return ExitState.StartupError;
             }
 
-            /*
-            ScanResult scanResult = this.directoryScanner.ScanDirectory(this.scanPath);
-
-            return scanResult == ScanResult.ScanSuccess ? ExitState.Normal : ExitState.RuntimeError;
-            */
+            if (!this.Initialized)
+            {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
+                throw new InvalidOperationException("Can't start in uninitialized state.");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
+            }
 
             ScanResult scanResult;
 
@@ -79,9 +103,12 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
+
                 scanResult = fileScanner.ScanDirectory(this.scanPath);
+
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
+
                 this.statusOutputWriter.WriteLine($"Scan time: {timeSpan}");
             }
 

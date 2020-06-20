@@ -38,6 +38,20 @@
             <param name="outputWriter">A <see cref="T:System.IO.TextWriter"/> that initialization messages will
             be written to.</param>
         </member>
+        <member name="P:RiotClub.FireMoth.Console.Initializer.Initialized">
+            <summary>
+            Gets or sets a value indicating whether the application has been initialized and is
+            ready for startup.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Initializer.Initialize">
+            <summary>
+            Performs initialization tasks to prepare application for startup. This must be called
+            before the call to the <see cref="M:RiotClub.FireMoth.Console.Initializer.Start"/> method.
+            </summary>
+            <returns><c>true</c> if initialization was successful and the application is ready for
+            startup.</returns>
+        </member>
         <member name="M:RiotClub.FireMoth.Console.Initializer.Start">
             <summary>
             Begins scanning the directory specified during application startup.

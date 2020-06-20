@@ -29,6 +29,38 @@ namespace RiotClub.FireMoth.Console
             this.outputWriter = new StringWriter(new StringBuilder());
         }
 
+        [Fact]
+        public void Initialize_ValidArguments_ReturnsTrue()
+        {
+            // Arrange
+            string[] arguments = { "--directory", @"C:\testdir" };
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            var result = initializer.Initialize();
+
+            // Assert
+            Assert.True(result);
+        }
+
+        /*
+        [Fact]
+        public void Initialize_ValidArguments_OptionsSet()
+        {
+            var testOption = "--directory";
+            var testValue = @"C:\testdir";
+            string[] arguments = { testOption, testValue };
+
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+            var initResult = initializer.Initialize();
+
+            var option = initializer.GetOption("directory");
+
+            Assert.NotNull(option);
+            Assert.Equal(testValue, option);
+        }
+        */
+
         [Theory]
         [InlineData("--badoption")]
         [InlineData("--badoption", "C:\\")]
