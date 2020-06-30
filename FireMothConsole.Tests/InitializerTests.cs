@@ -11,16 +11,30 @@ namespace RiotClub.FireMoth.Console
     using Xunit;
 
     /*
-     * Start:
-     * - Application startup arguments must be valid
-     *      - There must be one and only one argument.
-     *          - Start_InvalidArgumentCount_ReturnsExitStateStartupError
-     * - Valid application startup arguments returns ScanSuccess result.
-     *      - Start_ValidPathArgument_ReturnsScanSuccess
+     * x Init with valid command line arguments.
+     *      x Initialize_ValidDirectoryArgument_ReturnsTrue
+     *      x Initialize_ValidDirectoryArgument_SetsDirectoryOption
+     *
+     * x Init without directory argument.
+     *      x Initialize_NoArguments_ReturnsFalse
+     *      x Initialize_NoArguments_OutputsError
+     *
+     * x Init with unknown argument.
+     *      x Initialize_UnknownArgument_ReturnsFalse
+     *      x Initialize_UnknownArgument_OutputsError
+     *
+     * Init with invalid directory argument displays error (don't check for directory existence).
+     *      Initialize_InvalidDirectoryArgument_ReturnsFalse
+     *      Initialize_InvalidDirectoryArgument_OutputsError
+     *
+     * Start when initialized runs file scanner.
+     *      Start_Initialized_StartsDirectoryScan
+     *
+     * Start when not initialized throws exception.
+     *      Start_NotInitialized_ThrowsIllegalStateException
      */
     public class InitializerTests : IDisposable
     {
-        private const string UsageText = "Usage: FireMoth.Console.exe --directory [ScanDirectory]";
         private readonly StringWriter outputWriter;
         private bool disposed = false;
 
@@ -30,7 +44,7 @@ namespace RiotClub.FireMoth.Console
         }
 
         [Fact]
-        public void Initialize_ValidArguments_ReturnsTrue()
+        public void Initialize_ValidDirectoryArgument_ReturnsTrue()
         {
             // Arrange
             string[] arguments = { "--directory", @"C:\testdir" };
@@ -43,64 +57,94 @@ namespace RiotClub.FireMoth.Console
             Assert.True(result);
         }
 
-        /*
         [Fact]
-        public void Initialize_ValidArguments_OptionsSet()
+        public void Initialize_ValidDirectoryArgument_SetsDirectoryOption()
         {
+            // Arrange
             var testOption = "--directory";
             var testValue = @"C:\testdir";
             string[] arguments = { testOption, testValue };
-
             Initializer initializer = new Initializer(arguments, this.outputWriter);
-            var initResult = initializer.Initialize();
 
-            var option = initializer.GetOption("directory");
+            // Act
+            initializer.Initialize();
 
-            Assert.NotNull(option);
-            Assert.Equal(testValue, option);
+            // Assert
+            Assert.NotNull(initializer.CommandLineOptions);
+            Assert.Equal(testValue, initializer.CommandLineOptions.ScanDirectory);
         }
-        */
+
+        [Fact]
+        public void Initialize_NoArguments_ReturnsFalse()
+        {
+            // Arrange
+            var arguments = Array.Empty<string>();
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            var result = initializer.Initialize();
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Initialize_NoArguments_OutputsError()
+        {
+            // Arrange
+            var arguments = Array.Empty<string>();
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            initializer.Initialize();
+
+            // Assert
+            Assert.Contains(
+                "Required option 'd, directory' is missing.",
+                this.outputWriter.ToString(),
+                StringComparison.OrdinalIgnoreCase);
+        }
 
         [Theory]
         [InlineData("--badoption")]
         [InlineData("--badoption", "C:\\")]
-        [InlineData("--directory", "C:\\", "extraoption")]
-        public void Start_InvalidArguments_DisplaysUsageAndReturnStartupErrorExitState(
-            params string[] arguments)
+        [InlineData("--directory", "C:\\", "-x")]
+        public void Initialize_UnknownArgument_ReturnsFalse(params string[] arguments)
         {
             // Arrange
             var initializer = new Initializer(arguments, this.outputWriter);
 
             // Act
-            ExitState result = initializer.Start();
+            var result = initializer.Initialize();
 
             // Assert
-            Assert.StartsWith(
-                "Invalid option: ", this.outputWriter.ToString(), StringComparison.OrdinalIgnoreCase);
-            Assert.EndsWith(
-                UsageText + Environment.NewLine,
-                this.outputWriter.ToString(),
-                StringComparison.OrdinalIgnoreCase);
-            Assert.Equal(ExitState.StartupError, result);
+            Assert.False(result);
         }
 
-        [Fact]
-        public void Start_ZeroLengthArgumentsArray_DisplaysUsageAndReturnsStartupErrorExitState()
+        [Theory]
+        [InlineData("--badoption")]
+        [InlineData("--badoption", "C:\\")]
+        [InlineData("--directory", "C:\\", "-x")]
+        public void Initialize_UnknownArgument_OutputsError(params string[] arguments)
         {
             // Arrange
-            var arguments = Array.Empty<string>();
-            var initializer = new Initializer(arguments, this.outputWriter);
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
 
             // Act
-            ExitState result = initializer.Start();
+            initializer.Initialize();
 
             // Assert
-            Assert.EndsWith(
-                UsageText + Environment.NewLine,
-                this.outputWriter.ToString(),
-                StringComparison.OrdinalIgnoreCase);
-            Assert.Equal(ExitState.StartupError, result);
+            Assert.Matches("Option '[a-zA-Z]*' is unknown", this.outputWriter.ToString());
         }
+
+        /*
+        [Theory]
+        [InlineData("-d", "C:\\")]
+        public void Initialize_InvalidDirectoryArgument_ReturnsFalse(params string[] arguments)
+        {
+
+        }
+        */
 
         [Fact]
         public void Start_ValidArguments_ReturnNormalExitState()
@@ -108,6 +152,7 @@ namespace RiotClub.FireMoth.Console
             // Arrange
             var arguments = new string[] { "--directory", "C:\\" };
             var initializer = new Initializer(arguments, this.outputWriter);
+            initializer.Initialize();
 
             // Act
             ExitState result = initializer.Start();

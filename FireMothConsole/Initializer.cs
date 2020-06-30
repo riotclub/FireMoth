@@ -6,10 +6,16 @@
 namespace RiotClub.FireMoth.Console
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Runtime.CompilerServices;
     using System.Security.Cryptography;
+    using CommandLine;
+    using CommandLine.Text;
+    using FireMothConsole;
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.FileScanning;
 
@@ -18,9 +24,6 @@ namespace RiotClub.FireMoth.Console
     /// </summary>
     public class Initializer
     {
-        private const string UsageMessage =
-            "Usage: FireMoth.Console.exe --directory [ScanDirectory]";
-
         private const string DefaultFilePrefix = "FireMothData_";
         private const string DefaultFileExtension = "csv";
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
@@ -28,7 +31,6 @@ namespace RiotClub.FireMoth.Console
         private readonly string[] processArguments;
         private TextWriter statusOutputWriter;
         private string dataOutputFile;
-        private string scanPath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Initializer"/> class.
@@ -50,6 +52,14 @@ namespace RiotClub.FireMoth.Console
         public bool Initialized { get; set; } = false;
 
         /// <summary>
+        /// Gets the <see cref="CommandLineOptions"/> containing the command line arguments sent on
+        /// application invocation.
+        /// </summary>
+        /// <remarks> If the application has not been initialized (via <see cref="Initialize"/>),
+        /// this value will be <c>null</c>.</remarks>
+        public CommandLineOptions CommandLineOptions { get; private set; }
+
+        /// <summary>
         /// Performs initialization tasks to prepare application for startup. This must be called
         /// before the call to the <see cref="Start"/> method.
         /// </summary>
@@ -57,14 +67,26 @@ namespace RiotClub.FireMoth.Console
         /// startup.</returns>
         public bool Initialize()
         {
-            if (!this.ValidateStartupArguments(this.processArguments))
+            using (var commandLineParser = new Parser(config => ConfigureCommandLineParser(config)))
             {
-                this.DisplayUsageMessage();
-                return false;
-            }
+                var parseResult =
+                    commandLineParser.ParseArguments<CommandLineOptions>(this.processArguments);
 
-            this.Initialized = true;
-            return true;
+                if (parseResult.Tag == ParserResultType.Parsed)
+                {
+                    // Command line successfully parsed. Update state and return success (true).
+                    this.CommandLineOptions = ((Parsed<CommandLineOptions>)parseResult).Value;
+                    this.Initialized = true;
+                    return true;
+                }
+                else
+                {
+                    // Error during command line parsing. Display usage and return failure (false).
+                    this.DisplayHelpText(
+                        parseResult, ((NotParsed<CommandLineOptions>)parseResult).Errors);
+                    return false;
+                }
+            }
         }
 
         /// <summary>
@@ -74,11 +96,6 @@ namespace RiotClub.FireMoth.Console
         /// operation.</returns>
         public ExitState Start()
         {
-            if (!this.Initialize())
-            {
-                return ExitState.StartupError;
-            }
-
             if (!this.Initialized)
             {
 #pragma warning disable CA1303 // Do not pass literals as localized parameters
@@ -104,7 +121,7 @@ namespace RiotClub.FireMoth.Console
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                scanResult = fileScanner.ScanDirectory(this.scanPath);
+                scanResult = fileScanner.ScanDirectory(this.CommandLineOptions.ScanDirectory);
 
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
@@ -116,50 +133,37 @@ namespace RiotClub.FireMoth.Console
         }
 
         /// <summary>
-        /// Verifies that the provided arguments are valid process startup arguments.
+        /// Configures an instance of <see cref="ParserSettings"/> to be consumed by the command
+        /// line parser.
         /// </summary>
-        /// <param name="arguments">An array of <see cref="string"/> containing process command line
-        /// arguments.</param>
-        /// <returns><c>true</c> if the provided array of arguments contains only valid command line
-        /// arguments, <c>false</c> otherwise.</returns>
-        private bool ValidateStartupArguments(string[] arguments)
+        /// <param name="config">A <see cref="ParserSettings"/> object used to configure the
+        /// command line parser.</param>
+        private static void ConfigureCommandLineParser(ParserSettings config)
         {
-            if (arguments.Length == 0)
-            {
-                return false;
-            }
-
-            if (arguments[0] != "-d" && arguments[0] != "--directory")
-            {
-                this.statusOutputWriter.WriteLine(
-                    "Invalid option: {0}" + Environment.NewLine, arguments[0]);
-                return false;
-            }
-
-            if (arguments.Length < 2)
-            {
-                this.statusOutputWriter.WriteLine(
-                    "A valid scan directory is required." + Environment.NewLine);
-                return false;
-            }
-
-            if (arguments.Length > 2)
-            {
-                this.statusOutputWriter.WriteLine(
-                    "Invalid option: {0}" + Environment.NewLine, arguments[2]);
-                return false;
-            }
-
-            this.scanPath = arguments[1];
-            return true;
+            config.AutoVersion = false;
+            config.AutoHelp = false;
+            config.HelpWriter = null;
         }
 
         /// <summary>
         /// Writes the application usage message to the status output.
         /// </summary>
-        private void DisplayUsageMessage()
+        private void DisplayHelpText<T>(ParserResult<T> parseResult, IEnumerable<Error> errors)
         {
-            this.statusOutputWriter.Write(UsageMessage + Environment.NewLine);
+            var helpText = HelpText.AutoBuild(
+                parseResult,
+                help =>
+                {
+                    help.AutoHelp = false;
+                    help.AutoVersion = false;
+                    help.AdditionalNewLineAfterOption = false;
+                    help.Heading = "FireMoth File Analyzer";
+                    help.Copyright = string.Empty;
+                    return HelpText.DefaultParsingErrorsHandler(parseResult, help);
+                },
+                e => e);
+
+            this.statusOutputWriter.WriteLine(helpText);
         }
     }
 }
