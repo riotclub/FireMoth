@@ -2,7 +2,7 @@
   "profiles": {
     "FireMothConsole": {
       "commandName": "Project",
-      "commandLineArgs": "--directory \"\\\\\\\\||>\\a\\t< \\U+0000\""
+      "commandLineArgs": "--directory \"D:\\FireMoth Test Data\""
     }
   }
 }
