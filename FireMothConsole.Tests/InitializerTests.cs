@@ -23,15 +23,15 @@ namespace RiotClub.FireMoth.Console
      *      x Initialize_UnknownArgument_ReturnsFalse
      *      x Initialize_UnknownArgument_OutputsError
      *
-     * Init with invalid directory argument displays error (don't check for directory existence).
-     *      Initialize_InvalidDirectoryArgument_ReturnsFalse
-     *      Initialize_InvalidDirectoryArgument_OutputsError
+     * x Init with invalid directory argument displays error (don't check for directory existence).
+     *      x Initialize_InvalidDirectoryArgument_ReturnsFalse
+     *      x Initialize_InvalidDirectoryArgument_OutputsError
      *
-     * Start when initialized runs file scanner.
-     *      Start_Initialized_StartsDirectoryScan
+     * x Start when initialized runs file scanner.
+     *      x Start_Initialized_StartsDirectoryScan
      *
-     * Start when not initialized throws exception.
-     *      Start_NotInitialized_ThrowsIllegalStateException
+     * x Start when not initialized throws exception.
+     *      x Start_NotInitialized_ThrowsIllegalStateException
      */
     public class InitializerTests : IDisposable
     {
@@ -137,17 +137,41 @@ namespace RiotClub.FireMoth.Console
             Assert.Matches("Option '[a-zA-Z]*' is unknown", this.outputWriter.ToString());
         }
 
-        /*
         [Theory]
-        [InlineData("-d", "C:\\")]
+        [InlineData("-d", @"C:\path/with|invalid/chars")]
+        [InlineData("-d", "\\:\\||>\a\b::t<")]
         public void Initialize_InvalidDirectoryArgument_ReturnsFalse(params string[] arguments)
         {
+            // Arrange
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
 
+            // Act
+            var result = initializer.Initialize();
+
+            // Assert
+            Assert.False(result);
         }
-        */
+
+        [Theory]
+        [InlineData("-d", @"C:\path/with|invalid/chars")]
+        [InlineData("-d", "\\:\\||>\a\b::t<")]
+        public void Initialize_InvalidDirectoryArgument_OutputsError(params string[] arguments)
+        {
+            // Arrange
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            initializer.Initialize();
+
+            // Assert
+            Assert.Contains(
+                "ERROR: Scan path contains invalid characters.",
+                this.outputWriter.ToString(),
+                StringComparison.OrdinalIgnoreCase);
+        }
 
         [Fact]
-        public void Start_ValidArguments_ReturnNormalExitState()
+        public void Start_Initialized_RunsDirectoryScan()
         {
             // Arrange
             var arguments = new string[] { "--directory", "C:\\" };
@@ -159,6 +183,17 @@ namespace RiotClub.FireMoth.Console
 
             // Assert
             Assert.Equal(ExitState.Normal, result);
+        }
+
+        [Fact]
+        public void Start_NotInitialized_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var arguments = new string[] { "--directory", "C:\\" };
+            var initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act, Assert
+            Assert.Throws<InvalidOperationException>(() => initializer.Start());
         }
 
         public void Dispose()

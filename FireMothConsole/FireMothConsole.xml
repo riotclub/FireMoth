@@ -77,6 +77,13 @@
             <returns>An <see cref="T:RiotClub.FireMoth.Console.ExitState"/> indicating the result of the directory scan
             operation.</returns>
         </member>
+        <member name="M:RiotClub.FireMoth.Console.Initializer.ContainsInvalidPathCharacters(System.String)">
+            <summary>
+            Checks the provided string for invalid path characters.
+            </summary>
+            <param name="testPath">The path to test.</param>
+            <returns><c>true</c> if the provided path contains invalid path characters.</returns>
+        </member>
         <member name="M:RiotClub.FireMoth.Console.Initializer.ConfigureCommandLineParser(CommandLine.ParserSettings)">
             <summary>
             Configures an instance of <see cref="T:CommandLine.ParserSettings"/> to be consumed by the command

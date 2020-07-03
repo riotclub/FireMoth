@@ -13,6 +13,7 @@ namespace RiotClub.FireMoth.Console
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Security.Cryptography;
+    using System.Text.RegularExpressions;
     using CommandLine;
     using CommandLine.Text;
     using FireMothConsole;
@@ -67,25 +68,37 @@ namespace RiotClub.FireMoth.Console
         /// startup.</returns>
         public bool Initialize()
         {
+            ParserResult<CommandLineOptions> parseResult;
+
             using (var commandLineParser = new Parser(config => ConfigureCommandLineParser(config)))
             {
-                var parseResult =
+                parseResult =
                     commandLineParser.ParseArguments<CommandLineOptions>(this.processArguments);
+            }
 
-                if (parseResult.Tag == ParserResultType.Parsed)
+            if (parseResult.Tag == ParserResultType.Parsed)
+            {
+                // Command line successfully parsed.
+                this.CommandLineOptions = ((Parsed<CommandLineOptions>)parseResult).Value;
+
+                // Check for illegal characters in scan directory.
+                if (ContainsInvalidPathCharacters(this.CommandLineOptions.ScanDirectory))
                 {
-                    // Command line successfully parsed. Update state and return success (true).
-                    this.CommandLineOptions = ((Parsed<CommandLineOptions>)parseResult).Value;
-                    this.Initialized = true;
-                    return true;
-                }
-                else
-                {
-                    // Error during command line parsing. Display usage and return failure (false).
-                    this.DisplayHelpText(
-                        parseResult, ((NotParsed<CommandLineOptions>)parseResult).Errors);
+                    this.statusOutputWriter.WriteLine(
+                        "ERROR: Scan path contains invalid characters.");
                     return false;
                 }
+
+                // Update state and return success (true).
+                this.Initialized = true;
+                return true;
+            }
+            else
+            {
+                // Error during command line parsing. Display usage and return failure (false).
+                this.DisplayHelpText(
+                    parseResult, ((NotParsed<CommandLineOptions>)parseResult).Errors);
+                return false;
             }
         }
 
@@ -130,6 +143,23 @@ namespace RiotClub.FireMoth.Console
             }
 
             return scanResult == ScanResult.ScanSuccess ? ExitState.Normal : ExitState.RuntimeError;
+        }
+
+        /// <summary>
+        /// Checks the provided string for invalid path characters.
+        /// </summary>
+        /// <param name="testPath">The path to test.</param>
+        /// <returns><c>true</c> if the provided path contains invalid path characters.</returns>
+        private static bool ContainsInvalidPathCharacters(string testPath)
+        {
+            Regex invalidPathCharacters = new Regex(
+                "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+            if (invalidPathCharacters.IsMatch(testPath))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
