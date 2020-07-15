@@ -19,14 +19,24 @@ namespace RiotClub.FireMoth.Console
         /// <param name="args">Command-line arguments. A single argument, --directory, is currently
         /// supported and required. This value must be a well-formed and existing directory path.
         /// </param>
-        public static void Main(string[] args)
+        /// <returns>An <c>int</c> return code indicating invocation result.</returns>
+        public static int Main(string[] args)
         {
             var initializer = new Initializer(args, Console.Out);
-            ExitState exitState = initializer.Start();
+            bool initResult = initializer.Initialize();
 
+            if (initResult)
+            {
+                ExitState exitState = initializer.Start();
 #pragma warning disable CA1303 // Do not pass literals as localized parameters
-            Console.WriteLine("Process completed with exit state: {0}.", exitState);
+                Console.WriteLine("Process completed with exit state: {0}.", exitState);
 #pragma warning restore CA1303 // Do not pass literals as localized parameters
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }
