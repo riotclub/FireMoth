@@ -9,15 +9,26 @@
             Implementation of a data access provider that persists data to a stream in CSV format.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.TextWriter)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.TextWriter,System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> class.
             </summary>
             <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.
             </param>
+            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not
+            be closed when the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> is disposed.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
             <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and, optionally, managed resources.
+            </summary>
+            <param name="disposing">If true, managed resources are freed.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.IsBase64String(System.String)">
             <summary>
@@ -25,6 +36,18 @@
             </summary>
             <param name="base64">A <see cref="T:System.String"/> to check for base 64 validity.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.BuildFileFingerprint(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
+            <summary>
+            Builds a <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> object from the provided <see cref="T:Microsoft.Extensions.FileProviders.IFileInfo"/>
+            and base 64 hash string.
+            </summary>
+            <param name="fileInfo">The <see cref="T:Microsoft.Extensions.FileProviders.IFileInfo"/> implementation containing the file
+            information to use for the returned <see cref="T:FireMothServices.DataAccess.FileFingerprint"/>.</param>
+            <param name="base64Hash">A <c>string</c> containing the base 64 hash string to use in
+            the returned <see cref="T:FireMothServices.DataAccess.FileFingerprint"/>.</param>
+            <returns>A new <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> object containing the provided
+            information.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>

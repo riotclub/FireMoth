@@ -121,13 +121,15 @@ namespace RiotClub.FireMoth.Console
                 + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
                 + '.' + DefaultFileExtension;
 
+            // This is closed when the encapsulating CsvDataAccessProvider is disposed.
+            StreamWriter dataOutputWriter = new StreamWriter(this.dataOutputFile, false);
+
             using (SHA256 hasher = SHA256.Create())
-            using (StreamWriter dataOutputWriter = new StreamWriter(this.dataOutputFile, false))
+            using (CsvDataAccessProvider dataAccessProvider = new CsvDataAccessProvider(
+                dataOutputWriter))
             {
-                CsvDataAccessProvider dataAccessProvider =
-                    new CsvDataAccessProvider(dataOutputWriter);
-                var fileScanner =
-                    new FileScanner(dataAccessProvider, hasher, this.statusOutputWriter);
+                var fileScanner = new FileScanner(
+                    dataAccessProvider, hasher, this.statusOutputWriter);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();

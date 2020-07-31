@@ -170,39 +170,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
             mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(file);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
-            var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Strict);
-            var callSequence = new MockSequence();
-            mockStreamWriter
-                .InSequence(callSequence)
-                .Setup(writer => writer.Write(testPath));
-            mockStreamWriter
-                .InSequence(callSequence)
-                .Setup(writer => writer.Write(","));
-            mockStreamWriter
-                .InSequence(callSequence)
-                .Setup(writer => writer.Write(testFileName));
-            mockStreamWriter
-                .InSequence(callSequence)
-                .Setup(writer => writer.Write(","));
-            mockStreamWriter
-                .InSequence(callSequence)
-                .Setup(writer => writer.Write(hash));
-            mockStreamWriter
-                .InSequence(callSequence)
-                .Setup(writer => writer.WriteLine());
-
-            CsvDataAccessProvider testObject = new CsvDataAccessProvider(mockStreamWriter.Object);
+            var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Default);
 
             // Act
-            testObject.AddFileRecord(mockFileInfo.Object, hash);
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(mockStreamWriter.Object))
+            {
+                testObject.AddFileRecord(mockFileInfo.Object, hash);
+            }
 
             // Assert
             mockStreamWriter.Verify(writer => writer.Write(testPath));
-            mockStreamWriter.Verify(writer => writer.Write(","));
             mockStreamWriter.Verify(writer => writer.Write(testFileName));
-            mockStreamWriter.Verify(writer => writer.Write(","));
             mockStreamWriter.Verify(writer => writer.Write(hash));
-            mockStreamWriter.Verify(writer => writer.WriteLine());
         }
 
         /// <inheritdoc/>
