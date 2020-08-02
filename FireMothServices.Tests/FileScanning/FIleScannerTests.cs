@@ -26,8 +26,18 @@ namespace RiotClub.FireMoth.Services.FileScanning
      *      - ScanDirectory_NullDirectory_ThrowsArgumentNullException
      * - directory must be valid
      *      - ScanDirectory_InvalidDirectory_ReturnsScanFailureResult
-     * - valid directory results in successful scan
+     * - valid directory returns successful scan result
      *      - ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
+     * - valid empty directory returns successful scan result
+     *      - ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult
+     * - valid empty directory does not add records to data access provider
+     *      - ScanDirectory_EmptyDirectory_NoRecordsAddedToDataAccessProvider
+     * - valid directory with files adds records for all files contained within directory to the
+     *   data access provider
+     *      - ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
+     * - valid directory in recursive mode adds records for all files contained within directory,
+     *   including subdirectories
+     *      - ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
      */
     public class FileScannerTests : IDisposable
     {
@@ -83,6 +93,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
                 new FileScanner(null, this.mockHashAlgorithm.Object, this.outputWriter));
+        }
+
+        [Fact]
+        public void ScanDirectory_NullDirectory_ThrowsArgumentNullException()
+        {
+            // Arrange
+            FileScanner fileScanner = new FileScanner(
+                this.mockDataAccessProvider.Object,
+                this.mockHashAlgorithm.Object,
+                this.outputWriter);
+
+            // Act, Assert
+            Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(null));
         }
 
         [Fact]

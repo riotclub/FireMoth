@@ -51,7 +51,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// </returns>
         public ScanResult ScanDirectory(string directory)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(directory));
+            if (directory == null)
+            {
+                throw new ArgumentNullException(nameof(directory));
+            }
 
             if (!Directory.Exists(directory))
             {
