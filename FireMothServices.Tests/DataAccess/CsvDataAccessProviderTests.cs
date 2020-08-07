@@ -7,7 +7,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
     using System.IO;
-    using Microsoft.Extensions.FileProviders;
+    //using Microsoft.Extensions.FileProviders;
+    using System.IO.Abstractions;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
     using Xunit;
@@ -41,9 +42,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
         public CsvDataAccessProviderTests()
         {
-            this.mockFileInfo = new Mock<Microsoft.Extensions.FileProviders.IFileInfo>();
+            this.mockFileInfo = new Mock<IFileInfo>();
             this.mockFileInfo
-                .SetupGet(mock => mock.PhysicalPath)
+                .SetupGet(mock => mock.FullName)
                 .Returns(this.testFilePath + Path.DirectorySeparatorChar + this.testFileName);
             this.mockFileInfo
                 .SetupGet(mock => mock.Name)
@@ -70,20 +71,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
                 testObject.AddFileRecord(null, this.testBase64Hash));
-        }
-
-        [Fact]
-        public void AddFileRecord_NullFileInfoPhysicalPath_ThrowsArgumentException()
-        {
-            // Arrange
-            var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(() => null);
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() =>
-                testObject.AddFileRecord(mockFileInfo.Object, this.testBase64Hash));
         }
 
         [Fact]
@@ -142,7 +129,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Arrange
             var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(testFullPath);
+            mockFileInfo.SetupGet(mock => mock.FullName).Returns(testFullPath);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
             var mockStreamWriter = new Mock<TextWriter>();
@@ -167,7 +154,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Arrange
             var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(file);
+            mockFileInfo.SetupGet(mock => mock.FullName).Returns(file);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
             var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Default);

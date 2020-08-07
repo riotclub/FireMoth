@@ -6,9 +6,12 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
+    using System.IO.Abstractions;
     using System.Security.Cryptography;
     using Microsoft.Extensions.FileProviders;
     using RiotClub.FireMoth.Services.DataAccess;
@@ -49,28 +52,39 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <param name="directory">The directory to scan.</param>
         /// <returns>A <see cref="ScanResult"/> inticating the result of the scanning operation.
         /// </returns>
-        public ScanResult ScanDirectory(string directory)
+        public ScanResult ScanDirectory(IDirectoryInfo directory)
         {
             if (directory == null)
             {
                 throw new ArgumentNullException(nameof(directory));
             }
 
-            if (!Directory.Exists(directory))
+            if (!directory.Exists)
             {
                 this.outputWriter.WriteLine("Error: \"{0}\" is not a valid directory.", directory);
                 return ScanResult.ScanFailure;
             }
 
             this.outputWriter.WriteLine($"Scanning directory \"{directory}\"...");
+            //IEnumerable<IFileInfo> files = directory.EnumerateFiles();
+            this.ProcessFiles(directory.EnumerateFiles());
 
-            using (var provider = new PhysicalFileProvider(directory))
+            /*
+            using (var provider = new PhysicalFileProvider(directory.FullName))
             {
                 IDirectoryContents directoryContents = provider.GetDirectoryContents(string.Empty);
                 this.ProcessFiles(directoryContents);
             }
+            */
 
             return ScanResult.ScanSuccess;
+        }
+
+        public ScanResult ScanDirectory(string directory)
+        {
+            var fileSystem = new FileSystem();
+            var directoryInfo = fileSystem.DirectoryInfo.FromDirectoryName(directory);
+            return this.ScanDirectory(directoryInfo);
         }
 
         /// <summary>
@@ -84,7 +98,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             int scannedFiles = 0;
             int skippedFiles = 0;
 
-            foreach (IFileInfo file in files)
+            foreach (Microsoft.Extensions.FileProviders.IFileInfo file in files)
             {
                 if (file.IsDirectory)
                 {
@@ -97,7 +111,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     {
                         this.outputWriter.Write(file.PhysicalPath);
                         var hashString = this.GetBase64HashFromStream(fileStream);
-                        this.dataAccessProvider.AddFileRecord(file, hashString);
+                        //this.dataAccessProvider.AddFileRecord(file, hashString);
                         this.outputWriter.WriteLine($" [{hashString}]");
                         scannedFiles++;
                     }
@@ -106,6 +120,42 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 {
                     string msg = $"An error occurred while attempting to process "
                         + $"\"{file.PhysicalPath}\": \"{exception.Message}\"; skipping file.";
+                    this.outputWriter.WriteLine(msg);
+                    skippedFiles++;
+                }
+            }
+
+            this.outputWriter.WriteLine("Completed scanning {0} files.", scannedFiles);
+        }
+
+        /// <summary>
+        /// Hashes a set of files and records the filename and hash string.
+        /// </summary>
+        /// <param name="files">The set of files to hash and record.</param>
+        protected internal virtual void ProcessFiles(IEnumerable<System.IO.Abstractions.IFileInfo> files)
+        {
+            Contract.Requires(files != null);
+
+            int scannedFiles = 0;
+            int skippedFiles = 0;
+
+            foreach (System.IO.Abstractions.IFileInfo file in files)
+            {
+                try
+                {
+                    using (Stream fileStream = file.OpenRead())
+                    {
+                        this.outputWriter.Write(file.FullName);
+                        var hashString = this.GetBase64HashFromStream(fileStream);
+                        this.dataAccessProvider.AddFileRecord(file, hashString);
+                        this.outputWriter.WriteLine($" [{hashString}]");
+                        scannedFiles++;
+                    }
+                }
+                catch (IOException exception)
+                {
+                    string msg = $"An error occurred while attempting to process "
+                        + $"\"{file.FullName}\": \"{exception.Message}\"; skipping file.";
                     this.outputWriter.WriteLine(msg);
                     skippedFiles++;
                 }

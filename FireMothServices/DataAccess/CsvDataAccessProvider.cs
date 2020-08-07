@@ -8,9 +8,9 @@ namespace RiotClub.FireMoth.Services.DataAccess
     using System;
     using System.Globalization;
     using System.IO;
+    using System.IO.Abstractions;
     using CsvHelper;
     using FireMothServices.DataAccess;
-    using Microsoft.Extensions.FileProviders;
 
     /// <summary>
     /// Implementation of a data access provider that persists data to a stream in CSV format.
@@ -43,12 +43,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
             if (fileInfo == null)
             {
                 throw new ArgumentNullException(nameof(fileInfo));
-            }
-
-            if (fileInfo.PhysicalPath == null)
-            {
-                throw new ArgumentException(
-                    "Provided file is not directly accessible.", nameof(fileInfo));
             }
 
             if (base64Hash == null)
@@ -108,7 +102,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
             return Convert.TryFromBase64String(base64, buffer, out _);
         }
 
-
         /// <summary>
         /// Builds a <see cref="FileFingerprint"/> object from the provided <see cref="IFileInfo"/>
         /// and base 64 hash string.
@@ -123,7 +116,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         {
             return new FileFingerprint
             {
-                FilePath = Path.GetDirectoryName(fileInfo.PhysicalPath),
+                FilePath = Path.GetDirectoryName(fileInfo.FullName),
                 FileName = fileInfo.Name,
                 Base64Hash = base64Hash,
             };

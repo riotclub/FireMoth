@@ -131,6 +131,9 @@ namespace RiotClub.FireMoth.Console
                 var fileScanner = new FileScanner(
                     dataAccessProvider, hasher, this.statusOutputWriter);
 
+                DirectoryInfo scanDirectory =
+                    new DirectoryInfo(this.CommandLineOptions.ScanDirectory);
+
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 

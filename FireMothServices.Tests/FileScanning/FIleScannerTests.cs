@@ -6,7 +6,9 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.IO.Abstractions.TestingHelpers;
     using System.Security.Cryptography;
     using System.Text;
     using Moq;
@@ -15,17 +17,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
     /*
      * Constructor:
-     *  - IDataAccessProvider can't be null
-     *      - Ctor_NullDataAccessProvider_ThrowsArgumentNullException
-     *  - HashAlgorithm can't be null
-     *      - Ctor_NullHasher_ThrowsArgumentNullException
-     *  - TextWriter can't be null
-     *      - Ctor_NullOutputWriter_ThrowsArgumentNullException
+     *  * IDataAccessProvider can't be null
+     *      * Ctor_NullDataAccessProvider_ThrowsArgumentNullException
+     *  * HashAlgorithm can't be null
+     *      * Ctor_NullHashAlgorithm_ThrowsArgumentNullException
+     *  * TextWriter can't be null
+     *      * Ctor_NullTextWriter_ThrowsArgumentNullException
      * ScanDirectory:
-     * - directory can't be null
-     *      - ScanDirectory_NullDirectory_ThrowsArgumentNullException
-     * - directory must be valid
-     *      - ScanDirectory_InvalidDirectory_ReturnsScanFailureResult
+     * * directory must be valid
+     *      * ScanDirectory_NullDirectory_ThrowsArgumentNullException
+     *      * ScanDirectory_InvalidDirectory_ReturnsScanFailureResult
      * - valid directory returns successful scan result
      *      - ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
      * - valid empty directory returns successful scan result
@@ -46,6 +47,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
         private readonly Mock<HashAlgorithm> mockHashAlgorithm;
 
         private readonly StringWriter outputWriter;
+
+        private readonly IFileScanner defaultFileScanner;
 
         private readonly string tempDirectory;
 
@@ -103,13 +106,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 this.mockDataAccessProvider.Object,
                 this.mockHashAlgorithm.Object,
                 this.outputWriter);
+            string nullStr = null;
 
             // Act, Assert
-            Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(null));
+            Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(nullStr));
         }
 
-        [Fact]
-        public void ScanDirectory_ReturnsScanSuccessScanResult()
+        [Theory]
+        [InlineData(@"C:\path/with|invalid/chars")]
+        [InlineData(@"\\:\\||>\a\b::t<")]
+        public void ScanDirectory_InvalidDirectory_ReturnsScanFailureResult(string directory)
         {
             // Arrange
             FileScanner fileScanner = new FileScanner(
@@ -117,8 +123,29 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 this.mockHashAlgorithm.Object,
                 this.outputWriter);
 
+            // Act, Assert
+            Assert.Equal(ScanResult.ScanFailure, fileScanner.ScanDirectory(directory));
+        }
+
+        [Fact]
+        public void ScanDirectory_ValidDirectory_ReturnsScanSuccessResult()
+        {
+            // Arrange
+            FileScanner fileScanner = new FileScanner(
+                this.mockDataAccessProvider.Object,
+                this.mockHashAlgorithm.Object,
+                this.outputWriter);
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\TestFile.txt", new MockFileData("000") },
+                { @"c:\testdirectory\subdir\SubdirFileA", new MockFileData("111") },
+                { @"c:\testdirectory\subdir\SubdirFileB", new MockFileData("222") },
+            });
+
+            var testDirectory = fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory");
+
             // Act
-            ScanResult result = fileScanner.ScanDirectory(this.tempDirectory);
+            ScanResult result = fileScanner.ScanDirectory(testDirectory);
 
             // Assert
             Assert.Equal(ScanResult.ScanSuccess, result);

@@ -18,7 +18,7 @@
             <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not
             be closed when the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> is disposed.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(System.IO.Abstractions.IFileInfo,System.String)">
             <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.Dispose">
@@ -37,12 +37,12 @@
             <param name="base64">A <see cref="T:System.String"/> to check for base 64 validity.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.BuildFileFingerprint(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.BuildFileFingerprint(System.IO.Abstractions.IFileInfo,System.String)">
             <summary>
-            Builds a <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> object from the provided <see cref="T:Microsoft.Extensions.FileProviders.IFileInfo"/>
+            Builds a <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> object from the provided <see cref="T:System.IO.Abstractions.IFileInfo"/>
             and base 64 hash string.
             </summary>
-            <param name="fileInfo">The <see cref="T:Microsoft.Extensions.FileProviders.IFileInfo"/> implementation containing the file
+            <param name="fileInfo">The <see cref="T:System.IO.Abstractions.IFileInfo"/> implementation containing the file
             information to use for the returned <see cref="T:FireMothServices.DataAccess.FileFingerprint"/>.</param>
             <param name="base64Hash">A <c>string</c> containing the base 64 hash string to use in
             the returned <see cref="T:FireMothServices.DataAccess.FileFingerprint"/>.</param>
@@ -54,11 +54,11 @@
             Defines the public interface for a class that implements data access and persistence operations.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(Microsoft.Extensions.FileProviders.IFileInfo,System.String)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(System.IO.Abstractions.IFileInfo,System.String)">
             <summary>
             Adds a file and its hash value to the backing store.
             </summary>
-            <param name="fileInfo">A <see cref="T:Microsoft.Extensions.FileProviders.IFileInfo"/> containing the properties of the file to store.</param>
+            <param name="fileInfo">A <see cref="T:System.IO.Abstractions.IFileInfo"/> containing the properties of the file to store.</param>
             <param name="base64Hash">The hash value of the file represented by <paramref name="fileInfo"/> in base 64.
             </param>
         </member>
@@ -78,7 +78,7 @@
             for scanned files.</param>
             <param name="outputWriter">A <see cref="T:System.IO.TextWriter"/> used for status output.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.String)">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo)">
             <summary>
             Scans the provided directory, generates hash data for each file, and writes the file and
             hash data to a stream.
@@ -88,6 +88,12 @@
             </returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(Microsoft.Extensions.FileProviders.IDirectoryContents)">
+            <summary>
+            Hashes a set of files and records the filename and hash string.
+            </summary>
+            <param name="files">The set of files to hash and record.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo})">
             <summary>
             Hashes a set of files and records the filename and hash string.
             </summary>
