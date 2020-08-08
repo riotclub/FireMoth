@@ -5,6 +5,8 @@
 
 namespace RiotClub.FireMoth.Services.FileScanning
 {
+    using System.IO.Abstractions;
+
     /// <summary>
     /// Defines the public interface for a class that implements a directory scanner. A directory scanner is responsible
     /// for reading, analyzing, and persisting a hash or other signature that uniquely identifies a file and its
@@ -19,6 +21,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <param name="directory">The path of the directory to scan.</param>
         /// <returns>A <see cref="ScanResult"/> value indicating the result of the directory scanning operation.
         /// </returns>
-        public ScanResult ScanDirectory(string directory);
+        public ScanResult ScanDirectory(IDirectoryInfo directory);
     }
 }
