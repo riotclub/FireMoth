@@ -65,24 +65,26 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public void AddFileRecord_NullFileInfo_ThrowsArgumentNullException()
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentNullException>(() =>
-                testObject.AddFileRecord(null, this.testBase64Hash));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    testObject.AddFileRecord(null, this.testBase64Hash));
+            }
         }
 
         [Fact]
         public void AddFileRecord_NullHash_ThrowsArgumentNullException()
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentNullException>(() =>
-                testObject.AddFileRecord(this.mockFileInfo.Object, null));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    testObject.AddFileRecord(this.mockFileInfo.Object, null));
+            }
         }
 
         [Theory]
@@ -93,12 +95,13 @@ namespace RiotClub.FireMoth.Services.FileScanning
             string hashString)
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() =>
-                testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentException>(() =>
+                    testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            }
         }
 
         [Theory]
@@ -108,12 +111,13 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public void AddFileRecord_InvalidBase64Hash_ThrowsArgumentException(string hashString)
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() =>
-                testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentException>(() =>
+                    testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            }
         }
 
         [Fact]
@@ -134,10 +138,11 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             var mockStreamWriter = new Mock<TextWriter>();
 
-            CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object);
-
-            // Act
-            testobject.AddFileRecord(mockFileInfo.Object, testHash);
+            using (CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object))
+            {
+                // Act
+                testobject.AddFileRecord(mockFileInfo.Object, testHash);
+            }
 
             // Assert
             mockStreamWriter.Verify(writer => writer.Write(testPathWithQuotes));

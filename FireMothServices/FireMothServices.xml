@@ -114,7 +114,7 @@
             contents.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.IFileScanner.ScanDirectory(System.String)">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.IFileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo)">
             <summary>
             Scans the provided directory, analyzing and storing hashes or signatures that uniquely identify the files
             contained within.
