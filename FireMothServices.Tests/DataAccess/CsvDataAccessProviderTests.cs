@@ -7,7 +7,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
     using System.IO;
-    //using Microsoft.Extensions.FileProviders;
     using System.IO.Abstractions;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;

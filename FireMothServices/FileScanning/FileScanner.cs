@@ -66,66 +66,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
             }
 
             this.outputWriter.WriteLine($"Scanning directory \"{directory}\"...");
-            //IEnumerable<IFileInfo> files = directory.EnumerateFiles();
             this.ProcessFiles(directory.EnumerateFiles());
 
-            /*
-            using (var provider = new PhysicalFileProvider(directory.FullName))
-            {
-                IDirectoryContents directoryContents = provider.GetDirectoryContents(string.Empty);
-                this.ProcessFiles(directoryContents);
-            }
-            */
-
             return ScanResult.ScanSuccess;
-        }
-
-        public ScanResult ScanDirectory(string directory)
-        {
-            var fileSystem = new FileSystem();
-            var directoryInfo = fileSystem.DirectoryInfo.FromDirectoryName(directory);
-            return this.ScanDirectory(directoryInfo);
-        }
-
-        /// <summary>
-        /// Hashes a set of files and records the filename and hash string.
-        /// </summary>
-        /// <param name="files">The set of files to hash and record.</param>
-        protected internal virtual void ProcessFiles(IDirectoryContents files)
-        {
-            Contract.Requires(files != null);
-
-            int scannedFiles = 0;
-            int skippedFiles = 0;
-
-            foreach (Microsoft.Extensions.FileProviders.IFileInfo file in files)
-            {
-                if (file.IsDirectory)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    using (Stream fileStream = file.CreateReadStream())
-                    {
-                        this.outputWriter.Write(file.PhysicalPath);
-                        var hashString = this.GetBase64HashFromStream(fileStream);
-                        //this.dataAccessProvider.AddFileRecord(file, hashString);
-                        this.outputWriter.WriteLine($" [{hashString}]");
-                        scannedFiles++;
-                    }
-                }
-                catch (IOException exception)
-                {
-                    string msg = $"An error occurred while attempting to process "
-                        + $"\"{file.PhysicalPath}\": \"{exception.Message}\"; skipping file.";
-                    this.outputWriter.WriteLine(msg);
-                    skippedFiles++;
-                }
-            }
-
-            this.outputWriter.WriteLine("Completed scanning {0} files.", scannedFiles);
         }
 
         /// <summary>
@@ -154,7 +97,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
                 catch (IOException exception)
                 {
-                    string msg = $"An error occurred while attempting to process "
+                    var msg = $"An error occurred while attempting to process "
                         + $"\"{file.FullName}\": \"{exception.Message}\"; skipping file.";
                     this.outputWriter.WriteLine(msg);
                     skippedFiles++;

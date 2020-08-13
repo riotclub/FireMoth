@@ -87,12 +87,6 @@
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> inticating the result of the scanning operation.
             </returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(Microsoft.Extensions.FileProviders.IDirectoryContents)">
-            <summary>
-            Hashes a set of files and records the filename and hash string.
-            </summary>
-            <param name="files">The set of files to hash and record.</param>
-        </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo})">
             <summary>
             Hashes a set of files and records the filename and hash string.

@@ -17,7 +17,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     /// </summary>
     public class CsvDataAccessProvider : IDataAccessProvider, IDisposable
     {
-        private CsvWriter csvWriter;
+        private readonly CsvWriter csvWriter;
         private bool disposed;
 
         /// <summary>

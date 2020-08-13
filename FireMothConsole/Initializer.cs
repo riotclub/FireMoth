@@ -10,6 +10,7 @@ namespace RiotClub.FireMoth.Console
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.IO.Abstractions;
     using System.Security.Cryptography;
     using System.Text.RegularExpressions;
     using CommandLine;
@@ -130,15 +131,12 @@ namespace RiotClub.FireMoth.Console
             {
                 var fileScanner = new FileScanner(
                     dataAccessProvider, hasher, this.statusOutputWriter);
-
-                DirectoryInfo scanDirectory =
-                    new DirectoryInfo(this.CommandLineOptions.ScanDirectory);
+                var scanDirectory = new FileSystem().DirectoryInfo.FromDirectoryName(
+                    this.CommandLineOptions.ScanDirectory);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-
-                scanResult = fileScanner.ScanDirectory(this.CommandLineOptions.ScanDirectory);
-
+                scanResult = fileScanner.ScanDirectory(scanDirectory);
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
 

@@ -24,6 +24,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.1.5" />
+    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
