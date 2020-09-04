@@ -136,7 +136,7 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                scanResult = fileScanner.ScanDirectory(scanDirectory);
+                scanResult = fileScanner.ScanDirectory(scanDirectory, false);
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
@@ -153,8 +153,9 @@ namespace RiotClub.FireMoth.Console
         /// <returns><c>true</c> if the provided path contains invalid path characters.</returns>
         private static bool ContainsInvalidPathCharacters(string testPath)
         {
+            var invalidPathChars = new FileSystem().Path.GetInvalidPathChars();
             Regex invalidPathCharacters = new Regex(
-                "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+                "[" + Regex.Escape(new string(invalidPathChars)) + "]");
             if (invalidPathCharacters.IsMatch(testPath))
             {
                 return true;

@@ -41,6 +41,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
      * - valid directory in recursive mode adds records for all files contained within directory,
      *   including subdirectories
      *      - ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
+     *      - ScanDirectory_NonRecursiveScan_IgnoresSubdirectories
      */
     public class FileScannerTests : IDisposable
     {
@@ -111,7 +112,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 this.outputWriter);
 
             // Act, Assert
-            Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(null));
+            Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(null, false));
         }
 
         [Theory]
@@ -127,7 +128,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var testDirectory = this.testFileSystem.DirectoryInfo.FromDirectoryName(directory);
 
             // Act, Assert
-            Assert.Equal(ScanResult.ScanFailure, fileScanner.ScanDirectory(testDirectory));
+            Assert.Equal(ScanResult.ScanFailure, fileScanner.ScanDirectory(testDirectory, false));
         }
 
         [Fact]
@@ -148,7 +149,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var testDirectory = fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory");
 
             // Act
-            ScanResult result = fileScanner.ScanDirectory(testDirectory);
+            ScanResult result = fileScanner.ScanDirectory(testDirectory, false);
 
             // Assert
             Assert.Equal(ScanResult.ScanSuccess, result);
@@ -170,7 +171,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var testDirectory = fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory");
 
             // Act
-            ScanResult result = fileScanner.ScanDirectory(testDirectory);
+            ScanResult result = fileScanner.ScanDirectory(testDirectory, false);
 
             // Assert
             Assert.Equal(ScanResult.ScanSuccess, result);
@@ -192,7 +193,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Act
             var result = fileScanner.ScanDirectory(
-                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"));
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
 
             // Assert
             mockDataAccessProvider.Verify(
@@ -210,8 +211,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
                 { @"c:\testdirectory\YetAnotherFile.xml", new MockFileData("333") },
             });
-            var allFiles =
-                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory").EnumerateFiles();
 
             var mockDataAccessProvider = new Mock<IDataAccessProvider>();
             var fileScanner = new FileScanner(
@@ -219,12 +218,53 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Act
             var result = fileScanner.ScanDirectory(
-                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"));
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
 
             // Assert
             mockDataAccessProvider.Verify(
                 dap => dap.AddFileRecord(It.IsAny<IFileInfo>(), It.IsAny<string>()),
                 Times.Exactly(fileSystem.AllFiles.Count()));
+        }
+
+        /*
+         * - valid directory in recursive mode adds records for all files contained within directory,
+         *   including subdirectories
+         *      - ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
+         */
+        [Theory]
+        [InlineData(@"c:\testdirectory\test\testfile")]
+        [InlineData(@"c:\testdirectory\subdirectoryA\testsubdirFile.xml")]
+        [InlineData(@"c:\testdirectory\subdirectoryA\nestedsubdir\nestedsubdirfile")]
+        [InlineData(@"c:\testdirectory\subdirectoryB\000.txt")]
+        public void ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider(
+            string subdirectoryFile)
+        {
+            // Arrange
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\SomeFile.txt", new MockFileData("111") },
+                { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
+                { @"c:\testdirectory\subdirectoryA\GoodFile.xml", new MockFileData("333") },
+                { @"c:\testdirectory\subdirectoryA\BadFile.exe", new MockFileData("000") },
+                { @"c:\testdirectory\subdirectoryB\AverageFile", new MockFileData("AAA") },
+            });
+            MockFileInfo mockFileInfo = new MockFileInfo(fileSystem, subdirectoryFile);
+            fileSystem.AddFile(mockFileInfo.FullName, new MockFileData("000"));
+
+            var mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            var fileScanner = new FileScanner(
+                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+
+            // Act
+            fileScanner.ScanDirectory(
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), true);
+
+            // Assert
+            mockDataAccessProvider.Verify(dap =>
+                dap.AddFileRecord(
+                    It.Is<IFileInfo>(file =>
+                        file.FullName.Equals(subdirectoryFile, StringComparison.OrdinalIgnoreCase)),
+                    It.IsAny<string>()));
         }
 
         /// <inheritdoc/>

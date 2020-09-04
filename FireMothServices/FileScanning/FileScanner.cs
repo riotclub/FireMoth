@@ -12,6 +12,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.IO.Abstractions;
+    using System.Linq;
     using System.Security.Cryptography;
     using Microsoft.Extensions.FileProviders;
     using RiotClub.FireMoth.Services.DataAccess;
@@ -24,7 +25,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     {
         private readonly IDataAccessProvider dataAccessProvider;
         private readonly HashAlgorithm hasher;
-        private readonly TextWriter outputWriter;
+        private readonly TextWriter logWriter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileScanner"/> class.
@@ -33,26 +34,21 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// access to the application backing store.</param>
         /// <param name="hasher">A <see cref="HashAlgorithm"/> that is used to compute hash values
         /// for scanned files.</param>
-        /// <param name="outputWriter">A <see cref="TextWriter"/> used for status output.</param>
+        /// <param name="logWriter">A <see cref="TextWriter"/> to which logging output will be
+        /// written.</param>
         public FileScanner(
-            IDataAccessProvider dataAccessProvider, HashAlgorithm hasher, TextWriter outputWriter)
+            IDataAccessProvider dataAccessProvider, HashAlgorithm hasher, TextWriter logWriter)
         {
             this.dataAccessProvider =
                 dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
             this.hasher =
                 hasher ?? throw new ArgumentNullException(nameof(hasher));
-            this.outputWriter =
-                outputWriter ?? throw new ArgumentNullException(nameof(outputWriter));
+            this.logWriter =
+                logWriter ?? throw new ArgumentNullException(nameof(logWriter));
         }
 
-        /// <summary>
-        /// Scans the provided directory, generates hash data for each file, and writes the file and
-        /// hash data to a stream.
-        /// </summary>
-        /// <param name="directory">The directory to scan.</param>
-        /// <returns>A <see cref="ScanResult"/> inticating the result of the scanning operation.
-        /// </returns>
-        public ScanResult ScanDirectory(IDirectoryInfo directory)
+        /// <inheritdoc/>
+        public ScanResult ScanDirectory(IDirectoryInfo directory, bool recursive)
         {
             if (directory == null)
             {
@@ -61,11 +57,20 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             if (!directory.Exists)
             {
-                this.outputWriter.WriteLine("Error: \"{0}\" is not a valid directory.", directory);
+                this.logWriter.WriteLine("Error: \"{0}\" is not a valid directory.", directory);
                 return ScanResult.ScanFailure;
             }
 
-            this.outputWriter.WriteLine($"Scanning directory \"{directory}\"...");
+            this.logWriter.WriteLine($"Scanning directory \"{directory}\"...");
+
+            if (recursive && directory.EnumerateDirectories().Any())
+            {
+                foreach (IDirectoryInfo subDirectory in directory.EnumerateDirectories())
+                {
+                    this.ScanDirectory(subDirectory, true);
+                }
+            }
+
             this.ProcessFiles(directory.EnumerateFiles());
 
             return ScanResult.ScanSuccess;
@@ -75,7 +80,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// Hashes a set of files and records the filename and hash string.
         /// </summary>
         /// <param name="files">The set of files to hash and record.</param>
-        protected internal virtual void ProcessFiles(IEnumerable<System.IO.Abstractions.IFileInfo> files)
+        protected internal virtual void ProcessFiles(
+            IEnumerable<System.IO.Abstractions.IFileInfo> files)
         {
             Contract.Requires(files != null);
 
@@ -88,10 +94,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 {
                     using (Stream fileStream = file.OpenRead())
                     {
-                        this.outputWriter.Write(file.FullName);
+                        this.logWriter.Write(file.FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
                         this.dataAccessProvider.AddFileRecord(file, hashString);
-                        this.outputWriter.WriteLine($" [{hashString}]");
+                        this.logWriter.WriteLine($" [{hashString}]");
                         scannedFiles++;
                     }
                 }
@@ -99,12 +105,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 {
                     var msg = $"An error occurred while attempting to process "
                         + $"\"{file.FullName}\": \"{exception.Message}\"; skipping file.";
-                    this.outputWriter.WriteLine(msg);
+                    this.logWriter.WriteLine(msg);
                     skippedFiles++;
                 }
             }
 
-            this.outputWriter.WriteLine("Completed scanning {0} files.", scannedFiles);
+            this.logWriter.WriteLine("Completed scanning {0} files.", scannedFiles);
         }
 
         /// <summary>

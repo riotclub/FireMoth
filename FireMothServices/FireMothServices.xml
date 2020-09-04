@@ -76,16 +76,11 @@
             access to the application backing store.</param>
             <param name="hasher">A <see cref="T:System.Security.Cryptography.HashAlgorithm"/> that is used to compute hash values
             for scanned files.</param>
-            <param name="outputWriter">A <see cref="T:System.IO.TextWriter"/> used for status output.</param>
+            <param name="logWriter">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
+            written.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo)">
-            <summary>
-            Scans the provided directory, generates hash data for each file, and writes the file and
-            hash data to a stream.
-            </summary>
-            <param name="directory">The directory to scan.</param>
-            <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> inticating the result of the scanning operation.
-            </returns>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
+            <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo})">
             <summary>
@@ -108,12 +103,14 @@
             contents.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.IFileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo)">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.IFileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
             <summary>
             Scans the provided directory, analyzing and storing hashes or signatures that uniquely identify the files
             contained within.
             </summary>
             <param name="directory">The path of the directory to scan.</param>
+            <param name="recursive">Determines whether subdirectories of the provided directory are
+            recursively scanned.</param>
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the directory scanning operation.
             </returns>
         </member>
