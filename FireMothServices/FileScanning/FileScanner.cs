@@ -47,6 +47,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 logWriter ?? throw new ArgumentNullException(nameof(logWriter));
         }
 
+        /// <summary>
+        /// Gets the total number of files scanned by this <see cref="FileScanner"/>.
+        /// </summary>
+        public int TotalFilesScanned { get; private set; }
+
+        /// <summary>
+        /// Gets the total number of files that were skpped by this <see cref="FileScanner"/>.
+        /// </summary>
+        public int TotalFilesSkipped { get; private set; }
+
         /// <inheritdoc/>
         public ScanResult ScanDirectory(IDirectoryInfo directory, bool recursive)
         {
@@ -71,7 +81,15 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
             }
 
-            this.ProcessFiles(directory.EnumerateFiles());
+            (int scannedFiles, int skippedFiles) scanCount =
+                this.ProcessFiles(directory.EnumerateFiles());
+            this.logWriter.WriteLine(
+                "Completed scanning \"{0}\" ({1}/{2} file(s) scanned).",
+                directory.FullName,
+                scanCount.scannedFiles,
+                scanCount.scannedFiles + scanCount.skippedFiles);
+            this.TotalFilesScanned += scanCount.scannedFiles;
+            this.TotalFilesSkipped += scanCount.skippedFiles;
 
             return ScanResult.ScanSuccess;
         }
@@ -80,7 +98,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// Hashes a set of files and records the filename and hash string.
         /// </summary>
         /// <param name="files">The set of files to hash and record.</param>
-        protected internal virtual void ProcessFiles(
+        /// <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
+        /// number of files skipped, respectively.</returns>
+        protected internal virtual (int scannedFiles, int skippedFiles) ProcessFiles(
             IEnumerable<System.IO.Abstractions.IFileInfo> files)
         {
             Contract.Requires(files != null);
@@ -110,7 +130,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
             }
 
-            this.logWriter.WriteLine("Completed scanning {0} files.", scannedFiles);
+            return (scannedFiles, skippedFiles);
         }
 
         /// <summary>

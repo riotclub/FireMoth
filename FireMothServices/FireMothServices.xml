@@ -79,6 +79,16 @@
             <param name="logWriter">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
             written.</param>
         </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.FileScanner.TotalFilesScanned">
+            <summary>
+            Gets the total number of files scanned by this <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/>.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.FileScanner.TotalFilesSkipped">
+            <summary>
+            Gets the total number of files that were skpped by this <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/>.
+            </summary>
+        </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
             <inheritdoc/>
         </member>
@@ -87,6 +97,8 @@
             Hashes a set of files and records the filename and hash string.
             </summary>
             <param name="files">The set of files to hash and record.</param>
+            <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
+            number of files skipped, respectively.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.GetBase64HashFromStream(System.IO.Stream)">
             <summary>

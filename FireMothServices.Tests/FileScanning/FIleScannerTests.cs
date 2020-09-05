@@ -226,11 +226,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 Times.Exactly(fileSystem.AllFiles.Count()));
         }
 
-        /*
-         * - valid directory in recursive mode adds records for all files contained within directory,
-         *   including subdirectories
-         *      - ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
-         */
         [Theory]
         [InlineData(@"c:\testdirectory\test\testfile")]
         [InlineData(@"c:\testdirectory\subdirectoryA\testsubdirFile.xml")]

@@ -136,11 +136,20 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                scanResult = fileScanner.ScanDirectory(scanDirectory, false);
+                scanResult = fileScanner.ScanDirectory(scanDirectory, true);
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
-                this.statusOutputWriter.WriteLine($"Scan time: {timeSpan}");
+                this.statusOutputWriter.WriteLine(
+                    "Scan complete. Scanned {0} files.", fileScanner.TotalFilesScanned);
+                if (fileScanner.TotalFilesSkipped > 0)
+                {
+                    this.statusOutputWriter.WriteLine(
+                        "{0} files could not be scanned due to errors.",
+                        fileScanner.TotalFilesSkipped);
+                }
+
+                this.statusOutputWriter.WriteLine($"Total scan time: {timeSpan}");
             }
 
             return scanResult == ScanResult.ScanSuccess ? ExitState.Normal : ExitState.RuntimeError;
