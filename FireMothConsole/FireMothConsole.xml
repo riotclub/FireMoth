@@ -11,7 +11,13 @@
         </member>
         <member name="P:FireMothConsole.CommandLineOptions.ScanDirectory">
             <summary>
-            Gets or sets the Directory option, indicating the input directory to scan.
+            Gets or sets the ScanDirectory option, indicating the input directory to scan.
+            </summary>
+        </member>
+        <member name="P:FireMothConsole.CommandLineOptions.RecursiveScan">
+            <summary>
+            Gets or sets a value indicating whether subdirectories of <see cref="P:FireMothConsole.CommandLineOptions.ScanDirectory"/>
+            will be recursively scanned in addition to its file contents.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Console.ExitState">

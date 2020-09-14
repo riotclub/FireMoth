@@ -23,6 +23,12 @@ namespace RiotClub.FireMoth.Console
      *      x Initialize_UnknownArgument_ReturnsFalse
      *      x Initialize_UnknownArgument_OutputsError
      *
+     * x Init with recursive scan flag argument.
+     *      x Initialize_RecursiveFlagArgumentExists_SetsRecursiveScanOptionToTrue
+     *
+     * x Init without recursive scan flag argument.
+     *      x Initialize_RecursiveFlagArgumentDoesNotExist_SetsRecursiveScanOptionToFalse
+
      * x Init with invalid directory argument displays error (don't check for directory existence).
      *      x Initialize_InvalidDirectoryArgument_ReturnsFalse
      *      x Initialize_InvalidDirectoryArgument_OutputsError
@@ -72,6 +78,37 @@ namespace RiotClub.FireMoth.Console
             // Assert
             Assert.NotNull(initializer.CommandLineOptions);
             Assert.Equal(testValue, initializer.CommandLineOptions.ScanDirectory);
+        }
+
+        [Theory]
+        [InlineData("--recursive")]
+        [InlineData("-r")]
+        public void Initialize_RecursiveFlagArgumentExists_SetsRecursiveScanOptionToTrue(
+            string recursiveFlag)
+        {
+            // Arrange
+            string[] arguments = { "--directory", @"C:\testdir", recursiveFlag };
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            initializer.Initialize();
+
+            // Assert
+            Assert.True(initializer.CommandLineOptions.RecursiveScan);
+        }
+
+        [Fact]
+        public void Initialize_RecursiveFlagArgumentDoesNotExist_SetsRecursiveScanOptionToFalse()
+        {
+            // Arrange
+            string[] arguments = { "--directory", @"C:\testdir" };
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            initializer.Initialize();
+
+            // Assert
+            Assert.False(initializer.CommandLineOptions.RecursiveScan);
         }
 
         [Fact]

@@ -10,6 +10,7 @@ namespace RiotClub.FireMoth.Console
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.IO.Abstractions;
     using System.Security.Cryptography;
     using System.Text.RegularExpressions;
     using CommandLine;
@@ -130,16 +131,26 @@ namespace RiotClub.FireMoth.Console
             {
                 var fileScanner = new FileScanner(
                     dataAccessProvider, hasher, this.statusOutputWriter);
+                var scanDirectory = new FileSystem().DirectoryInfo.FromDirectoryName(
+                    this.CommandLineOptions.ScanDirectory);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-
-                scanResult = fileScanner.ScanDirectory(this.CommandLineOptions.ScanDirectory);
-
+                scanResult = fileScanner.ScanDirectory(
+                    scanDirectory, this.CommandLineOptions.RecursiveScan);
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
-                this.statusOutputWriter.WriteLine($"Scan time: {timeSpan}");
+                this.statusOutputWriter.WriteLine(
+                    "Scan complete. Scanned {0} files.", fileScanner.TotalFilesScanned);
+                if (fileScanner.TotalFilesSkipped > 0)
+                {
+                    this.statusOutputWriter.WriteLine(
+                        "{0} files could not be scanned due to errors.",
+                        fileScanner.TotalFilesSkipped);
+                }
+
+                this.statusOutputWriter.WriteLine($"Total scan time: {timeSpan}");
             }
 
             return scanResult == ScanResult.ScanSuccess ? ExitState.Normal : ExitState.RuntimeError;
@@ -152,8 +163,9 @@ namespace RiotClub.FireMoth.Console
         /// <returns><c>true</c> if the provided path contains invalid path characters.</returns>
         private static bool ContainsInvalidPathCharacters(string testPath)
         {
+            var invalidPathChars = new FileSystem().Path.GetInvalidPathChars();
             Regex invalidPathCharacters = new Regex(
-                "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+                "[" + Regex.Escape(new string(invalidPathChars)) + "]");
             if (invalidPathCharacters.IsMatch(testPath))
             {
                 return true;

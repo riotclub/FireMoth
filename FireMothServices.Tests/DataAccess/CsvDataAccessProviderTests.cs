@@ -7,7 +7,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
     using System.IO;
-    using Microsoft.Extensions.FileProviders;
+    using System.IO.Abstractions;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
     using Xunit;
@@ -41,9 +41,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
         public CsvDataAccessProviderTests()
         {
-            this.mockFileInfo = new Mock<Microsoft.Extensions.FileProviders.IFileInfo>();
+            this.mockFileInfo = new Mock<IFileInfo>();
             this.mockFileInfo
-                .SetupGet(mock => mock.PhysicalPath)
+                .SetupGet(mock => mock.FullName)
                 .Returns(this.testFilePath + Path.DirectorySeparatorChar + this.testFileName);
             this.mockFileInfo
                 .SetupGet(mock => mock.Name)
@@ -64,38 +64,26 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public void AddFileRecord_NullFileInfo_ThrowsArgumentNullException()
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentNullException>(() =>
-                testObject.AddFileRecord(null, this.testBase64Hash));
-        }
-
-        [Fact]
-        public void AddFileRecord_NullFileInfoPhysicalPath_ThrowsArgumentException()
-        {
-            // Arrange
-            var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(() => null);
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() =>
-                testObject.AddFileRecord(mockFileInfo.Object, this.testBase64Hash));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    testObject.AddFileRecord(null, this.testBase64Hash));
+            }
         }
 
         [Fact]
         public void AddFileRecord_NullHash_ThrowsArgumentNullException()
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentNullException>(() =>
-                testObject.AddFileRecord(this.mockFileInfo.Object, null));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    testObject.AddFileRecord(this.mockFileInfo.Object, null));
+            }
         }
 
         [Theory]
@@ -106,12 +94,13 @@ namespace RiotClub.FireMoth.Services.FileScanning
             string hashString)
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() =>
-                testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentException>(() =>
+                    testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            }
         }
 
         [Theory]
@@ -121,12 +110,13 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public void AddFileRecord_InvalidBase64Hash_ThrowsArgumentException(string hashString)
         {
             // Arrange
-            CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() =>
-                testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            using (CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
+            {
+                // Act, Assert
+                Assert.Throws<ArgumentException>(() =>
+                    testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+            }
         }
 
         [Fact]
@@ -142,15 +132,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Arrange
             var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(testFullPath);
+            mockFileInfo.SetupGet(mock => mock.FullName).Returns(testFullPath);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
             var mockStreamWriter = new Mock<TextWriter>();
 
-            CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object);
-
-            // Act
-            testobject.AddFileRecord(mockFileInfo.Object, testHash);
+            using (CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object))
+            {
+                // Act
+                testobject.AddFileRecord(mockFileInfo.Object, testHash);
+            }
 
             // Assert
             mockStreamWriter.Verify(writer => writer.Write(testPathWithQuotes));
@@ -167,7 +158,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Arrange
             var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.PhysicalPath).Returns(file);
+            mockFileInfo.SetupGet(mock => mock.FullName).Returns(file);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
             var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Default);

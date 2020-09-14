@@ -6,7 +6,11 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.IO.Abstractions;
+    using System.IO.Abstractions.TestingHelpers;
+    using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
     using Moq;
@@ -15,19 +19,29 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
     /*
      * Constructor:
-     *  - IDataAccessProvider can't be null
-     *      - Ctor_NullDataAccessProvider_ThrowsArgumentNullException
-     *  - HashAlgorithm can't be null
-     *      - Ctor_NullHasher_ThrowsArgumentNullException
-     *  - TextWriter can't be null
-     *      - Ctor_NullOutputWriter_ThrowsArgumentNullException
+     *  * IDataAccessProvider can't be null
+     *      * Ctor_NullDataAccessProvider_ThrowsArgumentNullException
+     *  * HashAlgorithm can't be null
+     *      * Ctor_NullHashAlgorithm_ThrowsArgumentNullException
+     *  * TextWriter can't be null
+     *      * Ctor_NullTextWriter_ThrowsArgumentNullException
      * ScanDirectory:
-     * - directory can't be null
-     *      - ScanDirectory_NullDirectory_ThrowsArgumentNullException
-     * - directory must be valid
-     *      - ScanDirectory_InvalidDirectory_ReturnsScanFailureResult
-     * - valid directory results in successful scan
-     *      - ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
+     * * directory must be valid
+     *      * ScanDirectory_NullDirectory_ThrowsArgumentNullException
+     *      * ScanDirectory_InvalidDirectory_ReturnsScanFailureResult
+     * * valid directory returns successful scan result
+     *      * ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
+     * * valid empty directory returns successful scan result
+     *      * ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult
+     * * valid empty directory does not add records to data access provider
+     *      * ScanDirectory_EmptyDirectory_NoRecordsAddedToDataAccessProvider
+     * - valid directory with files adds records for all files contained within directory to the
+     *   data access provider
+     *      * ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
+     * - valid directory in recursive mode adds records for all files contained within directory,
+     *   including subdirectories
+     *      - ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
+     *      - ScanDirectory_NonRecursiveScan_IgnoresSubdirectories
      */
     public class FileScannerTests : IDisposable
     {
@@ -39,6 +53,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
         private readonly string tempDirectory;
 
+        private readonly FileSystem testFileSystem;
+
         private bool disposed = false;
 
         public FileScannerTests()
@@ -49,6 +65,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             this.mockDataAccessProvider
                 .Setup(provider => provider.AddFileRecord())
             */
+            this.testFileSystem = new FileSystem();
 
             this.outputWriter = new StringWriter(new StringBuilder());
 
@@ -86,7 +103,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         [Fact]
-        public void ScanDirectory_ReturnsScanSuccessScanResult()
+        public void ScanDirectory_NullDirectory_ThrowsArgumentNullException()
         {
             // Arrange
             FileScanner fileScanner = new FileScanner(
@@ -94,11 +111,183 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 this.mockHashAlgorithm.Object,
                 this.outputWriter);
 
+            // Act, Assert
+            Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(null, false));
+        }
+
+        [Theory]
+        [InlineData(@"C:\path/with|invalid/chars")]
+        [InlineData(@"\\:\\||>\a\b::t<")]
+        public void ScanDirectory_InvalidDirectory_ReturnsScanFailureResult(string directory)
+        {
+            // Arrange
+            FileScanner fileScanner = new FileScanner(
+                this.mockDataAccessProvider.Object,
+                this.mockHashAlgorithm.Object,
+                this.outputWriter);
+            var testDirectory = this.testFileSystem.DirectoryInfo.FromDirectoryName(directory);
+
+            // Act, Assert
+            Assert.Equal(ScanResult.ScanFailure, fileScanner.ScanDirectory(testDirectory, false));
+        }
+
+        [Fact]
+        public void ScanDirectory_ValidDirectory_ReturnsScanSuccessResult()
+        {
+            // Arrange
+            FileScanner fileScanner = new FileScanner(
+                this.mockDataAccessProvider.Object,
+                this.mockHashAlgorithm.Object,
+                this.outputWriter);
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\TestFile.txt", new MockFileData("000") },
+                { @"c:\testdirectory\subdir\SubdirFileA", new MockFileData("111") },
+                { @"c:\testdirectory\subdir\SubdirFileB", new MockFileData("222") },
+            });
+
+            var testDirectory = fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory");
+
             // Act
-            ScanResult result = fileScanner.ScanDirectory(this.tempDirectory);
+            ScanResult result = fileScanner.ScanDirectory(testDirectory, false);
 
             // Assert
             Assert.Equal(ScanResult.ScanSuccess, result);
+        }
+
+        [Fact]
+        public void ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult()
+        {
+            // Arrange
+            FileScanner fileScanner = new FileScanner(
+                this.mockDataAccessProvider.Object,
+                this.mockHashAlgorithm.Object,
+                this.outputWriter);
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\subdir\SubdirFile.txt", new MockFileData("111") },
+            });
+
+            var testDirectory = fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory");
+
+            // Act
+            ScanResult result = fileScanner.ScanDirectory(testDirectory, false);
+
+            // Assert
+            Assert.Equal(ScanResult.ScanSuccess, result);
+        }
+
+        [Fact]
+        public void ScanDirectory_EmptyDirectory_NoRecordsAddedToDataAccessProvider()
+        {
+            // Arrange
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\subdirA\SubdirFile.txt", new MockFileData("111") },
+                { @"c:\testdirectory\subdirB\SubdirFile.txt", new MockFileData("222") },
+            });
+
+            var mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            var fileScanner = new FileScanner(
+                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+
+            // Act
+            var result = fileScanner.ScanDirectory(
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
+
+            // Assert
+            mockDataAccessProvider.Verify(
+                dap => dap.AddFileRecord(It.IsAny<IFileInfo>(), It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public void ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider()
+        {
+            // Arrange
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\SomeFile.txt", new MockFileData("111") },
+                { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
+                { @"c:\testdirectory\YetAnotherFile.xml", new MockFileData("333") },
+            });
+
+            var mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            var fileScanner = new FileScanner(
+                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+
+            // Act
+            var result = fileScanner.ScanDirectory(
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
+
+            // Assert
+            mockDataAccessProvider.Verify(
+                dap => dap.AddFileRecord(It.IsAny<IFileInfo>(), It.IsAny<string>()),
+                Times.Exactly(fileSystem.AllFiles.Count()));
+        }
+
+        [Theory]
+        [InlineData(@"c:\testdirectory\test\testfile")]
+        [InlineData(@"c:\testdirectory\subdirectoryA\testsubdirFile.xml")]
+        [InlineData(@"c:\testdirectory\subdirectoryA\nestedsubdir\nestedsubdirfile")]
+        [InlineData(@"c:\testdirectory\subdirectoryB\000.txt")]
+        public void ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider(
+            string subdirectoryFile)
+        {
+            // Arrange
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\SomeFile.txt", new MockFileData("111") },
+                { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
+                { @"c:\testdirectory\subdirectoryA\GoodFile.xml", new MockFileData("333") },
+                { @"c:\testdirectory\subdirectoryA\BadFile.exe", new MockFileData("000") },
+                { @"c:\testdirectory\subdirectoryB\AverageFile", new MockFileData("AAA") },
+            });
+            MockFileInfo mockFileInfo = new MockFileInfo(fileSystem, subdirectoryFile);
+            fileSystem.AddFile(mockFileInfo.FullName, new MockFileData("000"));
+
+            var mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            var fileScanner = new FileScanner(
+                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+
+            // Act
+            fileScanner.ScanDirectory(
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), true);
+
+            // Assert
+            mockDataAccessProvider.Verify(dap =>
+                dap.AddFileRecord(
+                    It.Is<IFileInfo>(file =>
+                        file.FullName.Equals(subdirectoryFile, StringComparison.OrdinalIgnoreCase)),
+                    It.IsAny<string>()));
+        }
+
+        [Fact]
+        public void ScanDirectory_NonRecursiveScan_IgnoresSubdirectories()
+        {
+            // Arrange
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\SomeFile.txt", new MockFileData("111") },
+                { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
+                { @"c:\testdirectory\subdirectory\A.xml", new MockFileData("333") },
+            });
+
+            var mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            var fileScanner = new FileScanner(
+                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+
+            // Act
+            fileScanner.ScanDirectory(
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
+
+            // Assert
+            mockDataAccessProvider.Verify(
+                dap => dap.AddFileRecord(
+                    It.Is<IFileInfo>(file => file.FullName.StartsWith(
+                        @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase)),
+                    It.IsAny<string>()),
+                Times.Never);
         }
 
         /// <inheritdoc/>
