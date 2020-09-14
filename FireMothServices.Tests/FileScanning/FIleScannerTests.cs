@@ -262,6 +262,34 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     It.IsAny<string>()));
         }
 
+        [Fact]
+        public void ScanDirectory_NonRecursiveScan_IgnoresSubdirectories()
+        {
+            // Arrange
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\testdirectory\SomeFile.txt", new MockFileData("111") },
+                { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
+                { @"c:\testdirectory\subdirectory\A.xml", new MockFileData("333") },
+            });
+
+            var mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            var fileScanner = new FileScanner(
+                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+
+            // Act
+            fileScanner.ScanDirectory(
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
+
+            // Assert
+            mockDataAccessProvider.Verify(
+                dap => dap.AddFileRecord(
+                    It.Is<IFileInfo>(file => file.FullName.StartsWith(
+                        @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase)),
+                    It.IsAny<string>()),
+                Times.Never);
+        }
+
         /// <inheritdoc/>
         public void Dispose()
         {
