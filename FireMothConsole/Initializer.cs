@@ -136,7 +136,8 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                scanResult = fileScanner.ScanDirectory(scanDirectory, true);
+                scanResult = fileScanner.ScanDirectory(
+                    scanDirectory, this.CommandLineOptions.RecursiveScan);
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
