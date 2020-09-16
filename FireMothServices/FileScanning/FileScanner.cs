@@ -13,6 +13,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
+    using System.Security;
     using System.Security.Cryptography;
     using Microsoft.Extensions.FileProviders;
     using RiotClub.FireMoth.Services.DataAccess;
@@ -83,13 +84,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 catch (IOException ex)
                 {
                     this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories: {ex.Message}");
+                        $"Could not enumerate subdirectories (I/O): {ex.Message}");
                     return ScanResult.ScanFailure;
                 }
                 catch (UnauthorizedAccessException ex)
                 {
                     this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories: {ex.Message}");
+                        $"Could not enumerate subdirectories (unauthorized): {ex.Message}");
+                    return ScanResult.ScanFailure;
+                }
+                catch (SecurityException ex)
+                {
+                    this.logWriter.WriteLine(
+                        $"Could not enumerate subdirectories (security): {ex.Message}");
                     return ScanResult.ScanFailure;
                 }
 
@@ -144,7 +151,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
                 catch (IOException exception)
                 {
-                    var msg = $"Could not read from "
+                    var msg = $"Could not git pushread from "
                         + $"\"{file.FullName}\": {exception.Message}; skipping file.";
                     this.logWriter.WriteLine(msg);
                     skippedFiles++;
