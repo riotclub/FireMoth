@@ -73,11 +73,32 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             this.logWriter.WriteLine($"Scanning directory \"{directory}\"...");
 
-            if (recursive && directory.EnumerateDirectories().Any())
+            if (recursive)
             {
-                foreach (IDirectoryInfo subDirectory in directory.EnumerateDirectories())
+                IEnumerable<IDirectoryInfo> subdirectories;
+                try
                 {
-                    this.ScanDirectory(subDirectory, true);
+                    subdirectories = directory.EnumerateDirectories();
+                }
+                catch (IOException ex)
+                {
+                    this.logWriter.WriteLine(
+                        $"Could not enumerate subdirectories: {ex.Message}");
+                    return ScanResult.ScanFailure;
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    this.logWriter.WriteLine(
+                        $"Could not enumerate subdirectories: {ex.Message}");
+                    return ScanResult.ScanFailure;
+                }
+
+                if (subdirectories.Any())
+                {
+                    foreach (IDirectoryInfo subDirectory in directory.EnumerateDirectories())
+                    {
+                        this.ScanDirectory(subDirectory, true);
+                    }
                 }
             }
 
@@ -123,8 +144,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
                 catch (IOException exception)
                 {
-                    var msg = $"An error occurred while attempting to process "
-                        + $"\"{file.FullName}\": \"{exception.Message}\"; skipping file.";
+                    var msg = $"Could not read from "
+                        + $"\"{file.FullName}\": {exception.Message}; skipping file.";
                     this.logWriter.WriteLine(msg);
                     skippedFiles++;
                 }
