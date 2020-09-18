@@ -28,7 +28,10 @@ namespace RiotClub.FireMoth.Console
      *
      * x Init without recursive scan flag argument.
      *      x Initialize_RecursiveFlagArgumentDoesNotExist_SetsRecursiveScanOptionToFalse
-
+     *
+     * x Init with directory argument containing trailing double quote removes double quote.
+     *      x Initialize_QuotedDirectoryArgumentEndsWithBackslash_SetsDirectoryOptionWithoutTrailingDoubleQuote
+     *
      * x Init with invalid directory argument displays error (don't check for directory existence).
      *      x Initialize_InvalidDirectoryArgument_ReturnsFalse
      *      x Initialize_InvalidDirectoryArgument_OutputsError
@@ -95,6 +98,23 @@ namespace RiotClub.FireMoth.Console
 
             // Assert
             Assert.True(initializer.CommandLineOptions.RecursiveScan);
+        }
+
+        [Fact]
+        public void Initialize_QuotedDirectoryArgumentEndsWithBackslash_SetsDirectoryOptionWithoutTrailingDoubleQuote()
+        {
+            // Arrange
+            string quotedPath = @"""C:\ends with backslash\""";
+            string[] arguments = { "-d", quotedPath };
+            Initializer initializer = new Initializer(arguments, this.outputWriter);
+
+            // Act
+            initializer.Initialize();
+
+            // Assert
+            Assert.True(initializer.CommandLineOptions.ScanDirectory.Equals(
+                quotedPath.Substring(0, quotedPath.Length - 1),
+                StringComparison.OrdinalIgnoreCase));
         }
 
         [Fact]
