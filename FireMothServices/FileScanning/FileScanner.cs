@@ -102,7 +102,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
                 if (subdirectories.Any())
                 {
-                    foreach (IDirectoryInfo subDirectory in directory.EnumerateDirectories())
+                    foreach (IDirectoryInfo subDirectory in subdirectories)
                     {
                         this.ScanDirectory(subDirectory, true);
                     }
@@ -151,9 +151,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
                 catch (IOException exception)
                 {
-                    var msg = $"Could not git pushread from "
-                        + $"\"{file.FullName}\": {exception.Message}; skipping file.";
-                    this.logWriter.WriteLine(msg);
+                    this.logWriter.WriteLine(
+                        $"Could not read from \"{file.FullName}\": {exception.Message}");
                     skippedFiles++;
                 }
             }
