@@ -13,6 +13,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
+    using System.Security;
     using System.Security.Cryptography;
     using Microsoft.Extensions.FileProviders;
     using RiotClub.FireMoth.Services.DataAccess;
@@ -73,11 +74,38 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             this.logWriter.WriteLine($"Scanning directory \"{directory}\"...");
 
-            if (recursive && directory.EnumerateDirectories().Any())
+            if (recursive)
             {
-                foreach (IDirectoryInfo subDirectory in directory.EnumerateDirectories())
+                IEnumerable<IDirectoryInfo> subdirectories;
+                try
                 {
-                    this.ScanDirectory(subDirectory, true);
+                    subdirectories = directory.EnumerateDirectories();
+                }
+                catch (IOException ex)
+                {
+                    this.logWriter.WriteLine(
+                        $"Could not enumerate subdirectories (I/O): {ex.Message}");
+                    return ScanResult.ScanFailure;
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    this.logWriter.WriteLine(
+                        $"Could not enumerate subdirectories (unauthorized): {ex.Message}");
+                    return ScanResult.ScanFailure;
+                }
+                catch (SecurityException ex)
+                {
+                    this.logWriter.WriteLine(
+                        $"Could not enumerate subdirectories (security): {ex.Message}");
+                    return ScanResult.ScanFailure;
+                }
+
+                if (subdirectories.Any())
+                {
+                    foreach (IDirectoryInfo subDirectory in subdirectories)
+                    {
+                        this.ScanDirectory(subDirectory, true);
+                    }
                 }
             }
 
@@ -123,9 +151,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
                 catch (IOException exception)
                 {
-                    var msg = $"An error occurred while attempting to process "
-                        + $"\"{file.FullName}\": \"{exception.Message}\"; skipping file.";
-                    this.logWriter.WriteLine(msg);
+                    this.logWriter.WriteLine(
+                        $"Could not read from \"{file.FullName}\": {exception.Message}");
                     skippedFiles++;
                 }
             }
