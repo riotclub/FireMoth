@@ -13,21 +13,27 @@ namespace FireMothServices.DataAccess
     public class FileFingerprint
     {
         /// <summary>
-        /// Gets or sets the path to the file.
+        /// Gets or sets a string representing the directory's full path.
         /// </summary>
         [Index(0)]
-        public string FilePath { get; set; }
+        public string DirectoryName { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the file.
         /// </summary>
         [Index(1)]
-        public string FileName { get; set; }
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size, in bytes, of the file.
+        /// </summary>
+        [Index(2)]
+        public long Length { get; set; }
 
         /// <summary>
         /// Gets or sets the base-64 hash of the file's data.
         /// </summary>
-        [Index(2)]
+        [Index(3)]
         public string Base64Hash { get; set; }
     }
 }
