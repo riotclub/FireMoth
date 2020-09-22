@@ -146,12 +146,12 @@
             Conatins data that uniquely identifies a file and its data.
             </summary>
         </member>
-        <member name="P:FireMothServices.DataAccess.FileFingerprint.FilePath">
+        <member name="P:FireMothServices.DataAccess.FileFingerprint.Path">
             <summary>
             Gets or sets the path to the file.
             </summary>
         </member>
-        <member name="P:FireMothServices.DataAccess.FileFingerprint.FileName">
+        <member name="P:FireMothServices.DataAccess.FileFingerprint.Name">
             <summary>
             Gets or sets the name of the file.
             </summary>
