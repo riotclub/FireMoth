@@ -116,8 +116,9 @@ namespace RiotClub.FireMoth.Services.DataAccess
         {
             return new FileFingerprint
             {
-                Path = Path.GetDirectoryName(fileInfo.FullName),
+                DirectoryName = Path.GetDirectoryName(fileInfo.FullName),
                 Name = fileInfo.Name,
+                Length = fileInfo.Length,
                 Base64Hash = base64Hash,
             };
         }
