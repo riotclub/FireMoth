@@ -18,6 +18,9 @@
             <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not
             be closed when the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> is disposed.</param>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(FireMothServices.DataAccess.IFileFingerprint)">
+            <inheritdoc/>
+        </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(System.IO.Abstractions.IFileInfo,System.String)">
             <inheritdoc/>
         </member>
@@ -62,19 +65,26 @@
             <param name="base64Hash">The hash value of the file represented by <paramref name="fileInfo"/> in base 64.
             </param>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(FireMothServices.DataAccess.IFileFingerprint)">
+            <summary>
+            Adds a file and its hash value to the backing store.
+            </summary>
+            <param name="fileFingerprint">An <see cref="T:FireMothServices.DataAccess.IFileFingerprint"/> containing the properties of the file to
+            store.</param>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.FileScanner">
             <summary>
             Directory scanner implementation that reads the files in a directory and writes the file
             and hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,System.Security.Cryptography.HashAlgorithm,System.IO.TextWriter)">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,FireMothServices.DataAnalysis.IFileHasher,System.IO.TextWriter)">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/> class.
             </summary>
             <param name="dataAccessProvider">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/> that provides
             access to the application backing store.</param>
-            <param name="hasher">A <see cref="T:System.Security.Cryptography.HashAlgorithm"/> that is used to compute hash values
+            <param name="hasher">An <see cref="T:FireMothServices.DataAnalysis.IFileHasher"/> that is used to compute hash values
             for scanned files.</param>
             <param name="logWriter">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
             written.</param>
@@ -165,6 +175,61 @@
             <summary>
             Gets or sets the base-64 hash of the file's data.
             </summary>
+        </member>
+        <member name="M:FireMothServices.DataAccess.FileFingerprint.CreateFileFingerprint(System.IO.Abstractions.IFileInfo,System.String)">
+            <summary>
+            Builds a <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> object from the provided <see cref="T:System.IO.Abstractions.IFileInfo"/>
+            and base 64 hash string.
+            </summary>
+            <param name="fileInfo">The <see cref="T:System.IO.Abstractions.IFileInfo"/> implementation containing the file
+            information to use for the returned <see cref="T:FireMothServices.DataAccess.FileFingerprint"/>.</param>
+            <param name="base64Hash">A <c>string</c> containing the base 64 hash string to use in
+            the returned <see cref="T:FireMothServices.DataAccess.FileFingerprint"/>.</param>
+            <returns>A new <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> object containing the provided
+            information.</returns>
+        </member>
+        <member name="M:FireMothServices.DataAccess.FileFingerprint.IsBase64String(System.String)">
+            <summary>
+            Returns <c>true</c> if the provided string is a valid base 64 string.
+            </summary>
+            <param name="base64">The string to check.</param>
+            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
+        </member>
+        <member name="T:FireMothServices.DataAnalysis.IFileHasher">
+            <summary>
+            Defines the public interface for a class that implements file hashing operations.
+            </summary>
+        </member>
+        <member name="M:FireMothServices.DataAnalysis.IFileHasher.ComputeHashFromStream(System.IO.Stream)">
+            <summary>
+            Computes the hash of the provided stream's data.
+            </summary>
+            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the data to hash.</param>
+            <returns>An array of <c>byte</c> containing the value of the computed hash.</returns>
+        </member>
+        <member name="T:FireMothServices.DataAnalysis.SHA256FileHasher">
+            <summary>
+            Provides file hashing services using the SHA256 algorithm.
+            </summary>
+        </member>
+        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/> class.
+            </summary>
+        </member>
+        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.ComputeHashFromStream(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose">
+            <summary>
+            Releases all resources used by the current instance of this <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/>.
+            </summary>
+        </member>
+        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and, optionally, managed resources.
+            </summary>
+            <param name="disposing">If true, managed resources are freed.</param>
         </member>
     </members>
 </doc>

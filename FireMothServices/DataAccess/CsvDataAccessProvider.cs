@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.IO.Abstractions;
@@ -35,6 +36,20 @@ namespace RiotClub.FireMoth.Services.DataAccess
             }
 
             this.csvWriter = new CsvWriter(outputWriter, CultureInfo.InvariantCulture, leaveOpen);
+            this.csvWriter.WriteHeader<FileFingerprint>();
+            this.csvWriter.NextRecord();
+        }
+
+        /// <inheritdoc/>
+        public void AddFileRecord(IFileFingerprint fingerprint)
+        {
+            if (fingerprint == null)
+            {
+                throw new ArgumentNullException(nameof(fingerprint));
+            }
+
+            this.csvWriter.WriteRecord(fingerprint);
+            this.csvWriter.NextRecord();
         }
 
         /// <inheritdoc/>
