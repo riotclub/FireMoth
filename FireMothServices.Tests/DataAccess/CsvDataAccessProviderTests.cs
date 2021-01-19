@@ -8,6 +8,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System;
     using System.IO;
     using System.IO.Abstractions;
+    using FireMothServices.DataAccess;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
     using Xunit;
@@ -34,7 +35,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
     {
         private readonly Mock<IFileInfo> mockFileInfo;
         private readonly Mock<TextWriter> mockDefaultStreamWriter;
-        private readonly string testBase64Hash = "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=";
         private readonly string testFilePath = @"C:\TestDir";
         private readonly string testFileName = "TestFile.txt";
         private bool disposed;
@@ -61,61 +61,14 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         [Fact]
-        public void AddFileRecord_NullFileInfo_ThrowsArgumentNullException()
+        public void AddFileRecord_NullFileFingerprint_ThrowsArgumentNullException()
         {
             // Arrange
             using (CsvDataAccessProvider testObject =
                 new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
             {
                 // Act, Assert
-                Assert.Throws<ArgumentNullException>(() =>
-                    testObject.AddFileRecord(null, this.testBase64Hash));
-            }
-        }
-
-        [Fact]
-        public void AddFileRecord_NullHash_ThrowsArgumentNullException()
-        {
-            // Arrange
-            using (CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
-            {
-                // Act, Assert
-                Assert.Throws<ArgumentNullException>(() =>
-                    testObject.AddFileRecord(this.mockFileInfo.Object, null));
-            }
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData("    ")]
-        [InlineData("\n")]
-        public void AddFileRecord_EmptyOrWhitespaceHash_ThrowsArgumentException(
-            string hashString)
-        {
-            // Arrange
-            using (CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
-            {
-                // Act, Assert
-                Assert.Throws<ArgumentException>(() =>
-                    testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
-            }
-        }
-
-        [Theory]
-        [InlineData("abcdefg!#")]
-        [InlineData("0123+=$")]
-        [InlineData("_0")]
-        public void AddFileRecord_InvalidBase64Hash_ThrowsArgumentException(string hashString)
-        {
-            // Arrange
-            using (CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
-            {
-                // Act, Assert
-                Assert.Throws<ArgumentException>(() =>
-                    testObject.AddFileRecord(this.mockFileInfo.Object, hashString));
+                Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
             }
         }
 
@@ -132,6 +85,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Arrange
             var mockFileInfo = new Mock<IFileInfo>();
+            mockFileInfo.SetupGet(mock => mock.DirectoryName).Returns(testPath);
             mockFileInfo.SetupGet(mock => mock.FullName).Returns(testFullPath);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
@@ -140,7 +94,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             using (CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object))
             {
                 // Act
-                testobject.AddFileRecord(mockFileInfo.Object, testHash);
+                testobject.AddFileRecord(new FileFingerprint(mockFileInfo.Object, testHash));
             }
 
             // Assert
@@ -158,6 +112,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Arrange
             var mockFileInfo = new Mock<IFileInfo>();
+            mockFileInfo.SetupGet(mock => mock.DirectoryName).Returns(testPath);
             mockFileInfo.SetupGet(mock => mock.FullName).Returns(file);
             mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
 
@@ -167,7 +122,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             using (CsvDataAccessProvider testObject =
                 new CsvDataAccessProvider(mockStreamWriter.Object))
             {
-                testObject.AddFileRecord(mockFileInfo.Object, hash);
+                testObject.AddFileRecord(new FileFingerprint(mockFileInfo.Object, hash));
             }
 
             // Assert

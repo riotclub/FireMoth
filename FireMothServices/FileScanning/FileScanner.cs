@@ -6,16 +6,14 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
     using System.Security;
-    using System.Security.Cryptography;
-    using Microsoft.Extensions.FileProviders;
+    using FireMothServices.DataAccess;
+    using FireMothServices.DataAnalysis;
     using RiotClub.FireMoth.Services.DataAccess;
 
     /// <summary>
@@ -25,7 +23,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class FileScanner : IFileScanner
     {
         private readonly IDataAccessProvider dataAccessProvider;
-        private readonly HashAlgorithm hasher;
+        private readonly IFileHasher hasher;
         private readonly TextWriter logWriter;
 
         /// <summary>
@@ -33,12 +31,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// </summary>
         /// <param name="dataAccessProvider">A <see cref="IDataAccessProvider"/> that provides
         /// access to the application backing store.</param>
-        /// <param name="hasher">A <see cref="HashAlgorithm"/> that is used to compute hash values
+        /// <param name="hasher">An <see cref="IFileHasher"/> that is used to compute hash values
         /// for scanned files.</param>
         /// <param name="logWriter">A <see cref="TextWriter"/> to which logging output will be
         /// written.</param>
         public FileScanner(
-            IDataAccessProvider dataAccessProvider, HashAlgorithm hasher, TextWriter logWriter)
+            IDataAccessProvider dataAccessProvider, IFileHasher hasher, TextWriter logWriter)
         {
             this.dataAccessProvider =
                 dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
@@ -144,7 +142,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     {
                         this.logWriter.Write(file.FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
-                        this.dataAccessProvider.AddFileRecord(file, hashString);
+                        this.dataAccessProvider.AddFileRecord(
+                            new FileFingerprint(file, hashString));
                         this.logWriter.WriteLine($" [{hashString}]");
                         scannedFiles++;
                     }
@@ -168,7 +167,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <returns>A base 64 encoded <see cref="string"/> of the hash.</returns>
         private string GetBase64HashFromStream(Stream stream)
         {
-            byte[] hashBytes = this.hasher.ComputeHash(stream);
+            byte[] hashBytes = this.hasher.ComputeHashFromStream(stream);
             return Convert.ToBase64String(hashBytes);
         }
     }

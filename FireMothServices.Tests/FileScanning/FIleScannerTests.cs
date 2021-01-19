@@ -13,6 +13,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
+    using FireMothServices.DataAccess;
+    using FireMothServices.DataAnalysis;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
     using Xunit;
@@ -47,7 +49,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     {
         private readonly Mock<IDataAccessProvider> mockDataAccessProvider;
 
-        private readonly Mock<HashAlgorithm> mockHashAlgorithm;
+        private readonly Mock<IFileHasher> mockFileHasher;
 
         private readonly StringWriter outputWriter;
 
@@ -60,11 +62,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public FileScannerTests()
         {
             this.mockDataAccessProvider = new Mock<IDataAccessProvider>();
-            this.mockHashAlgorithm = new Mock<HashAlgorithm>();
-            /*
-            this.mockDataAccessProvider
-                .Setup(provider => provider.AddFileRecord())
-            */
+            this.mockFileHasher = new Mock<IFileHasher>();
+            this.mockFileHasher.Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
+                .Returns(new byte[] { 0x20, 0x20, 0x20 });
+
             this.testFileSystem = new FileSystem();
 
             this.outputWriter = new StringWriter(new StringBuilder());
@@ -83,7 +84,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
                 new FileScanner(
-                    this.mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, null));
+                    this.mockDataAccessProvider.Object, this.mockFileHasher.Object, null));
         }
 
         [Fact]
@@ -99,7 +100,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         {
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new FileScanner(null, this.mockHashAlgorithm.Object, this.outputWriter));
+                new FileScanner(null, this.mockFileHasher.Object, this.outputWriter));
         }
 
         [Fact]
@@ -108,7 +109,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Arrange
             FileScanner fileScanner = new FileScanner(
                 this.mockDataAccessProvider.Object,
-                this.mockHashAlgorithm.Object,
+                this.mockFileHasher.Object,
                 this.outputWriter);
 
             // Act, Assert
@@ -123,7 +124,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Arrange
             FileScanner fileScanner = new FileScanner(
                 this.mockDataAccessProvider.Object,
-                this.mockHashAlgorithm.Object,
+                this.mockFileHasher.Object,
                 this.outputWriter);
             var testDirectory = this.testFileSystem.DirectoryInfo.FromDirectoryName(directory);
 
@@ -137,7 +138,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Arrange
             FileScanner fileScanner = new FileScanner(
                 this.mockDataAccessProvider.Object,
-                this.mockHashAlgorithm.Object,
+                this.mockFileHasher.Object,
                 this.outputWriter);
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -161,7 +162,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Arrange
             FileScanner fileScanner = new FileScanner(
                 this.mockDataAccessProvider.Object,
-                this.mockHashAlgorithm.Object,
+                this.mockFileHasher.Object,
                 this.outputWriter);
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -189,7 +190,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             var mockDataAccessProvider = new Mock<IDataAccessProvider>();
             var fileScanner = new FileScanner(
-                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+                mockDataAccessProvider.Object, this.mockFileHasher.Object, this.outputWriter);
+            var mockFileFingerprint = new Mock<IFileFingerprint>();
 
             // Act
             var result = fileScanner.ScanDirectory(
@@ -197,7 +199,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Assert
             mockDataAccessProvider.Verify(
-                dap => dap.AddFileRecord(It.IsAny<IFileInfo>(), It.IsAny<string>()),
+                dap => dap.AddFileRecord(mockFileFingerprint.Object),
                 Times.Never);
         }
 
@@ -214,7 +216,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             var mockDataAccessProvider = new Mock<IDataAccessProvider>();
             var fileScanner = new FileScanner(
-                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+                mockDataAccessProvider.Object, this.mockFileHasher.Object, this.outputWriter);
 
             // Act
             var result = fileScanner.ScanDirectory(
@@ -222,7 +224,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Assert
             mockDataAccessProvider.Verify(
-                dap => dap.AddFileRecord(It.IsAny<IFileInfo>(), It.IsAny<string>()),
+                dap => dap.AddFileRecord(It.IsAny<IFileFingerprint>()),
                 Times.Exactly(fileSystem.AllFiles.Count()));
         }
 
@@ -239,16 +241,13 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 { @"c:\testdirectory\SomeFile.txt", new MockFileData("111") },
                 { @"c:\testdirectory\AnotherFile.dat", new MockFileData("222") },
-                { @"c:\testdirectory\subdirectoryA\GoodFile.xml", new MockFileData("333") },
-                { @"c:\testdirectory\subdirectoryA\BadFile.exe", new MockFileData("000") },
-                { @"c:\testdirectory\subdirectoryB\AverageFile", new MockFileData("AAA") },
             });
             MockFileInfo mockFileInfo = new MockFileInfo(fileSystem, subdirectoryFile);
             fileSystem.AddFile(mockFileInfo.FullName, new MockFileData("000"));
 
             var mockDataAccessProvider = new Mock<IDataAccessProvider>();
             var fileScanner = new FileScanner(
-                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+                mockDataAccessProvider.Object, this.mockFileHasher.Object, this.outputWriter);
 
             // Act
             fileScanner.ScanDirectory(
@@ -257,9 +256,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Assert
             mockDataAccessProvider.Verify(dap =>
                 dap.AddFileRecord(
-                    It.Is<IFileInfo>(file =>
-                        file.FullName.Equals(subdirectoryFile, StringComparison.OrdinalIgnoreCase)),
-                    It.IsAny<string>()));
+                    It.Is<IFileFingerprint>(file =>
+                        file.Name.Equals(Path.GetFileName(subdirectoryFile), StringComparison.OrdinalIgnoreCase))));
         }
 
         [Fact]
@@ -275,7 +273,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             var mockDataAccessProvider = new Mock<IDataAccessProvider>();
             var fileScanner = new FileScanner(
-                mockDataAccessProvider.Object, this.mockHashAlgorithm.Object, this.outputWriter);
+                mockDataAccessProvider.Object, this.mockFileHasher.Object, this.outputWriter);
 
             // Act
             fileScanner.ScanDirectory(
@@ -284,9 +282,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
             // Assert
             mockDataAccessProvider.Verify(
                 dap => dap.AddFileRecord(
-                    It.Is<IFileInfo>(file => file.FullName.StartsWith(
-                        @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase)),
-                    It.IsAny<string>()),
+                    It.Is<IFileFingerprint>(file =>
+                        file.DirectoryName.StartsWith(
+                            @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase))),
                 Times.Never);
         }
 

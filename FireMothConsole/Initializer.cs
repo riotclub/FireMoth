@@ -16,6 +16,7 @@ namespace RiotClub.FireMoth.Console
     using CommandLine;
     using CommandLine.Text;
     using FireMothConsole;
+    using FireMothServices.DataAnalysis;
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.FileScanning;
 
@@ -129,7 +130,7 @@ namespace RiotClub.FireMoth.Console
             // This is closed when the encapsulating CsvDataAccessProvider is disposed.
             StreamWriter dataOutputWriter = new StreamWriter(this.dataOutputFile, false);
 
-            using (SHA256 hasher = SHA256.Create())
+            using (SHA256FileHasher hasher = new SHA256FileHasher())
             using (CsvDataAccessProvider dataAccessProvider = new CsvDataAccessProvider(
                 dataOutputWriter))
             {
