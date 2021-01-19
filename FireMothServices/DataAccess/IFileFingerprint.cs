@@ -7,12 +7,12 @@ namespace FireMothServices.DataAccess
 {
     public interface IFileFingerprint
     {
-        string DirectoryName { get; set; }
+        string DirectoryName { get; }
 
-        string Name { get; set; }
+        string Name { get; }
 
-        long Length { get; set; }
+        long Length { get; }
 
-        string Base64Hash { get; set; }
+        string Base64Hash { get; }
     }
 }

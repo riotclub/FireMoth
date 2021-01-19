@@ -147,7 +147,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                         this.logWriter.Write(file.FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
                         this.dataAccessProvider.AddFileRecord(
-                            FileFingerprint.CreateFileFingerprint(file, hashString));
+                            new FileFingerprint(file, hashString));
                         //this.dataAccessProvider.AddFileRecord(file, hashString);
                         this.logWriter.WriteLine($" [{hashString}]");
                         scannedFiles++;

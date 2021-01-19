@@ -6,10 +6,8 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.IO.Abstractions;
     using CsvHelper;
     using FireMothServices.DataAccess;
 
@@ -53,34 +51,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
         }
 
         /// <inheritdoc/>
-        public void AddFileRecord(IFileInfo fileInfo, string base64Hash)
-        {
-            if (fileInfo == null)
-            {
-                throw new ArgumentNullException(nameof(fileInfo));
-            }
-
-            if (base64Hash == null)
-            {
-                throw new ArgumentNullException(nameof(base64Hash));
-            }
-
-            if (string.IsNullOrWhiteSpace(base64Hash))
-            {
-                throw new ArgumentException("Base 64 string cannot be empty.");
-            }
-
-            if (!IsBase64String(base64Hash))
-            {
-                throw new ArgumentException("Not a valid base 64 string.", nameof(base64Hash));
-            }
-
-            FileFingerprint fingerprint = BuildFileFingerprint(fileInfo, base64Hash);
-            this.csvWriter.WriteRecord(fingerprint);
-            this.csvWriter.NextRecord();
-        }
-
-        /// <inheritdoc/>
         public void Dispose()
         {
             this.Dispose(true);
@@ -115,27 +85,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
         {
             Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
             return Convert.TryFromBase64String(base64, buffer, out _);
-        }
-
-        /// <summary>
-        /// Builds a <see cref="FileFingerprint"/> object from the provided <see cref="IFileInfo"/>
-        /// and base 64 hash string.
-        /// </summary>
-        /// <param name="fileInfo">The <see cref="IFileInfo"/> implementation containing the file
-        /// information to use for the returned <see cref="FileFingerprint"/>.</param>
-        /// <param name="base64Hash">A <c>string</c> containing the base 64 hash string to use in
-        /// the returned <see cref="FileFingerprint"/>.</param>
-        /// <returns>A new <see cref="FileFingerprint"/> object containing the provided
-        /// information.</returns>
-        private static FileFingerprint BuildFileFingerprint(IFileInfo fileInfo, string base64Hash)
-        {
-            return new FileFingerprint
-            {
-                DirectoryName = Path.GetDirectoryName(fileInfo.FullName),
-                Name = fileInfo.Name,
-                Length = fileInfo.Length,
-                Base64Hash = base64Hash,
-            };
         }
     }
 }

@@ -297,14 +297,14 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Act
             fileScanner.ScanDirectory(
-                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), true);
+                fileSystem.DirectoryInfo.FromDirectoryName(@"c:\testdirectory"), false);
 
             // Assert
             mockDataAccessProvider.Verify(
                 dap => dap.AddFileRecord(
-                    It.Is<IFileInfo>(file => file.FullName.StartsWith(
-                        @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase)),
-                    It.IsAny<string>()),
+                    It.Is<IFileFingerprint>(file =>
+                        file.DirectoryName.StartsWith(
+                            @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase))),
                 Times.Never);
         }
 
