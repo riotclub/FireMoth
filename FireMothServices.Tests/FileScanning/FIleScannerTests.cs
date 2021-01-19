@@ -49,11 +49,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     {
         private readonly Mock<IDataAccessProvider> mockDataAccessProvider;
 
-        private readonly Mock<SHA256> mockHashAlgorithm;
-
         private readonly Mock<IFileHasher> mockFileHasher;
-
-        private readonly Mock<Stream> mockStream;
 
         private readonly StringWriter outputWriter;
 
@@ -66,24 +62,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public FileScannerTests()
         {
             this.mockDataAccessProvider = new Mock<IDataAccessProvider>();
-            //this.mockHashAlgorithm = new Mock<HashAlgorithm>();
-            this.mockHashAlgorithm = new Mock<SHA256>();
-
-            this.mockStream = new Mock<Stream>();
             this.mockFileHasher = new Mock<IFileHasher>();
             this.mockFileHasher.Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
                 .Returns(new byte[] { 0x20, 0x20, 0x20 });
 
-            /*
-            this.mockStream = new Mock<Stream>();
-            this.mockHashAlgorithm
-                .Setup(h => h.(this.mockStream.Object))
-                .Returns(new byte[] { 0x20, 0x20, 0x20 });
-            */
-            /*
-            this.mockDataAccessProvider
-                .Setup(provider => provider.AddFileRecord())
-            */
             this.testFileSystem = new FileSystem();
 
             this.outputWriter = new StringWriter(new StringBuilder());
@@ -219,7 +201,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             mockDataAccessProvider.Verify(
                 dap => dap.AddFileRecord(mockFileFingerprint.Object),
                 Times.Never);
-
         }
 
         [Fact]
@@ -277,7 +258,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 dap.AddFileRecord(
                     It.Is<IFileFingerprint>(file =>
                         file.Name.Equals(Path.GetFileName(subdirectoryFile), StringComparison.OrdinalIgnoreCase))));
-
         }
 
         [Fact]

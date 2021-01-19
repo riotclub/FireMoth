@@ -28,10 +28,11 @@ namespace FireMothServices.DataAnalysis
 
         /// <inheritdoc/>
         public byte[] ComputeHashFromStream(Stream inputStream) =>
-            hashAlgorithm.ComputeHash(inputStream);
+            this.hashAlgorithm.ComputeHash(inputStream);
 
         /// <summary>
-        /// Releases all resources used by the current instance of this <see cref="SHA256FileHasher"/>.
+        /// Releases all resources used by the current instance of this
+        /// <see cref="SHA256FileHasher"/>.
         /// </summary>
         public void Dispose()
         {

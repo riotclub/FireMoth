@@ -6,18 +6,14 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
     using System.Security;
-    using System.Security.Cryptography;
     using FireMothServices.DataAccess;
     using FireMothServices.DataAnalysis;
-    using Microsoft.Extensions.FileProviders;
     using RiotClub.FireMoth.Services.DataAccess;
 
     /// <summary>
@@ -148,7 +144,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
                         var hashString = this.GetBase64HashFromStream(fileStream);
                         this.dataAccessProvider.AddFileRecord(
                             new FileFingerprint(file, hashString));
-                        //this.dataAccessProvider.AddFileRecord(file, hashString);
                         this.logWriter.WriteLine($" [{hashString}]");
                         scannedFiles++;
                     }

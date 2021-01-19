@@ -168,6 +168,32 @@
             <param name="base64">The string to check.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         </member>
+        <member name="T:FireMothServices.DataAccess.IFileFingerprint">
+            <summary>
+            Defines the public interface for a class that implements properties that define a file and
+            its hash value.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.IFileFingerprint.DirectoryName">
+            <summary>
+            Gets the directory that the file resides in.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.IFileFingerprint.Name">
+            <summary>
+            Gets the name of the file.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.IFileFingerprint.Length">
+            <summary>
+            Gets the size, in bytes, of the file.
+            </summary>
+        </member>
+        <member name="P:FireMothServices.DataAccess.IFileFingerprint.Base64Hash">
+            <summary>
+            Gets a base 64 string representation of the file's hash.
+            </summary>
+        </member>
         <member name="T:FireMothServices.DataAnalysis.IFileHasher">
             <summary>
             Defines the public interface for a class that implements file hashing operations.
@@ -195,7 +221,8 @@
         </member>
         <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose">
             <summary>
-            Releases all resources used by the current instance of this <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/>.
+            Releases all resources used by the current instance of this
+            <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/>.
             </summary>
         </member>
         <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose(System.Boolean)">
