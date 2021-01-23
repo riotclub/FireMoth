@@ -11,7 +11,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.IO.Abstractions;
     using System.IO.Abstractions.TestingHelpers;
     using System.Linq;
-    using System.Security.Cryptography;
     using System.Text;
     using FireMothServices.DataAccess;
     using FireMothServices.DataAnalysis;

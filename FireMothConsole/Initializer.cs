@@ -11,7 +11,6 @@ namespace RiotClub.FireMoth.Console
     using System.Globalization;
     using System.IO;
     using System.IO.Abstractions;
-    using System.Security.Cryptography;
     using System.Text.RegularExpressions;
     using CommandLine;
     using CommandLine.Text;
@@ -30,7 +29,7 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
         private readonly string[] processArguments;
-        private TextWriter statusOutputWriter;
+        private readonly TextWriter statusOutputWriter;
         private string dataOutputFile;
 
         /// <summary>
@@ -210,7 +209,9 @@ namespace RiotClub.FireMoth.Console
         /// <summary>
         /// Writes the application usage message to the status output.
         /// </summary>
+#pragma warning disable CA1801 // Review unused parameters
         private void DisplayHelpText<T>(ParserResult<T> parseResult, IEnumerable<Error> errors)
+#pragma warning restore CA1801 // Review unused parameters
         {
             var helpText = HelpText.AutoBuild(
                 parseResult,

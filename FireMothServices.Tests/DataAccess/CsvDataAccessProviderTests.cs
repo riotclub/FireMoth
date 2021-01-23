@@ -18,18 +18,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
      *  - TextWriter can't be null
      *      * Ctor_NullTextWriter_ThrowsArgumentNullException
      * AddFileRecord:
-     * - IFileInfo can't be null
-     *      * AddFileRecord_NullFileInfo_ThrowsArgumentNullException
-     * - IFileInfo.PhysicalPath can't be null
-     *      * AddFileRecord_NullFileInfoPhysicalPath_ThrowsArgumentException
-     * - base64Hash can't be null
-     *      * AddFileRecord_NullHash_ThrowsArgumentNullException
-     * - base64hash can't be empty or whitespace
-     *      * AddFileRecord_EmptyOrWhitespaceHash_ThrowsArgumentException
-     * - base64hash must be a valid base 64 string
-     *      * AddFileRecord_InvalidBase64String_ThrowsArgumentException
-     * - Valid IFileInfo and base64Hash adds record to backing store
-     *      * AddFileRecord_ValidFileInfoAndHash_AddsRecordToStore
+     * - IFileFingerprint can't be null
+     *      * AddFileRecord_NullFileFingerprint_ThrowsArgumentNullException
+     * - File with commas in name adds file with quotes to backing store
+     *      * AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile
+     * - Valid IFileFingerprint adds record to backing store
+     *      * AddFileRecord_ValidFileFingerprint_AddsRecordToStore
      */
     public class CsvDataAccessProviderTests : IDisposable
     {
@@ -91,7 +85,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             var mockStreamWriter = new Mock<TextWriter>();
 
-            using (CsvDataAccessProvider testobject = new CsvDataAccessProvider(mockStreamWriter.Object))
+            using (CsvDataAccessProvider testobject =
+                new CsvDataAccessProvider(mockStreamWriter.Object))
             {
                 // Act
                 testobject.AddFileRecord(new FileFingerprint(mockFileInfo.Object, testHash));
@@ -105,7 +100,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         [Theory]
         [InlineData(@"C:\somedir\somefile.txt", "CyA2DbkxG5oPUX/flw2v4RZDvHmdzSQL0jKAWlrsMVY=")]
         [InlineData(@"\\NETWORK\LOCATION\networkfile", "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=")]
-        public void AddFileRecord_ValidFileInfoAndHash_AddsRecordToStore(string file, string hash)
+        public void AddFileRecord_ValidFileFingerprint_AddsRecordToStore(string file, string hash)
         {
             var testPath = Path.GetDirectoryName(file);
             var testFileName = Path.GetFileName(file);

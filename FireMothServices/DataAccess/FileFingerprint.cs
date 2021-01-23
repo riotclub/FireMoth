@@ -19,9 +19,10 @@ namespace FireMothServices.DataAccess
         /// <summary>
         /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
         /// </summary>
-        /// <param name="fileInfo">A <see cref="IFileInfo"/> containing information about the file.</param>
-        /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the specified file.
+        /// <param name="fileInfo">A <see cref="IFileInfo"/> containing information about the file.
         /// </param>
+        /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the
+        /// specified file.</param>
         public FileFingerprint(IFileInfo fileInfo, string base64Hash)
         {
             if (fileInfo == null)

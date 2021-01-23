@@ -5,7 +5,6 @@
 
 namespace RiotClub.FireMoth.Services.DataAccess
 {
-    using System.IO.Abstractions;
     using FireMothServices.DataAccess;
 
     /// <summary>

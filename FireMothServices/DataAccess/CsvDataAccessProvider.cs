@@ -75,16 +75,5 @@ namespace RiotClub.FireMoth.Services.DataAccess
 
             this.disposed = true;
         }
-
-        /// <summary>
-        /// Determines if the provided string is a valid base 64 string.
-        /// </summary>
-        /// <param name="base64">A <see cref="string"/> to check for base 64 validity.</param>
-        /// <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
-        private static bool IsBase64String(string base64)
-        {
-            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
-            return Convert.TryFromBase64String(base64, buffer, out _);
-        }
     }
 }

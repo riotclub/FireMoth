@@ -30,13 +30,6 @@
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.IsBase64String(System.String)">
-            <summary>
-            Determines if the provided string is a valid base 64 string.
-            </summary>
-            <param name="base64">A <see cref="T:System.String"/> to check for base 64 validity.</param>
-            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
             Defines the public interface for a class that implements data access and persistence operations.
@@ -137,9 +130,10 @@
             <summary>
             Initializes a new instance of the <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> class.
             </summary>
-            <param name="fileInfo">A <see cref="T:System.IO.Abstractions.IFileInfo"/> containing information about the file.</param>
-            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the specified file.
+            <param name="fileInfo">A <see cref="T:System.IO.Abstractions.IFileInfo"/> containing information about the file.
             </param>
+            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
+            specified file.</param>
         </member>
         <member name="P:FireMothServices.DataAccess.FileFingerprint.DirectoryName">
             <summary>
