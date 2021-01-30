@@ -66,7 +66,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             if (!directory.Exists)
             {
-                this.logWriter.WriteLine("Error: \"{0}\" is not a valid directory.", directory);
+                this.logWriter.WriteLine(
+                    "Error: \"{0}\" is not a valid directory. Ensure the directory does not have a trailing backslash.",
+                    directory);
                 return ScanResult.ScanFailure;
             }
 
@@ -107,15 +109,14 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
             }
 
-            (int scannedFiles, int skippedFiles) scanCount =
-                this.ProcessFiles(directory.EnumerateFiles());
+            (int scannedFiles, int skippedFiles) = this.ProcessFiles(directory.EnumerateFiles());
             this.logWriter.WriteLine(
                 "Completed scanning \"{0}\" ({1}/{2} file(s) scanned).",
                 directory.FullName,
-                scanCount.scannedFiles,
-                scanCount.scannedFiles + scanCount.skippedFiles);
-            this.TotalFilesScanned += scanCount.scannedFiles;
-            this.TotalFilesSkipped += scanCount.skippedFiles;
+                scannedFiles,
+                scannedFiles + skippedFiles);
+            this.TotalFilesScanned += scannedFiles;
+            this.TotalFilesSkipped += skippedFiles;
 
             return ScanResult.ScanSuccess;
         }

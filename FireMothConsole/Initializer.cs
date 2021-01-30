@@ -80,10 +80,6 @@ namespace RiotClub.FireMoth.Console
                 // Command line successfully parsed.
                 this.CommandLineOptions = ((Parsed<CommandLineOptions>)parseResult).Value;
 
-                // Check paths for trailing quotes.
-                this.CommandLineOptions.ScanDirectory =
-                    RemoveTrailingDoubleQuote(this.CommandLineOptions.ScanDirectory);
-
                 // Check for illegal characters in scan directory.
                 if (ContainsInvalidPathCharacters(this.CommandLineOptions.ScanDirectory))
                 {
@@ -158,21 +154,6 @@ namespace RiotClub.FireMoth.Console
             }
 
             return scanResult == ScanResult.ScanSuccess ? ExitState.Normal : ExitState.RuntimeError;
-        }
-
-        /// <summary>
-        /// Removes a trailing double quote character from a string.
-        /// </summary>
-        /// <param name="s">A string.</param>
-        /// <returns>The string with one trailing double quote removed.</returns>
-        private static string RemoveTrailingDoubleQuote(string s)
-        {
-            if (s.EndsWith('"'))
-            {
-                return s.Substring(0, s.Length - 1);
-            }
-
-            return s;
         }
 
         /// <summary>

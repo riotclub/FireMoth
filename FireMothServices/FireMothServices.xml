@@ -32,15 +32,16 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
-            Defines the public interface for a class that implements data access and persistence operations.
+            Defines the public interface for a class that implements data access and persistence
+            operations.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(FireMothServices.DataAccess.IFileFingerprint)">
             <summary>
             Adds a file and its hash value to the backing store.
             </summary>
-            <param name="fileFingerprint">An <see cref="T:FireMothServices.DataAccess.IFileFingerprint"/> containing the properties of the file to
-            store.</param>
+            <param name="fileFingerprint">An <see cref="T:FireMothServices.DataAccess.IFileFingerprint"/> containing the
+            properties of the file to store.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.FileScanner">
             <summary>

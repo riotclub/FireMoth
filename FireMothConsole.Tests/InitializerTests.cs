@@ -101,23 +101,6 @@ namespace RiotClub.FireMoth.Console
         }
 
         [Fact]
-        public void Initialize_QuotedDirectoryArgumentEndsWithBackslash_SetsDirectoryOptionWithoutTrailingDoubleQuote()
-        {
-            // Arrange
-            string quotedPath = @"""C:\ends with backslash\""";
-            string[] arguments = { "-d", quotedPath };
-            Initializer initializer = new Initializer(arguments, this.outputWriter);
-
-            // Act
-            initializer.Initialize();
-
-            // Assert
-            Assert.True(initializer.CommandLineOptions.ScanDirectory.Equals(
-                quotedPath.Substring(0, quotedPath.Length - 1),
-                StringComparison.OrdinalIgnoreCase));
-        }
-
-        [Fact]
         public void Initialize_RecursiveFlagArgumentDoesNotExist_SetsRecursiveScanOptionToFalse()
         {
             // Arrange

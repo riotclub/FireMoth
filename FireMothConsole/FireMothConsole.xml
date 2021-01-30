@@ -83,13 +83,6 @@
             <returns>An <see cref="T:RiotClub.FireMoth.Console.ExitState"/> indicating the result of the directory scan
             operation.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.RemoveTrailingDoubleQuote(System.String)">
-            <summary>
-            Removes a trailing double quote character from a string.
-            </summary>
-            <param name="s">A string.</param>
-            <returns>The string with one trailing double quote removed.</returns>
-        </member>
         <member name="M:RiotClub.FireMoth.Console.Initializer.ContainsInvalidPathCharacters(System.String)">
             <summary>
             Checks the provided string for invalid path characters.
