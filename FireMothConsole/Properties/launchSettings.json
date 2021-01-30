@@ -2,7 +2,7 @@
   "profiles": {
     "FireMothConsole": {
       "commandName": "Project",
-      "commandLineArgs": "-r -d \"D:\\FireMoth Test Data\""
+      "commandLineArgs": "-d \"D:\\FireMoth Test Data\" -r"
     }
   }
 }

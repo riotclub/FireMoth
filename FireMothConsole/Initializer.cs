@@ -80,10 +80,6 @@ namespace RiotClub.FireMoth.Console
                 // Command line successfully parsed.
                 this.CommandLineOptions = ((Parsed<CommandLineOptions>)parseResult).Value;
 
-                // Check paths for trailing quotes.
-                this.CommandLineOptions.ScanDirectory =
-                    RemoveTrailingDoubleQuote(this.CommandLineOptions.ScanDirectory);
-
                 // Check for illegal characters in scan directory.
                 if (ContainsInvalidPathCharacters(this.CommandLineOptions.ScanDirectory))
                 {

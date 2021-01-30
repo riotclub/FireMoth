@@ -66,7 +66,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             if (!directory.Exists)
             {
-                this.logWriter.WriteLine("Error: \"{0}\" is not a valid directory.", directory);
+                this.logWriter.WriteLine(
+                    "Error: \"{0}\" is not a valid directory. Ensure the directory does not have a trailing backslash.",
+                    directory);
                 return ScanResult.ScanFailure;
             }
 
