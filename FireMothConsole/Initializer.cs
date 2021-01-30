@@ -157,21 +157,6 @@ namespace RiotClub.FireMoth.Console
         }
 
         /// <summary>
-        /// Removes a trailing double quote character from a string.
-        /// </summary>
-        /// <param name="s">A string.</param>
-        /// <returns>The string with one trailing double quote removed.</returns>
-        private static string RemoveTrailingDoubleQuote(string s)
-        {
-            if (s.EndsWith('"'))
-            {
-                return s.Substring(0, s.Length - 1);
-            }
-
-            return s;
-        }
-
-        /// <summary>
         /// Checks the provided string for invalid path characters.
         /// </summary>
         /// <param name="testPath">The path to test.</param>
