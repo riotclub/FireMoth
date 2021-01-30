@@ -210,7 +210,9 @@ namespace RiotClub.FireMoth.Console
         /// Writes the application usage message to the status output.
         /// </summary>
 #pragma warning disable CA1801 // Review unused parameters
+#pragma warning disable IDE0060 // Remove unused parameter
         private void DisplayHelpText<T>(ParserResult<T> parseResult, IEnumerable<Error> errors)
+#pragma warning restore IDE0060 // Remove unused parameter
 #pragma warning restore CA1801 // Review unused parameters
         {
             var helpText = HelpText.AutoBuild(
