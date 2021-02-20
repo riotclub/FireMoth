@@ -28,9 +28,7 @@ namespace RiotClub.FireMoth.Console
             if (initResult)
             {
                 ExitState exitState = initializer.Start();
-#pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.WriteLine("Process completed with exit state: {0}.", exitState);
-#pragma warning restore CA1303 // Do not pass literals as localized parameters
                 return 0;
             }
             else
