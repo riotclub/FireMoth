@@ -5,3 +5,4 @@
 // a specific target and scoped to a namespace, type, member, etc.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Ignoring this for early development builds.", Scope = "module")]
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Style preference.", Scope = "module")]

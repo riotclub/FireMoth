@@ -95,8 +95,7 @@ namespace RiotClub.FireMoth.Console
             else
             {
                 // Error during command line parsing. Display usage and return failure (false).
-                this.DisplayHelpText(
-                    parseResult, ((NotParsed<CommandLineOptions>)parseResult).Errors);
+                this.DisplayHelpText(parseResult);
                 return false;
             }
         }
@@ -110,9 +109,7 @@ namespace RiotClub.FireMoth.Console
         {
             if (!this.Initialized)
             {
-#pragma warning disable CA1303 // Do not pass literals as localized parameters
                 throw new InvalidOperationException("Can't start in uninitialized state.");
-#pragma warning restore CA1303 // Do not pass literals as localized parameters
             }
 
             ScanResult scanResult;
@@ -189,12 +186,8 @@ namespace RiotClub.FireMoth.Console
 
         /// <summary>
         /// Writes the application usage message to the status output.
-        /// </summary>
-#pragma warning disable CA1801 // Review unused parameters
-#pragma warning disable IDE0060 // Remove unused parameter
-        private void DisplayHelpText<T>(ParserResult<T> parseResult, IEnumerable<Error> errors)
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore CA1801 // Review unused parameters
+        /// </summary>7
+        private void DisplayHelpText<T>(ParserResult<T> parseResult)
         {
             var helpText = HelpText.AutoBuild(
                 parseResult,
