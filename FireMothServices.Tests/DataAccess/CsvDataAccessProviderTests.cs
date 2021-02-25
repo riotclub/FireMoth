@@ -58,12 +58,11 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public void AddFileRecord_NullFileFingerprint_ThrowsArgumentNullException()
         {
             // Arrange
-            using (CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object))
-            {
-                // Act, Assert
-                Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
-            }
+            using CsvDataAccessProvider testObject =
+                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
+
+            // Act, Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
         }
 
         [Fact]
