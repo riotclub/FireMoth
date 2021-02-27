@@ -6,8 +6,11 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.IO.Abstractions;
+    using System.Text;
+    using System.Threading.Tasks;
     using FireMothServices.DataAccess;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
@@ -66,7 +69,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         [Fact]
-        public void AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile()
+        public async void AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile()
         {
             var testFullPath = @"C:\dir, with, commas\file, with, commas.dat";
             var testHash = "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=";
@@ -77,52 +80,34 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var testFileNameWithQuotes = '"' + testFileName + '"';
 
             // Arrange
-            var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.DirectoryName).Returns(testPath);
-            mockFileInfo.SetupGet(mock => mock.FullName).Returns(testFullPath);
-            mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
-
-            var mockStreamWriter = new Mock<TextWriter>();
-
-            using (CsvDataAccessProvider testobject =
-                new CsvDataAccessProvider(mockStreamWriter.Object))
-            {
-                // Act
-                testobject.AddFileRecord(new FileFingerprint(mockFileInfo.Object, testHash));
-            }
+            var mockFileInfo = GetFileInfoMock(testPath, testFullPath, testFileName);
+            var dapOutput = await GetAddFileRecordOutput(
+                new FileFingerprint(mockFileInfo.Object, testHash));
 
             // Assert
-            mockStreamWriter.Verify(writer => writer.Write(testPathWithQuotes));
-            mockStreamWriter.Verify(writer => writer.Write(testFileNameWithQuotes));
+            var expectedOutput = string.Join(
+                ',',
+                new List<string> { testPathWithQuotes, testFileNameWithQuotes, "0", testHash });
+            Assert.Contains(expectedOutput, dapOutput);
         }
 
         [Theory]
         [InlineData(@"C:\somedir\somefile.txt", "CyA2DbkxG5oPUX/flw2v4RZDvHmdzSQL0jKAWlrsMVY=")]
         [InlineData(@"\\NETWORK\LOCATION\networkfile", "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=")]
-        public void AddFileRecord_ValidFileFingerprint_AddsRecordToStore(string file, string hash)
+        public async void AddFileRecord_ValidFileFingerprint_AddsRecordToStore(string file, string hash)
         {
             var testPath = Path.GetDirectoryName(file);
             var testFileName = Path.GetFileName(file);
 
             // Arrange
-            var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(mock => mock.DirectoryName).Returns(testPath);
-            mockFileInfo.SetupGet(mock => mock.FullName).Returns(file);
-            mockFileInfo.SetupGet(mock => mock.Name).Returns(testFileName);
-
-            var mockStreamWriter = new Mock<TextWriter>(MockBehavior.Default);
-
-            // Act
-            using (CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(mockStreamWriter.Object))
-            {
-                testObject.AddFileRecord(new FileFingerprint(mockFileInfo.Object, hash));
-            }
+            var mockFileInfo = GetFileInfoMock(testPath, file, testFileName);
+            var dapOutput = await GetAddFileRecordOutput(
+                new FileFingerprint(mockFileInfo.Object, hash));
 
             // Assert
-            mockStreamWriter.Verify(writer => writer.Write(testPath));
-            mockStreamWriter.Verify(writer => writer.Write(testFileName));
-            mockStreamWriter.Verify(writer => writer.Write(hash));
+            var expectedOutput = string.Join(
+                ',', new List<string> { testPath, testFileName, "0", hash });
+            Assert.Contains(expectedOutput, dapOutput);
         }
 
         /// <inheritdoc/>
@@ -149,6 +134,37 @@ namespace RiotClub.FireMoth.Services.FileScanning
             }
 
             this.disposed = true;
+        }
+
+        // Given an IFileFingerprint, creates a CsvDataAccessProvider, calls AddFileRecord, and
+        // returns the output generated from the DAP.
+        private static async Task<string> GetAddFileRecordOutput(IFileFingerprint fileFingerprint)
+        {
+            var testStream = new MemoryStream();
+            var testWriter = new StreamWriter(testStream, Encoding.UTF8);
+
+            using (CsvDataAccessProvider dataAccessProvider =
+                new CsvDataAccessProvider(testWriter, true))
+            {
+                dataAccessProvider.AddFileRecord(fileFingerprint);
+            }
+
+            testStream.Position = 0;
+            using (StreamReader reader = new StreamReader(testStream))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        private static Mock<IFileInfo> GetFileInfoMock(
+            string directoryName, string fullName, string name)
+        {
+            var mockFileInfo = new Mock<IFileInfo>();
+            mockFileInfo.SetupGet(mock => mock.DirectoryName).Returns(directoryName);
+            mockFileInfo.SetupGet(mock => mock.FullName).Returns(fullName);
+            mockFileInfo.SetupGet(mock => mock.Name).Returns(name);
+
+            return mockFileInfo;
         }
     }
 }
