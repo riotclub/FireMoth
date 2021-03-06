@@ -6,3 +6,4 @@
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Ignoring this for early development builds.", Scope = "module")]
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Style preference.", Scope = "module")]
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "Conflicts with SA1000KeywordsMustBeSpacedCorrectly", Scope = "module")]
