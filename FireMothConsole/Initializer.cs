@@ -12,17 +12,20 @@ namespace RiotClub.FireMoth.Console
     using System.IO;
     using System.IO.Abstractions;
     using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Threading.Tasks;
     using CommandLine;
     using CommandLine.Text;
     using FireMothConsole;
     using FireMothServices.DataAnalysis;
+    using Microsoft.Extensions.Hosting;
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.FileScanning;
 
     /// <summary>
     /// Validates application startup parameters and initiates directory scan.
     /// </summary>
-    public class Initializer
+    public class Initializer : IHostedService
     {
         private const string DefaultFilePrefix = "FireMothData_";
         private const string DefaultFileExtension = "csv";
@@ -203,6 +206,16 @@ namespace RiotClub.FireMoth.Console
                 e => e);
 
             this.statusOutputWriter.WriteLine(helpText);
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }
