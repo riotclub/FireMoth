@@ -5,11 +5,13 @@
 
 namespace RiotClub.FireMoth.Console
 {
+    using System;
+    using System.Threading.Tasks;
+    using FireMothConsole;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using System;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Application entry point.
@@ -17,6 +19,8 @@ namespace RiotClub.FireMoth.Console
     public static class Program
     {
         private static IServiceProvider serviceProvider;
+
+        private static IConfiguration configuration;
 
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
@@ -30,17 +34,7 @@ namespace RiotClub.FireMoth.Console
         {
             using IHost host = CreateHostBuilder(args).Build();
 
-            await Host.CreateDefaultBuilder(args)
-                //.ConfigureLogging((context) => context.AddEventLog());
-                .UseConsoleLifetime()
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddSingleton<Initializer>();
-                })
-                .RunConsoleAsync();
-
-            IServiceScope scope = serviceProvider.CreateScope();
-            scope.ServiceProvider.GetRequiredService<Initializer>().Initialize();
+            await host.RunAsync();
 
             /*
             var initializer = new Initializer(args, Console.Out);
@@ -52,8 +46,6 @@ namespace RiotClub.FireMoth.Console
                 Console.WriteLine("Process completed with exit state: {0}.", exitState);
             }
             */
-
-            await host.RunAsync();
         }
 
         /// <summary>
@@ -65,7 +57,7 @@ namespace RiotClub.FireMoth.Console
             Host.CreateDefaultBuilder(args)
                 .UseConsoleLifetime()
                 .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning))
-                .ConfigureHostConfiguration(builder =>
+                .ConfigureHostConfiguration(configuration =>
                 {
                     // Perform any configuration needed when building the host here.
                     // ConfigureDefaultBuilder sets content root to GetCurrentDirectory(); loads
@@ -73,14 +65,18 @@ namespace RiotClub.FireMoth.Console
                     // appsettings.json, appsettings.{env}.json, env vars, and cmd-line args;
                     // and adds logging providers for Console, Debug, EventSource, and EventLog.
                 })
-                .ConfigureAppConfiguration((hostContext, builder) =>
+                .ConfigureAppConfiguration((hostContext, configuration) =>
                 {
                     // Perform any app configuration here (after the host is built).
+                    //configuration.AddCommandLine(args);
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Configure services and add them to the IoC container here.
-                    // services.AddHostedService<Initializer>().AddScoped<IMessageWriter, MessageWriter>());
+                    //services.AddOptions();
+                    services.Configure<CommandLineOptions>(hostContext.Configuration);
+                    services.AddHostedService<Initializer>();
+                    services.AddSingleton(Console.Out);
                 });
     }
 }

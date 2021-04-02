@@ -45,7 +45,7 @@
             Validates application startup parameters and initiates directory scan.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.#ctor(System.String[],System.IO.TextWriter)">
+        <member name="M:RiotClub.FireMoth.Console.Initializer.#ctor(System.IO.TextWriter,Microsoft.Extensions.Options.IOptions{FireMothConsole.CommandLineOptions})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.Initializer"/> class.
             </summary>
@@ -117,6 +117,13 @@
             supported and required. This value must be a well-formed and existing directory path.
             </param>
             <returns>An <c>int</c> return code indicating invocation result.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            Creates the host builder.
+            </summary>
+            <param name="args">Arguments to supply to the host builder.</param>
+            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostBuilder"/>.</returns>
         </member>
     </members>
 </doc>

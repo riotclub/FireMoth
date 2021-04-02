@@ -19,6 +19,7 @@ namespace RiotClub.FireMoth.Console
     using FireMothConsole;
     using FireMothServices.DataAnalysis;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Options;
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.FileScanning;
 
@@ -31,7 +32,7 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileExtension = "csv";
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-        private readonly string[] processArguments;
+        private readonly CommandLineOptions processArguments;
         private readonly TextWriter statusOutputWriter;
         private string dataOutputFile;
 
@@ -42,9 +43,9 @@ namespace RiotClub.FireMoth.Console
         /// startup (command line) arguments.</param>
         /// <param name="outputWriter">A <see cref="TextWriter"/> that initialization messages will
         /// be written to.</param>
-        public Initializer(string[] processArguments, TextWriter outputWriter)
+        public Initializer(TextWriter outputWriter, IOptions<CommandLineOptions> processArguments)
         {
-            this.processArguments = processArguments;
+            this.processArguments = processArguments.Value;
             this.statusOutputWriter = outputWriter;
         }
 
@@ -75,7 +76,8 @@ namespace RiotClub.FireMoth.Console
             using (var commandLineParser = new Parser(config => ConfigureCommandLineParser(config)))
             {
                 parseResult =
-                    commandLineParser.ParseArguments<CommandLineOptions>(this.processArguments);
+                    //commandLineParser.ParseArguments<CommandLineOptions>(this.processArguments);
+                    commandLineParser.ParseArguments<CommandLineOptions>(new string[] { "x", "x" });
             }
 
             if (parseResult.Tag == ParserResultType.Parsed)
