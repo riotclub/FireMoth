@@ -32,9 +32,9 @@ namespace RiotClub.FireMoth.Console
         /// <returns>An <c>int</c> return code indicating invocation result.</returns>
         public static async Task Main(string[] args)
         {
-            using IHost host = CreateHostBuilder(args).Build();
+            IHostBuilder builder = CreateHostBuilder(args);
 
-            await host.RunAsync();
+            await builder.RunConsoleAsync();
 
             /*
             var initializer = new Initializer(args, Console.Out);
@@ -68,12 +68,10 @@ namespace RiotClub.FireMoth.Console
                 .ConfigureAppConfiguration((hostContext, configuration) =>
                 {
                     // Perform any app configuration here (after the host is built).
-                    //configuration.AddCommandLine(args);
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Configure services and add them to the IoC container here.
-                    //services.AddOptions();
                     services.Configure<CommandLineOptions>(hostContext.Configuration);
                     services.AddHostedService<Initializer>();
                     services.AddSingleton(Console.Out);

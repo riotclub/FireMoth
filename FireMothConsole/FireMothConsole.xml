@@ -101,7 +101,7 @@
         <member name="M:RiotClub.FireMoth.Console.Initializer.DisplayHelpText``1(CommandLine.ParserResult{``0})">
             <summary>
             Writes the application usage message to the status output.
-            </summary>7
+            </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
             <summary>

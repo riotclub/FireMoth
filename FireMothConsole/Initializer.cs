@@ -191,7 +191,7 @@ namespace RiotClub.FireMoth.Console
 
         /// <summary>
         /// Writes the application usage message to the status output.
-        /// </summary>7
+        /// </summary>
         private void DisplayHelpText<T>(ParserResult<T> parseResult)
         {
             var helpText = HelpText.AutoBuild(
@@ -210,14 +210,18 @@ namespace RiotClub.FireMoth.Console
             this.statusOutputWriter.WriteLine(helpText);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public virtual Task StartAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            this.statusOutputWriter.WriteLine("Application starting.");
+
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            this.statusOutputWriter.WriteLine("Application stopping.");
+
+            return Task.CompletedTask;
         }
     }
 }
