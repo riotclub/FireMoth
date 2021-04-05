@@ -32,7 +32,6 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileExtension = "csv";
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-        private readonly CommandLineOptions processArguments;
         private readonly TextWriter statusOutputWriter;
         private string dataOutputFile;
 
@@ -45,7 +44,7 @@ namespace RiotClub.FireMoth.Console
         /// be written to.</param>
         public Initializer(TextWriter outputWriter, IOptions<CommandLineOptions> processArguments)
         {
-            this.processArguments = processArguments.Value;
+            this.CommandLineOptions = processArguments.Value;
             this.statusOutputWriter = outputWriter;
         }
 

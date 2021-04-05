@@ -8,7 +8,6 @@ namespace RiotClub.FireMoth.Console
     using System;
     using System.Threading.Tasks;
     using FireMothConsole;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
@@ -18,10 +17,6 @@ namespace RiotClub.FireMoth.Console
     /// </summary>
     public static class Program
     {
-        private static IServiceProvider serviceProvider;
-
-        private static IConfiguration configuration;
-
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
         /// configuration, and invokes the directory scanning process.
