@@ -14,7 +14,7 @@ namespace FireMothServices.DataAnalysis
     /// </summary>
     public class SHA256FileHasher : IFileHasher, IDisposable
     {
-        private HashAlgorithm hashAlgorithm;
+        private readonly HashAlgorithm hashAlgorithm;
 
         private bool disposed = false;
 

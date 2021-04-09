@@ -128,14 +128,14 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
         /// number of files skipped, respectively.</returns>
         protected internal virtual (int scannedFiles, int skippedFiles) ProcessFiles(
-            IEnumerable<System.IO.Abstractions.IFileInfo> files)
+            IEnumerable<IFileInfo> files)
         {
             Contract.Requires(files != null);
 
             int scannedFiles = 0;
             int skippedFiles = 0;
 
-            foreach (System.IO.Abstractions.IFileInfo file in files)
+            foreach (IFileInfo file in files)
             {
                 try
                 {

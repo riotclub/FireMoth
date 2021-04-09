@@ -40,34 +40,6 @@
             Indicates an error occurred after program initialization.
             </summary>
         </member>
-        <member name="T:RiotClub.FireMoth.Console.Initializer">
-            <summary>
-            Validates application startup parameters and initiates directory scan.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.#ctor(System.IO.TextWriter,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Console.CommandLineOptions})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.Initializer"/> class.
-            </summary>
-            <param name="processArguments">An array of <see cref="T:System.String"/>s containing process
-            startup (command line) arguments.</param>
-            <param name="outputWriter">A <see cref="T:System.IO.TextWriter"/> that initialization messages will
-            be written to.</param>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.Start">
-            <summary>
-            Begins scanning the directory specified during application startup.
-            </summary>
-            <returns>An <see cref="T:RiotClub.FireMoth.Console.ExitState"/> indicating the result of the directory scan
-            operation.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.ContainsInvalidPathCharacters(System.String)">
-            <summary>
-            Checks the provided string for invalid path characters.
-            </summary>
-            <param name="testPath">The path to test.</param>
-            <returns><c>true</c> if the provided path contains invalid path characters.</returns>
-        </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
             <summary>
             Application entry point.

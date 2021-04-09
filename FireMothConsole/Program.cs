@@ -6,16 +6,28 @@
 namespace RiotClub.FireMoth.Console
 {
     using System;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.IO.Abstractions;
     using System.Threading.Tasks;
+    using FireMothServices.DataAnalysis;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.FileScanning;
 
     /// <summary>
     /// Application entry point.
     /// </summary>
     public static class Program
     {
+        private const string DefaultFilePrefix = "FireMothData_";
+        private const string DefaultFileExtension = "csv";
+        private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
+
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
         /// configuration, and invokes the directory scanning process.
@@ -25,25 +37,47 @@ namespace RiotClub.FireMoth.Console
         /// <seealso cref="CommandLineOptions"/>
         public static async Task Main(string[] args)
         {
-            using (var host = CreateHostBuilder(args).Build())
-            {
-                await host.StartAsync();
+            using var host = CreateHostBuilder(args).Build();
+            await host.StartAsync();
 
-                try
+            try
+            {
+                var fileScanner = host.Services.GetRequiredService<FileScanner>();
+                var options = host.Services.GetRequiredService<IOptions<CommandLineOptions>>();
+                var scanDirectory = new FileSystem().DirectoryInfo.FromDirectoryName(
+                    options.Value.ScanDirectory);
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var scanResult =
+                    fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
+                stopwatch.Stop();
+
+                TimeSpan timeSpan = stopwatch.Elapsed;
+                var outputWriter = host.Services.GetService<TextWriter>();
+                if (outputWriter != null)
                 {
-                    var initializer = host.Services.GetRequiredService<Initializer>();
-                    initializer.Start();
+                    outputWriter.WriteLine(
+                        "Scan complete. Scanned {0} files.", fileScanner.TotalFilesScanned);
+                    if (fileScanner.TotalFilesSkipped > 0)
+                    {
+                        outputWriter.WriteLine(
+                            "{0} files could not be scanned due to errors.",
+                            fileScanner.TotalFilesSkipped);
+                    }
+
+                    outputWriter.WriteLine($"Total scan time: {timeSpan}");
                 }
-                catch (Exception exception)
-                {
-                    Console.Error.WriteLine("ERROR: " + exception.Message);
-                }
-                finally
-                {
-                    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-                    lifetime.StopApplication();
-                    await host.WaitForShutdownAsync();
-                }
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine("ERROR: " + exception.Message);
+            }
+            finally
+            {
+                var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+                lifetime.StopApplication();
+                await host.WaitForShutdownAsync();
             }
         }
 
@@ -72,8 +106,16 @@ namespace RiotClub.FireMoth.Console
                 {
                     // Configure services and add them to the IoC container here.
                     services.Configure<CommandLineOptions>(hostContext.Configuration);
-                    services.AddTransient<Initializer>();
-                    services.AddSingleton (Console.Out);
+                    services.AddSingleton(Console.Out);
+                    services.AddSingleton<FileScanner>();
+                    services.AddTransient<IFileHasher, SHA256FileHasher>();
+                    services.AddTransient<IDataAccessProvider, CsvDataAccessProvider>();
+                    services.AddTransient(provider =>
+                        new StreamWriter(
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                            + Path.DirectorySeparatorChar + DefaultFilePrefix
+                            + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
+                            + '.' + DefaultFileExtension));
                 });
     }
 }
