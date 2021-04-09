@@ -38,10 +38,12 @@ namespace RiotClub.FireMoth.Console
                 {
                     Console.Error.WriteLine("ERROR: " + exception.Message);
                 }
-
-                var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-                lifetime.StopApplication();
-                await host.WaitForShutdownAsync();
+                finally
+                {
+                    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+                    lifetime.StopApplication();
+                    await host.WaitForShutdownAsync();
+                }
             }
         }
 
