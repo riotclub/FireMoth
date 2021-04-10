@@ -9,12 +9,13 @@
             Implementation of a data access provider that persists data to a stream in CSV format.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.TextWriter,System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.#ctor(System.IO.StreamWriter,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider},System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> class.
             </summary>
             <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.
             </param>
+            <param name="logger">The logger.</param>
             <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not
             be closed when the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> is disposed.</param>
         </member>
@@ -49,7 +50,7 @@
             and hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,FireMothServices.DataAnalysis.IFileHasher,System.IO.TextWriter)">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,FireMothServices.DataAnalysis.IFileHasher,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.FileScanning.FileScanner})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/> class.
             </summary>
@@ -80,6 +81,17 @@
             <param name="files">The set of files to hash and record.</param>
             <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
             number of files skipped, respectively.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetSubDirectories(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IDirectoryInfo}@)">
+            <summary>
+            Attempts to retrieve all immediate subdirectories of the provided directory.
+            </summary>
+            <param name="directory">An <see cref="T:System.IO.Abstractions.IDirectoryInfo"/> representing the directory for
+            which subdirectories will be enumerated.</param>
+            <param name="subdirectories">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection
+            containing the subdirectories of the provided directory.</param>
+            <returns><c>true</c> if subdirectories were successfully enumerated and set in
+            <paramref name="subdirectories"/>.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.GetBase64HashFromStream(System.IO.Stream)">
             <summary>

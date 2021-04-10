@@ -28,6 +28,8 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileExtension = "csv";
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
+        private static IServiceCollection serviceCollection;
+
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
         /// configuration, and invokes the directory scanning process.
@@ -40,6 +42,7 @@ namespace RiotClub.FireMoth.Console
             using var host = CreateHostBuilder(args).Build();
             await host.StartAsync();
 
+            var log = host.Services.GetService<ILoggerFactory>().CreateLogger(nameof(Program));
             try
             {
                 var fileScanner = host.Services.GetRequiredService<FileScanner>();
@@ -55,23 +58,25 @@ namespace RiotClub.FireMoth.Console
 
                 TimeSpan timeSpan = stopwatch.Elapsed;
                 var outputWriter = host.Services.GetService<TextWriter>();
-                if (outputWriter != null)
+                if (log != null)
                 {
-                    outputWriter.WriteLine(
-                        "Scan complete. Scanned {0} files.", fileScanner.TotalFilesScanned);
+                    log.LogInformation(
+                        "Scan complete. Scanned {ScannedFilesCount} files.",
+                        fileScanner.TotalFilesScanned);
                     if (fileScanner.TotalFilesSkipped > 0)
                     {
-                        outputWriter.WriteLine(
+                        log.LogInformation(
                             "{0} files could not be scanned due to errors.",
                             fileScanner.TotalFilesSkipped);
                     }
 
-                    outputWriter.WriteLine($"Total scan time: {timeSpan}");
+                    log.LogInformation("Total scan time: {ScanTime}.", timeSpan);
                 }
             }
             catch (Exception exception)
             {
-                Console.Error.WriteLine("ERROR: " + exception.Message);
+                log.LogCritical(
+                    exception, "Scan interrupted: {ExceptionMessage}", exception.Message);
             }
             finally
             {
@@ -88,25 +93,19 @@ namespace RiotClub.FireMoth.Console
         /// <returns>The configured <see cref="IHostBuilder"/>.</returns>
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Information))
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                    logging.SetMinimumLevel(LogLevel.Debug);
+                })
                 .UseConsoleLifetime()
-                .ConfigureHostConfiguration(configuration =>
-                {
-                    // Perform any configuration needed when building the host here.
-                    // ConfigureDefaultBuilder sets content root to GetCurrentDirectory(); loads
-                    // host config from DOTNET_* env vars and cmd line args; loads app config from
-                    // appsettings.json, appsettings.{env}.json, env vars, and cmd-line args;
-                    // and adds logging providers for Console, Debug, EventSource, and EventLog.
-                })
-                .ConfigureAppConfiguration((hostContext, configuration) =>
-                {
-                    // Perform any app configuration here (after the host is built).
-                })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    serviceCollection = services;
+
                     // Configure services and add them to the IoC container here.
                     services.Configure<CommandLineOptions>(hostContext.Configuration);
-                    services.AddSingleton(Console.Out);
                     services.AddSingleton<FileScanner>();
                     services.AddTransient<IFileHasher, SHA256FileHasher>();
                     services.AddTransient<IDataAccessProvider, CsvDataAccessProvider>();

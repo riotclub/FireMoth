@@ -10,6 +10,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     using System.IO;
     using CsvHelper;
     using FireMothServices.DataAccess;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Implementation of a data access provider that persists data to a stream in CSV format.
@@ -17,6 +18,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     public class CsvDataAccessProvider : IDataAccessProvider, IDisposable
     {
         private readonly CsvWriter csvWriter;
+        private readonly ILogger<CsvDataAccessProvider> logger;
         private bool disposed;
 
         /// <summary>
@@ -24,10 +26,14 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// </summary>
         /// <param name="outputWriter">The <see cref="TextWriter"/> object to which data is written.
         /// </param>
+        /// <param name="logger">The logger.</param>
         /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not
         /// be closed when the <see cref="CsvDataAccessProvider"/> is disposed.</param>
-        public CsvDataAccessProvider(TextWriter outputWriter, bool leaveOpen = false)
+        public CsvDataAccessProvider(
+            StreamWriter outputWriter, ILogger<CsvDataAccessProvider> logger, bool leaveOpen = false)
         {
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
             if (outputWriter == null)
             {
                 throw new ArgumentNullException(nameof(outputWriter));
@@ -46,6 +52,12 @@ namespace RiotClub.FireMoth.Services.DataAccess
                 throw new ArgumentNullException(nameof(fingerprint));
             }
 
+            var fullPath =
+                fingerprint.DirectoryName + Path.DirectorySeparatorChar + fingerprint.Name;
+            this.logger.LogDebug(
+                "Writing record for file {FileName} with hash {HashString}.",
+                fullPath,
+                fingerprint.Base64Hash);
             this.csvWriter.WriteRecord(fingerprint);
             this.csvWriter.NextRecord();
         }
