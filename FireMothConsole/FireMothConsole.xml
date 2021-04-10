@@ -4,19 +4,19 @@
         <name>FireMothConsole</name>
     </assembly>
     <members>
-        <member name="T:FireMothConsole.CommandLineOptions">
+        <member name="T:RiotClub.FireMoth.Console.CommandLineOptions">
             <summary>
             Defines options available when invoking the application via command line.
             </summary>
         </member>
-        <member name="P:FireMothConsole.CommandLineOptions.ScanDirectory">
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.ScanDirectory">
             <summary>
             Gets or sets the ScanDirectory option, indicating the input directory to scan.
             </summary>
         </member>
-        <member name="P:FireMothConsole.CommandLineOptions.RecursiveScan">
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.RecursiveScan">
             <summary>
-            Gets or sets a value indicating whether subdirectories of <see cref="P:FireMothConsole.CommandLineOptions.ScanDirectory"/>
+            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Console.CommandLineOptions.ScanDirectory"/>
             will be recursively scanned in addition to its file contents.
             </summary>
         </member>
@@ -40,69 +40,6 @@
             Indicates an error occurred after program initialization.
             </summary>
         </member>
-        <member name="T:RiotClub.FireMoth.Console.Initializer">
-            <summary>
-            Validates application startup parameters and initiates directory scan.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.#ctor(System.String[],System.IO.TextWriter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.Initializer"/> class.
-            </summary>
-            <param name="processArguments">An array of <see cref="T:System.String"/>s containing process
-            startup (command line) arguments.</param>
-            <param name="outputWriter">A <see cref="T:System.IO.TextWriter"/> that initialization messages will
-            be written to.</param>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.Initializer.Initialized">
-            <summary>
-            Gets or sets a value indicating whether the application has been initialized and is
-            ready for startup.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.Initializer.CommandLineOptions">
-            <summary>
-            Gets the <see cref="P:RiotClub.FireMoth.Console.Initializer.CommandLineOptions"/> containing the command line arguments sent on
-            application invocation.
-            </summary>
-            <remarks> If the application has not been initialized (via <see cref="M:RiotClub.FireMoth.Console.Initializer.Initialize"/>),
-            this value will be <c>null</c>.</remarks>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.Initialize">
-            <summary>
-            Performs initialization tasks to prepare application for startup. This must be called
-            before the call to the <see cref="M:RiotClub.FireMoth.Console.Initializer.Start"/> method.
-            </summary>
-            <returns><c>true</c> if initialization was successful and the application is ready for
-            startup.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.Start">
-            <summary>
-            Begins scanning the directory specified during application startup.
-            </summary>
-            <returns>An <see cref="T:RiotClub.FireMoth.Console.ExitState"/> indicating the result of the directory scan
-            operation.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.ContainsInvalidPathCharacters(System.String)">
-            <summary>
-            Checks the provided string for invalid path characters.
-            </summary>
-            <param name="testPath">The path to test.</param>
-            <returns><c>true</c> if the provided path contains invalid path characters.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.ConfigureCommandLineParser(CommandLine.ParserSettings)">
-            <summary>
-            Configures an instance of <see cref="T:CommandLine.ParserSettings"/> to be consumed by the command
-            line parser.
-            </summary>
-            <param name="config">A <see cref="T:CommandLine.ParserSettings"/> object used to configure the
-            command line parser.</param>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Initializer.DisplayHelpText``1(CommandLine.ParserResult{``0})">
-            <summary>
-            Writes the application usage message to the status output.
-            </summary>7
-        </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
             <summary>
             Application entry point.
@@ -113,10 +50,16 @@
             Class and application entry point. Validates command-line arguments, performs startup
             configuration, and invokes the directory scanning process.
             </summary>
-            <param name="args">Command-line arguments. A single argument, --directory, is currently
-            supported and required. This value must be a well-formed and existing directory path.
-            </param>
+            <param name="args">Command-line arguments.</param>
             <returns>An <c>int</c> return code indicating invocation result.</returns>
+            <seealso cref="T:RiotClub.FireMoth.Console.CommandLineOptions"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            Creates the host builder.
+            </summary>
+            <param name="args">Arguments to supply to the host builder.</param>
+            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostBuilder"/>.</returns>
         </member>
     </members>
 </doc>

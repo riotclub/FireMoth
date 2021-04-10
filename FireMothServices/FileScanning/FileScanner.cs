@@ -14,6 +14,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.Security;
     using FireMothServices.DataAccess;
     using FireMothServices.DataAnalysis;
+    using Microsoft.Extensions.Logging;
     using RiotClub.FireMoth.Services.DataAccess;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     {
         private readonly IDataAccessProvider dataAccessProvider;
         private readonly IFileHasher hasher;
-        private readonly TextWriter logWriter;
+        private readonly ILogger<FileScanner> log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileScanner"/> class.
@@ -36,14 +37,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <param name="logWriter">A <see cref="TextWriter"/> to which logging output will be
         /// written.</param>
         public FileScanner(
-            IDataAccessProvider dataAccessProvider, IFileHasher hasher, TextWriter logWriter)
+            IDataAccessProvider dataAccessProvider, IFileHasher hasher, ILogger<FileScanner> log)
         {
             this.dataAccessProvider =
                 dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
-            this.hasher =
-                hasher ?? throw new ArgumentNullException(nameof(hasher));
-            this.logWriter =
-                logWriter ?? throw new ArgumentNullException(nameof(logWriter));
+            this.hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
+            this.log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
         /// <summary>
@@ -64,39 +63,23 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 throw new ArgumentNullException(nameof(directory));
             }
 
-            if (!directory.Exists)
-            {
-                this.logWriter.WriteLine(
-                    "Error: \"{0}\" is not a valid directory. Ensure the directory does not have a trailing backslash.",
-                    directory);
-                return ScanResult.ScanFailure;
-            }
-
-            this.logWriter.WriteLine($"Scanning directory \"{directory}\"...");
+            // if (!directory.Exists)
+            // {
+            //    this.log.LogError(
+            //        "Error: \"{0}\" is not a valid directory. Ensure the directory does not have a trailing backslash.",
+            //        directory);
+            //    return ScanResult.ScanFailure;
+            // }
+            this.log.LogInformation("Scanning directory {ScanDirectory}...", directory);
 
             if (recursive)
             {
-                IEnumerable<IDirectoryInfo> subdirectories;
-                try
+                this.log.LogDebug(
+                    "Recursive scan requested; enumerating subdirectories of {ScanDirectory}...",
+                    directory);
+                if (!this.TryGetSubDirectories(
+                    directory, out IEnumerable<IDirectoryInfo> subdirectories))
                 {
-                    subdirectories = directory.EnumerateDirectories();
-                }
-                catch (IOException ex)
-                {
-                    this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories (I/O): {ex.Message}");
-                    return ScanResult.ScanFailure;
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories (unauthorized): {ex.Message}");
-                    return ScanResult.ScanFailure;
-                }
-                catch (SecurityException ex)
-                {
-                    this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories (security): {ex.Message}");
                     return ScanResult.ScanFailure;
                 }
 
@@ -110,8 +93,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
             }
 
             (int scannedFiles, int skippedFiles) = this.ProcessFiles(directory.EnumerateFiles());
-            this.logWriter.WriteLine(
-                "Completed scanning \"{0}\" ({1}/{2} file(s) scanned).",
+            this.log.LogInformation(
+                "Completed scanning {DirectoryName} ({ScannedFileCount}/{TotalFileCount} file(s) scanned).",
                 directory.FullName,
                 scannedFiles,
                 scannedFiles + skippedFiles);
@@ -128,36 +111,88 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
         /// number of files skipped, respectively.</returns>
         protected internal virtual (int scannedFiles, int skippedFiles) ProcessFiles(
-            IEnumerable<System.IO.Abstractions.IFileInfo> files)
+            IEnumerable<IFileInfo> files)
         {
             Contract.Requires(files != null);
 
             int scannedFiles = 0;
             int skippedFiles = 0;
 
-            foreach (System.IO.Abstractions.IFileInfo file in files)
+            foreach (IFileInfo file in files)
             {
                 try
                 {
                     using (Stream fileStream = file.OpenRead())
                     {
-                        this.logWriter.Write(file.FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
                         this.dataAccessProvider.AddFileRecord(
                             new FileFingerprint(file, hashString));
-                        this.logWriter.WriteLine($" [{hashString}]");
+                        this.log.LogDebug(
+                            "Adding record for file {FileName} with hash {HashString} to data access provider.",
+                            file.FullName,
+                            hashString);
                         scannedFiles++;
+
+                        if (scannedFiles % 10 == 0)
+                        {
+                            this.log.LogInformation(
+                                "Scanned {ScannedFileCount} files...", scannedFiles);
+                        }
                     }
                 }
                 catch (IOException exception)
                 {
-                    this.logWriter.WriteLine(
-                        $"Could not read from \"{file.FullName}\": {exception.Message}");
+                    this.log.LogError(
+                        "Could not add record for file {FileName}: {ExceptionMessage} (skipping)",
+                        file.FullName,
+                        exception.Message);
                     skippedFiles++;
                 }
             }
 
             return (scannedFiles, skippedFiles);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve all immediate subdirectories of the provided directory.
+        /// </summary>
+        /// <param name="directory">An <see cref="IDirectoryInfo"/> representing the directory for
+        /// which subdirectories will be enumerated.</param>
+        /// <param name="subdirectories">An <see cref="IEnumerable{IDirectoryInfo}"/> collection
+        /// containing the subdirectories of the provided directory.</param>
+        /// <returns><c>true</c> if subdirectories were successfully enumerated and set in
+        /// <paramref name="subdirectories"/>.</returns>
+        private bool TryGetSubDirectories(
+            IDirectoryInfo directory, out IEnumerable<IDirectoryInfo> subdirectories)
+        {
+            try
+            {
+                this.log.LogDebug("Enumerating subdirectories of directories");
+                subdirectories = directory.EnumerateDirectories();
+            }
+            catch (IOException ex)
+            {
+                this.log.LogError(
+                    ex, "Could not enumerate subdirectories of {Directory}.", directory);
+                subdirectories = null;
+                return false;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                this.log.LogError(
+                    ex, "Could not enumerate subdirectories of {Directory}.", directory);
+                subdirectories = null;
+                return false;
+            }
+            catch (SecurityException ex)
+            {
+                this.log.LogError(
+                    ex, "Could not enumerate subdirectories of {Directory}.", directory);
+                subdirectories = null;
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -168,6 +203,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <returns>A base 64 encoded <see cref="string"/> of the hash.</returns>
         private string GetBase64HashFromStream(Stream stream)
         {
+            this.log.LogDebug(
+                "Calculating hash from file stream using hasher {Hasher}...",
+                this.hasher.GetType().FullName);
             byte[] hashBytes = this.hasher.ComputeHashFromStream(stream);
             return Convert.ToBase64String(hashBytes);
         }
