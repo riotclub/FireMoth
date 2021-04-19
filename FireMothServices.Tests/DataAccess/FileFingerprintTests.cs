@@ -7,6 +7,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO.Abstractions.TestingHelpers;
     using FireMothServices.DataAccess;
     using Xunit;
@@ -24,6 +25,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
      * - Value must be a valid base 64 string
      *      * Base64HashSet_InvalidBase64String_ThrowsArgumentException
      */
+    [ExcludeFromCodeCoverage]
     public class FileFingerprintTests
     {
         private readonly MockFileSystem mockFileSystem;
