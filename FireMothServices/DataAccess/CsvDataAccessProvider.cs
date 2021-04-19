@@ -55,6 +55,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         {
             if (this.disposed)
             {
+                this.logger.LogCritical("Tried to call AddFileRecord on disposed object.");
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
 
