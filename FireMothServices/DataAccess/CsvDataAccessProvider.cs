@@ -30,7 +30,9 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not
         /// be closed when the <see cref="CsvDataAccessProvider"/> is disposed.</param>
         public CsvDataAccessProvider(
-            StreamWriter outputWriter, ILogger<CsvDataAccessProvider> logger, bool leaveOpen = false)
+            StreamWriter outputWriter,
+            ILogger<CsvDataAccessProvider> logger,
+            bool leaveOpen = false)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -45,8 +47,17 @@ namespace RiotClub.FireMoth.Services.DataAccess
         }
 
         /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException">Thrown when provided
+        /// <see cref="IFileFingerprint"/> reference is null.</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.
+        /// </exception>
         public void AddFileRecord(IFileFingerprint fingerprint)
         {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+
             if (fingerprint == null)
             {
                 throw new ArgumentNullException(nameof(fingerprint));

@@ -7,33 +7,43 @@ namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
     using System.Text;
     using System.Threading.Tasks;
     using FireMothServices.DataAccess;
+    using Microsoft.Extensions.Logging;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
     using Xunit;
 
     /*
-     * Ctor:
-     *  - TextWriter can't be null
-     *      * Ctor_NullTextWriter_ThrowsArgumentNullException
-     * AddFileRecord:
+     * Ctor
+     *  * StreamWriter can't be null
+     *      * Ctor_NullStreamWriter_ThrowsArgumentNullException
+     *  * ILogger can't be null
+     *      * Ctor_NullILogger_ThrowsArgumentNullException
+     *
+     * AddFileRecord
      * - IFileFingerprint can't be null
-     *      * AddFileRecord_NullFileFingerprint_ThrowsArgumentNullException
+     *      * AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException
      * - File with commas in name adds file with quotes to backing store
      *      * AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile
      * - Valid IFileFingerprint adds record to backing store
      *      * AddFileRecord_ValidFileFingerprint_AddsRecordToStore
+     * - Call on disposed object throws exception
+     *      * AddFileRecord_DisposedObject_ThrowsObjectDisposedException
      */
+    [ExcludeFromCodeCoverage]
     public class CsvDataAccessProviderTests : IDisposable
     {
         private readonly Mock<IFileInfo> mockFileInfo;
-        private readonly Mock<TextWriter> mockDefaultStreamWriter;
+        private readonly StreamWriter testStreamWriter;
         private readonly string testFilePath = @"C:\TestDir";
         private readonly string testFileName = "TestFile.txt";
+        private readonly string testHash = "CyA2DbkxG5oPUX/flw2v4RZDvHmdzSQL0jKAWlrsMVY=";
+        private readonly ILogger<CsvDataAccessProvider> testLogger;
         private bool disposed;
 
         public CsvDataAccessProviderTests()
@@ -46,23 +56,35 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 .SetupGet(mock => mock.Name)
                 .Returns(this.testFileName);
 
-            this.mockDefaultStreamWriter = new Mock<TextWriter>();
-            this.mockDefaultStreamWriter.Setup(mock => mock.WriteLine("result from test"));
+            this.testStreamWriter = new StreamWriter(new MemoryStream(), Encoding.UTF8);
+
+            this.testLogger = LoggerFactory
+                .Create(builder => builder.SetMinimumLevel(LogLevel.Information))
+                .CreateLogger<CsvDataAccessProvider>();
         }
 
         [Fact]
-        public void Ctor_NullTextWriter_ThrowsArgumentNullException()
+        public void Ctor_NullStreamWriter_ThrowsArgumentNullException()
         {
             // Arrange, Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new CsvDataAccessProvider(null));
+            Assert.Throws<ArgumentNullException>(() => new CsvDataAccessProvider(
+                null, this.testLogger, true));
         }
 
         [Fact]
-        public void AddFileRecord_NullFileFingerprint_ThrowsArgumentNullException()
+        public void Ctor_NullILogger_ThrowsArgumentNullException()
+        {
+            // Arrange, Act, Assert
+            Assert.Throws<ArgumentNullException>(() => new CsvDataAccessProvider(
+                this.testStreamWriter, null, true));
+        }
+
+        [Fact]
+        public void AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException()
         {
             // Arrange
             using CsvDataAccessProvider testObject =
-                new CsvDataAccessProvider(this.mockDefaultStreamWriter.Object);
+                new CsvDataAccessProvider(this.testStreamWriter, this.testLogger, true);
 
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
@@ -71,6 +93,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         [Fact]
         public async void AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile()
         {
+            // Arrange
             var testFullPath = @"C:\dir, with, commas\file, with, commas.dat";
             var testHash = "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=";
 
@@ -79,9 +102,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var testFileName = Path.GetFileName(testFullPath);
             var testFileNameWithQuotes = '"' + testFileName + '"';
 
-            // Arrange
             var mockFileInfo = GetFileInfoMock(testPath, testFullPath, testFileName);
-            var dapOutput = await GetAddFileRecordOutput(
+
+            // Act
+            var dapOutput = await this.GetAddFileRecordOutput(
                 new FileFingerprint(mockFileInfo.Object, testHash));
 
             // Assert
@@ -94,20 +118,38 @@ namespace RiotClub.FireMoth.Services.FileScanning
         [Theory]
         [InlineData(@"C:\somedir\somefile.txt", "CyA2DbkxG5oPUX/flw2v4RZDvHmdzSQL0jKAWlrsMVY=")]
         [InlineData(@"\\NETWORK\LOCATION\networkfile", "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=")]
-        public async void AddFileRecord_ValidFileFingerprint_AddsRecordToStore(string file, string hash)
+        public async void AddFileRecord_ValidFileFingerprint_AddsRecordToStore(
+            string file, string hash)
         {
+            // Arrange
             var testPath = Path.GetDirectoryName(file);
             var testFileName = Path.GetFileName(file);
-
-            // Arrange
             var mockFileInfo = GetFileInfoMock(testPath, file, testFileName);
-            var dapOutput = await GetAddFileRecordOutput(
+
+            // Act
+            var dapOutput = await this.GetAddFileRecordOutput(
                 new FileFingerprint(mockFileInfo.Object, hash));
 
             // Assert
             var expectedOutput = string.Join(
                 ',', new List<string> { testPath, testFileName, "0", hash });
             Assert.Contains(expectedOutput, dapOutput);
+        }
+
+        [Fact]
+        public void AddFileRecord_DisposedObject_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            var testObject = new CsvDataAccessProvider(
+                this.testStreamWriter, this.testLogger, true);
+
+            // Act
+            testObject.Dispose();
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(() =>
+                testObject.AddFileRecord(
+                    new FileFingerprint(this.mockFileInfo.Object, this.testHash)));
         }
 
         /// <inheritdoc/>
@@ -130,30 +172,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             if (disposing)
             {
-                this.mockDefaultStreamWriter.Object.Dispose();
+                this.testStreamWriter.Dispose();
             }
 
             this.disposed = true;
-        }
-
-        // Given an IFileFingerprint, creates a CsvDataAccessProvider, calls AddFileRecord, and
-        // returns the output generated from the DAP.
-        private static async Task<string> GetAddFileRecordOutput(IFileFingerprint fileFingerprint)
-        {
-            var testStream = new MemoryStream();
-            var testWriter = new StreamWriter(testStream, Encoding.UTF8);
-
-            using (CsvDataAccessProvider dataAccessProvider =
-                new CsvDataAccessProvider(testWriter, true))
-            {
-                dataAccessProvider.AddFileRecord(fileFingerprint);
-            }
-
-            testStream.Position = 0;
-            using (StreamReader reader = new StreamReader(testStream))
-            {
-                return await reader.ReadToEndAsync();
-            }
         }
 
         private static Mock<IFileInfo> GetFileInfoMock(
@@ -165,6 +187,26 @@ namespace RiotClub.FireMoth.Services.FileScanning
             mockFileInfo.SetupGet(mock => mock.Name).Returns(name);
 
             return mockFileInfo;
+        }
+
+        // Given an IFileFingerprint, creates a CsvDataAccessProvider, calls AddFileRecord, and
+        // returns the output generated from the DAP.
+        private async Task<string> GetAddFileRecordOutput(IFileFingerprint fileFingerprint)
+        {
+            var testStream = new MemoryStream();
+
+            // StreamWriter disposes underlying MemoryStream when disposed
+            var testWriter = new StreamWriter(testStream, Encoding.UTF8);
+
+            using (CsvDataAccessProvider dataAccessProvider =
+                new CsvDataAccessProvider(testWriter, this.testLogger, true))
+            {
+                dataAccessProvider.AddFileRecord(fileFingerprint);
+            }
+
+            testStream.Position = 0;
+            using StreamReader reader = new StreamReader(testStream);
+            return await reader.ReadToEndAsync();
         }
     }
 }
