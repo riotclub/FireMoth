@@ -21,6 +21,10 @@
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(FireMothServices.DataAccess.IFileFingerprint)">
             <inheritdoc/>
+            <exception cref="T:System.ArgumentNullException">Thrown when provided
+            <see cref="T:FireMothServices.DataAccess.IFileFingerprint"/> reference is null.</exception>
+            <exception cref="T:System.ObjectDisposedException">Thrown when object is in a disposed state.
+            </exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.Dispose">
             <inheritdoc/>
@@ -81,6 +85,17 @@
             <param name="files">The set of files to hash and record.</param>
             <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
             number of files skipped, respectively.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetFiles(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo}@)">
+            <summary>
+            Attempts to retrieve all immediate subdirectories of the provided directory.
+            </summary>
+            <param name="directory">An <see cref="T:System.IO.Abstractions.IDirectoryInfo"/> representing the directory for
+            which subdirectories will be enumerated.</param>
+            <param name="files">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection
+            containing the subdirectories of the provided directory.</param>
+            <returns><c>true</c> if subdirectories were successfully enumerated and set in
+            <paramref name="files"/>.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetSubDirectories(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IDirectoryInfo}@)">
             <summary>

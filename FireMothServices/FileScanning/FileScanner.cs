@@ -92,7 +92,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
             }
 
-            (int scannedFiles, int skippedFiles) = this.ProcessFiles(directory.EnumerateFiles());
+            if (!this.TryGetFiles(directory, out IEnumerable<IFileInfo> files))
+            {
+                return ScanResult.ScanFailure;
+            }
+
+            (int scannedFiles, int skippedFiles) = this.ProcessFiles(files);
             this.log.LogInformation(
                 "Completed scanning {DirectoryName} ({ScannedFileCount}/{TotalFileCount} file(s) scanned).",
                 directory.FullName,
@@ -143,7 +148,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 catch (IOException exception)
                 {
                     this.log.LogError(
-                        "Could not add record for file {FileName}: {ExceptionMessage} (skipping)",
+                        "Could not add record for file {FileName} (skipping): {ExceptionMessage}",
                         file.FullName,
                         exception.Message);
                     skippedFiles++;
@@ -151,6 +156,47 @@ namespace RiotClub.FireMoth.Services.FileScanning
             }
 
             return (scannedFiles, skippedFiles);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve all files in the provided directory.
+        /// </summary>
+        /// <param name="directory">An <see cref="IDirectoryInfo"/> representing the directory for
+        /// which files will be enumerated.</param>
+        /// <param name="files">An <see cref="IEnumerable{IFileInfo}"/> collection containing the
+        /// subdirectories of the provided directory.</param>
+        /// <returns><c>true</c> if files were successfully enumerated and set in
+        /// <paramref name="files"/>.</returns>
+        private bool TryGetFiles(
+            IDirectoryInfo directory, out IEnumerable<IFileInfo> files)
+        {
+            try
+            {
+                this.log.LogDebug("Enumerating files of directory {Directory}...", directory);
+                files = directory.EnumerateFiles();
+            }
+            catch (IOException ex)
+            {
+                this.log.LogError(
+                    ex,
+                    "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
+                    directory,
+                    ex.Message);
+                files = null;
+                return false;
+            }
+            catch (SecurityException ex)
+            {
+                this.log.LogError(
+                    ex,
+                    "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
+                    directory,
+                    ex.Message);
+                files = null;
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -173,21 +219,30 @@ namespace RiotClub.FireMoth.Services.FileScanning
             catch (IOException ex)
             {
                 this.log.LogError(
-                    ex, "Could not enumerate subdirectories of {Directory}.", directory);
+                    ex,
+                    "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
+                    directory,
+                    ex.Message);
                 subdirectories = null;
                 return false;
             }
             catch (UnauthorizedAccessException ex)
             {
                 this.log.LogError(
-                    ex, "Could not enumerate subdirectories of {Directory}.", directory);
+                    ex,
+                    "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
+                    directory,
+                    ex.Message);
                 subdirectories = null;
                 return false;
             }
             catch (SecurityException ex)
             {
                 this.log.LogError(
-                    ex, "Could not enumerate subdirectories of {Directory}.", directory);
+                    ex,
+                    "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
+                    directory,
+                    ex.Message);
                 subdirectories = null;
                 return false;
             }

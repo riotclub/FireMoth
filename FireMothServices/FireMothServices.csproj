@@ -8,6 +8,10 @@
     <DocumentationFile>C:\Users\Jason\source\repos\firemoth\FireMothServices\FireMothServices.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="stylecop.json" />
   </ItemGroup>

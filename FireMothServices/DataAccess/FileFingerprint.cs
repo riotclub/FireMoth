@@ -66,7 +66,7 @@ namespace FireMothServices.DataAccess
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    throw new ArgumentException("Hash string cannot be empty.");
+                    throw new ArgumentException("Hash string cannot be null or empty.");
                 }
 
                 if (!IsBase64String(value))
