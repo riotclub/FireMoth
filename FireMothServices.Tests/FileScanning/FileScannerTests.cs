@@ -29,11 +29,11 @@ namespace RiotClub.FireMoth.Services.FileScanning
      *      * Ctor_NullILogger_ThrowsArgumentNullException
      *
      * ScanDirectory:
-     * - Null IDirectoryInfo throws exception
+     * * Null IDirectoryInfo throws exception
      *      * ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException
-     * - Valid directory results in successful scan
+     * * Valid directory results in successful scan
      *      * ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
-     * - Valid directory adds file fingerprint records to data provider
+     * * Valid directory adds file fingerprint records to data provider
      *      * ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
      * - Valid directory returns proper count of scanned files
      *      - ScanDirectory_ValidDirectory_ReturnsProperScannedFileCount
@@ -79,7 +79,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
         public FileScannerTests()
         {
-            this.mockDataAccessProvider = new Mock<IDataAccessProvider>();
+            this.mockDataAccessProvider = new Mock<IDataAccessProvider>(MockBehavior.Strict);
             this.mockFileHasher = new Mock<IFileHasher>();
             this.mockFileHasher.Setup(hasher =>
                 hasher
@@ -149,6 +149,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             Assert.Equal(ScanResult.ScanSuccess, result);
         }
 
+        // *
         [Theory]
         [InlineData(@"c:\dirwithfiles\")]
         [InlineData(@"c:\dirwithfiles\subdirwithfiles")]
@@ -159,16 +160,17 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var fileScanner = this.GetTestFileScanner();
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(directory);
             var files = testDirectory.EnumerateFiles();
-
-            // Act
-            var result = fileScanner.ScanDirectory(testDirectory, false);
-
-            // Assert
             foreach (var file in files)
             {
-                this.mockDataAccessProvider.Verify(
-                    dap => dap.AddFileRecord(It.Is<IFileFingerprint>(ff => ff.Name == file.Name)));
+                this.mockDataAccessProvider.Setup(dap =>
+                    dap.AddFileRecord(It.Is<IFileFingerprint>(ff => ff.Name == file.Name)));
             }
+
+            // Act
+            fileScanner.ScanDirectory(testDirectory, false);
+
+            // Assert
+            this.mockDataAccessProvider.Verify();
         }
 
         [Theory]
