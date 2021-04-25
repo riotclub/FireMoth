@@ -5,19 +5,26 @@
 
 namespace RiotClub.FireMoth.Services.FileScanning
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Specifies the result of a file scan operation.
     /// </summary>
-    public enum ScanResult
+    public class ScanResult
     {
         /// <summary>
-        /// Inidicates the file scan operation was successful.
+        /// Gets or sets a value indicating whether the file scan was successful.
         /// </summary>
-        ScanSuccess,
+        public bool Success { get; set; }
 
         /// <summary>
-        /// Indicates the file scan operation encountered a problem that prevented it from completing successfully.
+        /// Gets a list of the files that were successfully scanned during the file scan operation.
         /// </summary>
-        ScanFailure,
+        public List<string> FilesScanned { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets a list of the files that were skipped during the file scan operation.
+        /// </summary>
+        public List<string> FilesSkipped { get; } = new List<string>();
     }
 }
