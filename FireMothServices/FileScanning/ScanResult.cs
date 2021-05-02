@@ -13,18 +13,40 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class ScanResult
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the file scan was successful.
-        /// </summary>
-        public bool Success { get; set; }
-
-        /// <summary>
         /// Gets a list of the files that were successfully scanned during the file scan operation.
         /// </summary>
         public List<string> FilesScanned { get; } = new List<string>();
 
         /// <summary>
-        /// Gets a list of the files that were skipped during the file scan operation.
+        /// Gets a key-value list of the files that were skipped during the file scan operation and
+        /// the reason the files were skipped.
         /// </summary>
-        public List<string> FilesSkipped { get; } = new List<string>();
+        public Dictionary<string, string> FilesSkipped { get; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Combines two <see cref="ScanResult"/> objects by combining their
+        /// <see cref="FilesScanned"/> and <see cref="FilesSkipped"/> collections.
+        /// </summary>
+        /// <param name="a">The first of two <see cref="ScanResult"/> operands to sum.</param>
+        /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>
+        /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.</returns>
+        public static ScanResult operator +(ScanResult a, ScanResult b)
+        {
+            var result = new ScanResult();
+            result.FilesScanned.AddRange(a.FilesScanned);
+            result.FilesScanned.AddRange(b.FilesScanned);
+
+            foreach (KeyValuePair<string, string> pair in a.FilesSkipped)
+            {
+                result.FilesSkipped.TryAdd(pair.Key, pair.Value);
+            }
+
+            foreach (KeyValuePair<string, string> pair in b.FilesSkipped)
+            {
+                result.FilesSkipped.TryAdd(pair.Key, pair.Value);
+            }
+
+            return result;
+        }
     }
 }
