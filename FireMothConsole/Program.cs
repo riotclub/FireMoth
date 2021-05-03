@@ -62,12 +62,12 @@ namespace RiotClub.FireMoth.Console
                 {
                     log.LogInformation(
                         "Scan complete. Scanned {ScannedFilesCount} files.",
-                        fileScanner.TotalFilesScanned);
-                    if (fileScanner.TotalFilesSkipped > 0)
+                        scanResult.ScannedFiles.Count);
+                    if (scanResult.SkippedFiles.Count > 0)
                     {
                         log.LogInformation(
                             "{0} files could not be scanned due to errors.",
-                            fileScanner.TotalFilesSkipped);
+                            scanResult.SkippedFiles.Count);
                     }
 
                     log.LogInformation("Total scan time: {ScanTime}.", timeSpan);
@@ -96,8 +96,11 @@ namespace RiotClub.FireMoth.Console
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.AddConsole();
-                    logging.SetMinimumLevel(LogLevel.Debug);
+                    logging.AddSimpleConsole(options =>
+                    {
+                        options.SingleLine = true;
+                    });
+                    logging.SetMinimumLevel(LogLevel.Information);
                 })
                 .UseConsoleLifetime()
                 .ConfigureServices((hostContext, services) =>

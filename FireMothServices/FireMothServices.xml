@@ -62,59 +62,19 @@
             access to the application backing store.</param>
             <param name="hasher">An <see cref="T:FireMothServices.DataAnalysis.IFileHasher"/> that is used to compute hash values
             for scanned files.</param>
-            <param name="logWriter">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
+            <param name="log">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
             written.</param>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.FileScanner.TotalFilesScanned">
-            <summary>
-            Gets the total number of files scanned by this <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/>.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.FileScanner.TotalFilesSkipped">
-            <summary>
-            Gets the total number of files that were skpped by this <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/>.
-            </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo})">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo},RiotClub.FireMoth.Services.FileScanning.ScanResult)">
             <summary>
             Hashes a set of files and records the filename and hash string.
             </summary>
             <param name="files">The set of files to hash and record.</param>
-            <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
-            number of files skipped, respectively.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetFiles(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo}@)">
-            <summary>
-            Attempts to retrieve all files in the provided directory.
-            </summary>
-            <param name="directory">An <see cref="T:System.IO.Abstractions.IDirectoryInfo"/> representing the directory for
-            which files will be enumerated.</param>
-            <param name="files">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection containing the
-            subdirectories of the provided directory.</param>
-            <returns><c>true</c> if files were successfully enumerated and set in
-            <paramref name="files"/>.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetSubDirectories(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IDirectoryInfo}@)">
-            <summary>
-            Attempts to retrieve all immediate subdirectories of the provided directory.
-            </summary>
-            <param name="directory">An <see cref="T:System.IO.Abstractions.IDirectoryInfo"/> representing the directory for
-            which subdirectories will be enumerated.</param>
-            <param name="subdirectories">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection
-            containing the subdirectories of the provided directory.</param>
-            <returns><c>true</c> if subdirectories were successfully enumerated and set in
-            <paramref name="subdirectories"/>.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.GetBase64HashFromStream(System.IO.Stream)">
-            <summary>
-            Calculates a hash of the provided stream's data and returns a base 64 encoded string of
-            the hash.
-            </summary>
-            <param name="stream">The <see cref="T:System.IO.Stream"/> containing the data to hash.</param>
-            <returns>A base 64 encoded <see cref="T:System.String"/> of the hash.</returns>
+            <param name="scanResult">A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> to which the names of scanned and
+            skipped files will be added.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.IFileScanner">
             <summary>
@@ -139,15 +99,25 @@
             Specifies the result of a file scan operation.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanSuccess">
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles">
             <summary>
-            Inidicates the file scan operation was successful.
+            Gets a list of the files that were successfully scanned during the file scan operation.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanFailure">
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles">
             <summary>
-            Indicates the file scan operation encountered a problem that prevented it from completing successfully.
+            Gets a key-value list of the files that were skipped during the file scan operation and
+            the reason the files were skipped.
             </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanResult.op_Addition(RiotClub.FireMoth.Services.FileScanning.ScanResult,RiotClub.FireMoth.Services.FileScanning.ScanResult)">
+            <summary>
+            Combines two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> objects by combining their
+            <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles"/> and <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles"/> collections.
+            </summary>
+            <param name="a">The first of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
+            <param name="b">The second of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
+            <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.</returns>
         </member>
         <member name="T:FireMothServices.DataAccess.FileFingerprint">
             <summary>
@@ -242,10 +212,7 @@
             <inheritdoc/>
         </member>
         <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose">
-            <summary>
-            Releases all resources used by the current instance of this
-            <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/>.
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose(System.Boolean)">
             <summary>

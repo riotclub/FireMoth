@@ -5,6 +5,7 @@
 
 namespace RiotClub.FireMoth.Services.FileScanning
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -15,17 +16,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <summary>
         /// Gets a list of the files that were successfully scanned during the file scan operation.
         /// </summary>
-        public List<string> FilesScanned { get; } = new List<string>();
+        public List<string> ScannedFiles { get; } = new List<string>();
 
         /// <summary>
         /// Gets a key-value list of the files that were skipped during the file scan operation and
         /// the reason the files were skipped.
         /// </summary>
-        public Dictionary<string, string> FilesSkipped { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> SkippedFiles { get; } = new Dictionary<string, string>();
+
+        public Dictionary<string, Exception> Errors { get; } = new Dictionary<string, Exception>();
 
         /// <summary>
         /// Combines two <see cref="ScanResult"/> objects by combining their
-        /// <see cref="FilesScanned"/> and <see cref="FilesSkipped"/> collections.
+        /// <see cref="ScannedFiles"/> and <see cref="SkippedFiles"/> collections.
         /// </summary>
         /// <param name="a">The first of two <see cref="ScanResult"/> operands to sum.</param>
         /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>
@@ -33,17 +36,17 @@ namespace RiotClub.FireMoth.Services.FileScanning
         public static ScanResult operator +(ScanResult a, ScanResult b)
         {
             var result = new ScanResult();
-            result.FilesScanned.AddRange(a.FilesScanned);
-            result.FilesScanned.AddRange(b.FilesScanned);
+            result.ScannedFiles.AddRange(a.ScannedFiles);
+            result.ScannedFiles.AddRange(b.ScannedFiles);
 
-            foreach (KeyValuePair<string, string> pair in a.FilesSkipped)
+            foreach (KeyValuePair<string, string> pair in a.SkippedFiles)
             {
-                result.FilesSkipped.TryAdd(pair.Key, pair.Value);
+                result.SkippedFiles.TryAdd(pair.Key, pair.Value);
             }
 
-            foreach (KeyValuePair<string, string> pair in b.FilesSkipped)
+            foreach (KeyValuePair<string, string> pair in b.SkippedFiles)
             {
-                result.FilesSkipped.TryAdd(pair.Key, pair.Value);
+                result.SkippedFiles.TryAdd(pair.Key, pair.Value);
             }
 
             return result;
