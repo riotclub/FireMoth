@@ -67,7 +67,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
             var fullPath =
                 fingerprint.DirectoryName + Path.DirectorySeparatorChar + fingerprint.Name;
             this.logger.LogDebug(
-                "Writing record for file {FileName} with hash {HashString}.",
+                "Writing fingerprint for file {FileName} with hash {HashString}.",
                 fullPath,
                 fingerprint.Base64Hash);
             this.csvWriter.WriteRecord(fingerprint);
