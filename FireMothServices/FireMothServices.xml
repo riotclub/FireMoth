@@ -195,6 +195,21 @@
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the directory scanning operation.
             </returns>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanError">
+            <summary>
+            Represents an error that occured during a file scan.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Path">
+            <summary>
+            Gets or sets the path to the file or directory related to this error.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Exception">
+            <summary>
+            Gets or sets any exception related to this error.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanResult">
             <summary>
             Specifies the result of a file scan operation.
