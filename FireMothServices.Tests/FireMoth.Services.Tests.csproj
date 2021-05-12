@@ -4,6 +4,10 @@
     <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <AssemblyName>FireMoth.Services.Tests</AssemblyName>
+
+    <RootNamespace>RiotClub.FireMoth.Services.Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -42,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FireMothServices\FireMothServices.csproj" />
+    <ProjectReference Include="..\FireMothServices\FireMoth.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace FireMothServices.DataAccess
+namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
     using System.IO.Abstractions;

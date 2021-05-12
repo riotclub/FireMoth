@@ -11,12 +11,12 @@ namespace RiotClub.FireMoth.Console
     using System.IO;
     using System.IO.Abstractions;
     using System.Threading.Tasks;
-    using FireMothServices.DataAnalysis;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
 
     /// <summary>

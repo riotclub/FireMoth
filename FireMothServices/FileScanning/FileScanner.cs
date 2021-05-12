@@ -9,12 +9,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.Collections.Generic;
     using System.IO;
     using System.IO.Abstractions;
-    using System.Linq;
     using System.Security;
-    using FireMothServices.DataAccess;
-    using FireMothServices.DataAnalysis;
     using Microsoft.Extensions.Logging;
     using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAnalysis;
 
     /// <summary>
     /// Directory scanner implementation that reads the files in a directory and writes the file

@@ -3,13 +3,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.FileScanning
+namespace RiotClub.FireMoth.Services.Tests.FileScanning
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO.Abstractions.TestingHelpers;
-    using FireMothServices.DataAccess;
+    using RiotClub.FireMoth.Services.DataAccess;
     using Xunit;
 
     /*

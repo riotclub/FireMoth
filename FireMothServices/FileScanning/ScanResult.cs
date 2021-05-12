@@ -24,6 +24,10 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// </summary>
         public Dictionary<string, string> SkippedFiles { get; } = new Dictionary<string, string>();
 
+        /// <summary>
+        /// Gets a key-value list of errors that occurred during the file scan operation and any
+        /// exceptions associated with the error
+        /// </summary>
         public Dictionary<string, Exception> Errors { get; } = new Dictionary<string, Exception>();
 
         /// <summary>

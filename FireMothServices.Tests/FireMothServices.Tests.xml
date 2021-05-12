@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>FireMothServices.Tests</name>
+        <name>FireMoth.Services.Tests</name>
     </assembly>
     <members>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.CsvDataAccessProviderTests.Dispose">
+        <member name="M:RiotClub.FireMoth.Services.Tests.FileScanning.CsvDataAccessProviderTests.Dispose">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.CsvDataAccessProviderTests.Dispose(System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.Tests.FileScanning.CsvDataAccessProviderTests.Dispose(System.Boolean)">
             <summary>
             Releases unmanaged and, optionally, managed resources.
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScannerTests.Dispose">
+        <member name="M:RiotClub.FireMoth.Services.Tests.FileScanning.FileScannerTests.Dispose">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScannerTests.Dispose(System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.Tests.FileScanning.FileScannerTests.Dispose(System.Boolean)">
             <summary>
             Releases unmanaged and, optionally, managed resources.
             </summary>

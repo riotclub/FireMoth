@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>FireMothConsole</name>
+        <name>FireMoth.Console</name>
     </assembly>
     <members>
         <member name="T:RiotClub.FireMoth.Console.CommandLineOptions">
