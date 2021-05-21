@@ -33,6 +33,12 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      *      * AddFileRecord_ValidFileFingerprint_AddsRecordToStore
      * - Call on disposed object throws exception
      *      * AddFileRecord_DisposedObject_ThrowsObjectDisposedException
+     *
+     * Dispose
+     * - If constructed with leaveOpen true, underlying StreamWriter object is undisposed after disposal
+     *      - Dispose_LeaveOpenTrue_StreamWriterUndisposed
+     * - If constructed with leaveOpen false, underlying StreamWriter object is disposed after disposal
+     *      - Dispose_LeaveOpenFalse_StreamWriterDisposed
      */
     [ExcludeFromCodeCoverage]
     public class CsvDataAccessProviderTests : IDisposable

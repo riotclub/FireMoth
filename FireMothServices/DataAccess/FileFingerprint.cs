@@ -25,6 +25,8 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// specified file.</param>
         public FileFingerprint(IFileInfo fileInfo, string base64Hash)
         {
+            this.Base64Hash = base64Hash ?? throw new ArgumentNullException(nameof(base64Hash));
+
             if (fileInfo == null)
             {
                 throw new ArgumentNullException(nameof(fileInfo));
@@ -33,26 +35,28 @@ namespace RiotClub.FireMoth.Services.DataAccess
             this.DirectoryName = fileInfo.DirectoryName;
             this.Name = fileInfo.Name;
             this.Length = fileInfo.Length;
-            this.Base64Hash = base64Hash;
         }
+
+        /// <inheritdoc/>
+        public IFileInfo FileInfo { get; }
 
         /// <summary>
         /// Gets the directory's full path.
         /// </summary>
         [Index(0)]
-        public string DirectoryName { get; private set; }
+        public string DirectoryName { get; }
 
         /// <summary>
         /// Gets the name of the file.
         /// </summary>
         [Index(1)]
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the size, in bytes, of the file.
         /// </summary>
         [Index(2)]
-        public long Length { get; private set; }
+        public long Length { get; }
 
         /// <summary>
         /// Gets or sets the base-64 hash of the file's data.

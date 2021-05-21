@@ -5,6 +5,8 @@
 
 namespace RiotClub.FireMoth.Services.DataAccess
 {
+    using System.IO.Abstractions;
+
     /// <summary>
     /// Defines the public interface for a class that implements properties that define a file and
     /// its hash value.
@@ -12,19 +14,9 @@ namespace RiotClub.FireMoth.Services.DataAccess
     public interface IFileFingerprint
     {
         /// <summary>
-        /// Gets the directory that the file resides in.
+        /// Gets the <see cref="IFileInfo"/> for the file represented by this fingerprint.
         /// </summary>
-        string DirectoryName { get; }
-
-        /// <summary>
-        /// Gets the name of the file.
-        /// </summary>
-        string Name { get; }
-
-        /// <summary>
-        /// Gets the size, in bytes, of the file.
-        /// </summary>
-        long Length { get; }
+        IFileInfo FileInfo { get; }
 
         /// <summary>
         /// Gets a base 64 string representation of the file's hash.
