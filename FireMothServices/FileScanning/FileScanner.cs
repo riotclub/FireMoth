@@ -60,7 +60,18 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     "Recursive scan requested; enumerating subdirectories of {ScanDirectory}",
                     directory);
 
-                var subDirectories = this.GetSubDirectories(directory);
+                IEnumerable<IDirectoryInfo>? subDirectories = null;
+                try
+                {
+                    subDirectories = this.GetSubDirectories(directory);
+                }
+                catch (Exception exception)
+                {
+                    result.Errors.Add(
+                        new ScanError(
+                            directory.FullName, "Unable to enumerate subdirectories.", exception));
+                }
+
                 if (subDirectories != null)
                 {
                     foreach (IDirectoryInfo subDirectory in subDirectories)

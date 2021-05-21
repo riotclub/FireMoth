@@ -9,7 +9,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
     using System.Globalization;
     using System.IO;
     using CsvHelper;
-    using RiotClub.FireMoth.Services.DataAccess;
     using Microsoft.Extensions.Logging;
 
     /// <summary>

@@ -13,13 +13,37 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class ScanError
     {
         /// <summary>
-        /// Gets or sets the path to the file or directory related to this error.
+        /// Initializes a new instance of the <see cref="ScanError"/> class.
         /// </summary>
-        public string? Path { get; set; }
+        /// <param name="path">The path to the file or directory that this error pertains to.
+        /// </param>
+        /// <param name="message">A message describing this error.</param>
+        /// <param name="exception">Any exception associated with this error.</param>
+        public ScanError(string? path, string message, Exception? exception)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+
+            this.Path = path;
+            this.Message = message;
+            this.Exception = exception;
+        }
 
         /// <summary>
-        /// Gets or sets any exception related to this error.
+        /// Gets the path to the file or directory related to this error.
         /// </summary>
-        public Exception? Exception { get; set; }
+        public string? Path { get; private set; }
+
+        /// <summary>
+        /// Gets the message describing this error.
+        /// </summary>
+        public string Message { get; private set; }
+
+        /// <summary>
+        /// Gets the exception related to this error.
+        /// </summary>
+        public Exception? Exception { get; private set; }
     }
 }
