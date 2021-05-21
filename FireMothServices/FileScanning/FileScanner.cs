@@ -52,7 +52,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             this.log.LogInformation("Scanning directory {ScanDirectory}", directory);
 
-            ScanResult result = new ScanResult();
+            ScanResult scanResult = new ScanResult();
 
             if (recursive)
             {
@@ -60,42 +60,32 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     "Recursive scan requested; enumerating subdirectories of {ScanDirectory}",
                     directory);
 
-                IEnumerable<IDirectoryInfo>? subDirectories = null;
-                try
-                {
-                    subDirectories = this.GetSubDirectories(directory);
-                }
-                catch (Exception exception)
-                {
-                    result.Errors.Add(
-                        new ScanError(
-                            directory.FullName, "Unable to enumerate subdirectories.", exception));
-                }
+                var subDirectories = this.GetSubDirectories(directory, scanResult);
 
                 if (subDirectories != null)
                 {
                     foreach (IDirectoryInfo subDirectory in subDirectories)
                     {
-                        result += this.ScanDirectory(subDirectory, true);
+                        scanResult += this.ScanDirectory(subDirectory, true);
                     }
                 }
             }
 
             this.log.LogDebug("Enumerating files of {ScanDirectory}", directory);
-            var files = this.GetFiles(directory);
+            var files = this.GetFiles(directory, scanResult);
             if (files == null)
             {
-                return result;
+                return scanResult;
             }
 
-            this.ProcessFiles(files, result);
+            this.ProcessFiles(files, scanResult);
             this.log.LogInformation(
                 "Completed scanning {DirectoryName} ({ScannedFileCount}/{TotalFileCount} file(s) scanned)",
                 directory.FullName,
-                result.ScannedFiles.Count,
-                result.ScannedFiles.Count + result.SkippedFiles.Count);
+                scanResult.ScannedFiles.Count,
+                scanResult.ScannedFiles.Count + scanResult.SkippedFiles.Count);
 
-            return result;
+            return scanResult;
         }
 
         /// <summary>
@@ -136,7 +126,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         // Attempts to retrieve all files in the provided directory.
-        private IEnumerable<IFileInfo>? GetFiles(IDirectoryInfo directory)
+        private IEnumerable<IFileInfo>? GetFiles(
+            IDirectoryInfo directory, ScanResult scanResult)
         {
             IEnumerable<IFileInfo>? result = null;
 
@@ -144,28 +135,39 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 result = directory.EnumerateFiles();
             }
-            catch (IOException ex)
+            catch (IOException exception)
             {
                 this.log.LogError(
-                    ex,
+                    exception,
                     "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
                     directory,
-                    ex.Message);
+                    exception.Message);
+                scanResult.Errors.Add(
+                    new ScanError(
+                        directory.FullName,
+                        $"Could not enumerate files of {directory.FullName}",
+                        exception));
             }
-            catch (SecurityException ex)
+            catch (SecurityException exception)
             {
                 this.log.LogError(
-                    ex,
+                    exception,
                     "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
                     directory,
-                    ex.Message);
+                    exception.Message);
+                scanResult.Errors.Add(
+                    new ScanError(
+                        directory.FullName,
+                        $"Could not enumerate files of {directory.FullName}",
+                        exception));
             }
 
             return result;
         }
 
         // Attempts to retrieve all immediate subdirectories of the provided directory.
-        private IEnumerable<IDirectoryInfo>? GetSubDirectories(IDirectoryInfo directory)
+        private IEnumerable<IDirectoryInfo>? GetSubDirectories(
+            IDirectoryInfo directory, ScanResult scanResult)
         {
             IEnumerable<IDirectoryInfo>? result = null;
 
@@ -173,21 +175,31 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 result = directory.EnumerateDirectories();
             }
-            catch (IOException ex)
+            catch (IOException exception)
             {
                 this.log.LogError(
-                    ex,
+                    exception,
                     "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
                     directory,
-                    ex.Message);
+                    exception.Message);
+                scanResult.Errors.Add(
+                    new ScanError(
+                        directory.FullName,
+                        $"Could not enumerate subdirectories of {directory.FullName}",
+                        exception));
             }
-            catch (SecurityException ex)
+            catch (SecurityException exception)
             {
                 this.log.LogError(
-                    ex,
+                    exception,
                     "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
                     directory,
-                    ex.Message);
+                    exception.Message);
+                scanResult.Errors.Add(
+                    new ScanError(
+                        directory.FullName,
+                        $"Could not enumerate subdirectories of {directory.FullName}",
+                        exception));
             }
 
             return result;
