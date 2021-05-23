@@ -121,6 +121,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     scanResult.SkippedFiles.Add(
                         file.FullName,
                         string.Format(messageTemplate, file.FullName, exception.Message));
+                    scanResult.Errors.Add(
+                        new ScanError(
+                            file.FullName, "Could not add record for file.", exception));
                 }
             }
         }
