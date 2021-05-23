@@ -32,31 +32,11 @@ namespace RiotClub.FireMoth.Services.DataAccess
                 throw new ArgumentNullException(nameof(fileInfo));
             }
 
-            this.DirectoryName = fileInfo.DirectoryName;
-            this.Name = fileInfo.Name;
-            this.Length = fileInfo.Length;
+            this.FileInfo = fileInfo;
         }
 
         /// <inheritdoc/>
         public IFileInfo FileInfo { get; }
-
-        /// <summary>
-        /// Gets the directory's full path.
-        /// </summary>
-        [Index(0)]
-        public string DirectoryName { get; }
-
-        /// <summary>
-        /// Gets the name of the file.
-        /// </summary>
-        [Index(1)]
-        public string Name { get; }
-
-        /// <summary>
-        /// Gets the size, in bytes, of the file.
-        /// </summary>
-        [Index(2)]
-        public long Length { get; }
 
         /// <summary>
         /// Gets or sets the base-64 hash of the file's data.

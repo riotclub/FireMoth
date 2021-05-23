@@ -49,20 +49,8 @@
             <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
             specified file.</param>
         </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.DirectoryName">
-            <summary>
-            Gets the directory's full path.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Name">
-            <summary>
-            Gets the name of the file.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Length">
-            <summary>
-            Gets the size, in bytes, of the file.
-            </summary>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.FileInfo">
+            <inheritdoc/>
         </member>
         <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Base64Hash">
             <summary>
@@ -75,6 +63,17 @@
             </summary>
             <param name="base64">The string to check.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
+            <summary>
+            A mapping between an <see cref="!:IFileInfo"/> and CSV headers.
+            </summary>
+            <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap"/> class.
+            </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
@@ -95,19 +94,9 @@
             its hash value.
             </summary>
         </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.DirectoryName">
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.FileInfo">
             <summary>
-            Gets the directory that the file resides in.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.Name">
-            <summary>
-            Gets the name of the file.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.Length">
-            <summary>
-            Gets the size, in bytes, of the file.
+            Gets the <see cref="T:System.IO.Abstractions.IFileInfo"/> for the file represented by this fingerprint.
             </summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.Base64Hash">
@@ -200,14 +189,28 @@
             Represents an error that occured during a file scan.
             </summary>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.#ctor(System.String,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> class.
+            </summary>
+            <param name="path">The path to the file or directory that this error pertains to.
+            </param>
+            <param name="message">A message describing this error.</param>
+            <param name="exception">Any exception associated with this error.</param>
+        </member>
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Path">
             <summary>
-            Gets or sets the path to the file or directory related to this error.
+            Gets the path to the file or directory related to this error.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Message">
+            <summary>
+            Gets the message describing this error.
             </summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Exception">
             <summary>
-            Gets or sets any exception related to this error.
+            Gets the exception related to this error.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanResult">
@@ -228,8 +231,8 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.Errors">
             <summary>
-            Gets a key-value list of errors that occurred during the file scan operation and any
-            exceptions associated with the error
+            Gets a list of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> that occurred during the file scan operation and
+            any exceptions associated with the error
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanResult.op_Addition(RiotClub.FireMoth.Services.FileScanning.ScanResult,RiotClub.FireMoth.Services.FileScanning.ScanResult)">

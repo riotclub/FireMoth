@@ -34,16 +34,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <summary>
         /// Gets the path to the file or directory related to this error.
         /// </summary>
-        public string? Path { get; private set; }
+        public string? Path { get; }
 
         /// <summary>
         /// Gets the message describing this error.
         /// </summary>
-        public string Message { get; private set; }
+        public string Message { get; }
 
         /// <summary>
         /// Gets the exception related to this error.
         /// </summary>
-        public Exception? Exception { get; private set; }
+        public Exception? Exception { get; }
     }
 }

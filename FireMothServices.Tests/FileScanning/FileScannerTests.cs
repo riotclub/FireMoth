@@ -161,7 +161,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             foreach (var file in files)
             {
                 this.mockDataAccessProvider.Setup(dap =>
-                    dap.AddFileRecord(It.Is<IFileFingerprint>(ff => ff.Name == file.Name)));
+                    dap.AddFileRecord(It.Is<IFileFingerprint>(ff => ff.FileInfo.Name == file.Name)));
             }
 
             // Act
@@ -258,7 +258,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             mockDap.Verify(dap =>
                 dap.AddFileRecord(
                     It.Is<IFileFingerprint>(file =>
-                        file.Name.Equals(Path.GetFileName(subdirectoryFile), StringComparison.OrdinalIgnoreCase))));
+                        file.FileInfo.Name.Equals(
+                            Path.GetFileName(subdirectoryFile),
+                            StringComparison.OrdinalIgnoreCase))));
         }
 
         [Fact]
@@ -284,7 +286,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             mockDap.Verify(
                 dap => dap.AddFileRecord(
                     It.Is<IFileFingerprint>(file =>
-                        file.DirectoryName.StartsWith(
+                        file.FileInfo.DirectoryName.StartsWith(
                             @"c:\testdirectory\subdirectory", StringComparison.OrdinalIgnoreCase))),
                 Times.Never);
         }
