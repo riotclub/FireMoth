@@ -26,7 +26,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
         /// <summary>
         /// Gets a list of <see cref="ScanError"/> that occurred during the file scan operation and
-        /// any exceptions associated with the error
+        /// any exceptions associated with the error.
         /// </summary>
         public List<ScanError> Errors { get; } = new List<ScanError>();
 
@@ -36,7 +36,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// </summary>
         /// <param name="a">The first of two <see cref="ScanResult"/> operands to sum.</param>
         /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>
-        /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.</returns>
+        /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.
+        /// </returns>
         public static ScanResult operator +(ScanResult a, ScanResult b)
         {
             var result = new ScanResult();

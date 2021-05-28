@@ -39,14 +39,14 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public IFileInfo FileInfo { get; }
 
         /// <summary>
-        /// Gets or sets the base-64 hash of the file's data.
+        /// Gets the base-64 hash of the file's data.
         /// </summary>
         [Index(3)]
         public string Base64Hash
         {
             get => this.base64Hash;
 
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {

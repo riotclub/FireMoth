@@ -54,7 +54,7 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Base64Hash">
             <summary>
-            Gets or sets the base-64 hash of the file's data.
+            Gets the base-64 hash of the file's data.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.IsBase64String(System.String)">
@@ -232,7 +232,7 @@
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.Errors">
             <summary>
             Gets a list of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> that occurred during the file scan operation and
-            any exceptions associated with the error
+            any exceptions associated with the error.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanResult.op_Addition(RiotClub.FireMoth.Services.FileScanning.ScanResult,RiotClub.FireMoth.Services.FileScanning.ScanResult)">
@@ -242,7 +242,8 @@
             </summary>
             <param name="a">The first of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
             <param name="b">The second of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
-            <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.</returns>
+            <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.
+            </returns>
         </member>
     </members>
 </doc>

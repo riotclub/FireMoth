@@ -61,7 +61,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
                     directory);
 
                 var subDirectories = this.GetSubDirectories(directory, scanResult);
-
                 if (subDirectories != null)
                 {
                     foreach (IDirectoryInfo subDirectory in subDirectories)
@@ -75,6 +74,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var files = this.GetFiles(directory, scanResult);
             if (files == null)
             {
+                this.log.LogDebug("Skipping empty directory {ScanDirectory}", directory);
                 return scanResult;
             }
 
@@ -103,7 +103,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 {
                     using (Stream fileStream = file.OpenRead())
                     {
+                        this.log.LogDebug(
+                            "Computing hash for file {FileName} using hasher {Hasher}",
+                            file.FullName,
+                            this.hasher.GetType().FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
+
                         this.log.LogDebug(
                             "Adding fingerprint for file {FileName} to data access provider",
                             file.FullName,
@@ -123,7 +128,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                         string.Format(messageTemplate, file.FullName, exception.Message));
                     scanResult.Errors.Add(
                         new ScanError(
-                            file.FullName, "Could not add record for file.", exception));
+                            file.FullName, "Could not add record for file", exception));
                 }
             }
         }
@@ -211,9 +216,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
         // Returns a base 64 representation of a data stream's hash.
         private string GetBase64HashFromStream(Stream stream)
         {
-            this.log.LogDebug(
-                "Calculating hash from file stream using hasher {Hasher}",
-                this.hasher.GetType().FullName);
             byte[] hashBytes = this.hasher.ComputeHashFromStream(stream);
             return Convert.ToBase64String(hashBytes);
         }
