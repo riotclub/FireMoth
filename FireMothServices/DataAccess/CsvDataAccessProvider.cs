@@ -41,6 +41,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
             }
 
             this.csvWriter = new CsvWriter(outputWriter, CultureInfo.InvariantCulture, leaveOpen);
+            this.csvWriter.Context.RegisterClassMap<FileFingerprintMap>();
             this.csvWriter.WriteHeader<FileFingerprint>();
             this.csvWriter.NextRecord();
         }

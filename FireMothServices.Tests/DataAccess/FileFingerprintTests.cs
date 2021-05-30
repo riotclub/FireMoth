@@ -50,7 +50,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Throws<ArgumentNullException>(() =>
                 new FileFingerprint(null, this.testBase64Hash));
         }
-
+        
+        /*
         [Fact]
         public void Base64HashSet_NullValue_ThrowsArgumentNullException()
         {
@@ -83,5 +84,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Act, Assert
             Assert.Throws<ArgumentException>(() => testObject.Base64Hash = "!!!");
         }
+        */
     }
 }

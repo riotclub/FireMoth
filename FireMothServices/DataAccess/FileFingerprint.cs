@@ -41,7 +41,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <summary>
         /// Gets the base-64 hash of the file's data.
         /// </summary>
-        [Index(3)]
         public string Base64Hash
         {
             get => this.base64Hash;
