@@ -16,14 +16,11 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      * Ctor
      * - IFileInfo can't be null
      *      * Ctor_NullFileInfo_ThrowsArgumentNullException
-
-     * Base64Hash Set
-     * - Value can't be null
-     *      * Base64HashSet_NullValue_ThrowsArgumentNullException
-     * - Value can't be empty or whitespace
-     *      * Base64HashSet_EmptyOrWhitespaceValue_ThrowsArgumentException
-     * - Value must be a valid base 64 string
-     *      * Base64HashSet_InvalidBase64String_ThrowsArgumentException
+     * - base64Hash string can't be null or empty
+     *      * Ctor_NullString_ThrowsArgumentNullException
+     *      * Ctor_EmptyOrWhitespaceString_ThrowsArgumentException
+     * - base64Hash must be a valid base 64 string
+     *      - Ctor_InvalidBase64String_ThrowsArgumentException
      */
     [ExcludeFromCodeCoverage]
     public class FileFingerprintTests
@@ -50,40 +47,31 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Throws<ArgumentNullException>(() =>
                 new FileFingerprint(null, this.testBase64Hash));
         }
-        
-        /*
-        [Fact]
-        public void Base64HashSet_NullValue_ThrowsArgumentNullException()
-        {
-            // Arrange
-            FileFingerprint testObject =
-                new FileFingerprint(this.mockFileInfo, this.testBase64Hash);
 
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() => testObject.Base64Hash = null);
+        [Fact]
+        public void Ctor_NullString_ThrowsArgumentNullException()
+        {
+            // Arrange, Act, Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                new FileFingerprint(this.mockFileInfo, null));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("     \t\n")]
+        public void Ctor_EmptyOrWhitespaceString_ThrowsArgumentException(string value)
+        {
+            // Arrange, Act, Assert
+            Assert.Throws<ArgumentException>(() =>
+                new FileFingerprint(this.mockFileInfo, value));
         }
 
         [Fact]
-        public void Base64HashSet_EmptyOrWhitespaceValue_ThrowsArgumentException()
+        public void Ctor_InvalidBase64String_ThrowsArgumentException()
         {
-            // Arrange
-            FileFingerprint testObject =
-                new FileFingerprint(this.mockFileInfo, this.testBase64Hash);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() => testObject.Base64Hash = "\t");
+            // Arrange, Act, Assert
+            Assert.Throws<ArgumentException>(() =>
+                new FileFingerprint(this.mockFileInfo, "asdf!!!000"));
         }
-
-        [Fact]
-        public void Base64HashSet_InvalidBase64String_ThrowsArgumentException()
-        {
-            // Arrange
-            FileFingerprint testObject =
-                new FileFingerprint(this.mockFileInfo, this.testBase64Hash);
-
-            // Act, Assert
-            Assert.Throws<ArgumentException>(() => testObject.Base64Hash = "!!!");
-        }
-        */
     }
 }

@@ -57,13 +57,6 @@
             Gets the base-64 hash of the file's data.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.IsBase64String(System.String)">
-            <summary>
-            Returns <c>true</c> if the provided string is a valid base 64 string.
-            </summary>
-            <param name="base64">The string to check.</param>
-            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
             <summary>
             A mapping between an <see cref="!:IFileInfo"/> and CSV headers.
@@ -137,6 +130,27 @@
             Releases unmanaged and, optionally, managed resources.
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Extensions.StringExtensions">
+            <summary>
+            Contains extension methods for <see cref="T:System.String"/> objects.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Extensions.StringExtensions.IsEmptyOrWhiteSpace(System.String)">
+            <summary>
+            Returns <c>true</c> if the provided string is empty or contains only whitespace
+            characters.
+            </summary>
+            <param name="value">The string to check.</param>
+            <returns><c>true</c> if the provided string is empty or contains only whitespace.
+            </returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Extensions.StringExtensions.IsBase64String(System.String)">
+            <summary>
+            Returns <c>true</c> if the provided string is a valid base 64 string.
+            </summary>
+            <param name="value">The string to check.</param>
+            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.FileScanner">
             <summary>

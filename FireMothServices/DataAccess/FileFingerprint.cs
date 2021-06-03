@@ -7,15 +7,13 @@ namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
     using System.IO.Abstractions;
-    using CsvHelper.Configuration.Attributes;
+    using RiotClub.FireMoth.Services.Extensions;
 
     /// <summary>
     /// Conatins data that uniquely identifies a file and its data.
     /// </summary>
     public class FileFingerprint : IFileFingerprint
     {
-        private string base64Hash;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
         /// </summary>
@@ -25,14 +23,25 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// specified file.</param>
         public FileFingerprint(IFileInfo fileInfo, string base64Hash)
         {
-            this.Base64Hash = base64Hash ?? throw new ArgumentNullException(nameof(base64Hash));
+            this.FileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
 
-            if (fileInfo == null)
+            if (base64Hash == null)
             {
-                throw new ArgumentNullException(nameof(fileInfo));
+                throw new ArgumentNullException(nameof(base64Hash));
             }
 
-            this.FileInfo = fileInfo;
+            if (base64Hash.IsEmptyOrWhiteSpace())
+            {
+                throw new ArgumentException("Hash string cannot be empty.");
+            }
+
+            if (!base64Hash.IsBase64String())
+            {
+                throw new ArgumentException(
+                    "Hash string is not a valid base 64 string.", nameof(base64Hash));
+            }
+
+            this.Base64Hash = base64Hash;
         }
 
         /// <inheritdoc/>
@@ -41,36 +50,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <summary>
         /// Gets the base-64 hash of the file's data.
         /// </summary>
-        public string Base64Hash
-        {
-            get => this.base64Hash;
-
-            private set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    throw new ArgumentException("Hash string cannot be null or empty.");
-                }
-
-                if (!IsBase64String(value))
-                {
-                    throw new ArgumentException(
-                        "Hash string is not a valid base 64 string.", nameof(value));
-                }
-
-                this.base64Hash = value;
-            }
-        }
-
-        /// <summary>
-        /// Returns <c>true</c> if the provided string is a valid base 64 string.
-        /// </summary>
-        /// <param name="base64">The string to check.</param>
-        /// <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
-        private static bool IsBase64String(string base64)
-        {
-            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
-            return Convert.TryFromBase64String(base64, buffer, out _);
-        }
+        public string Base64Hash { get; }
     }
 }

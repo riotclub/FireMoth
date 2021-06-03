@@ -85,6 +85,16 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         }
 
         [Fact]
+        public void Ctor_ValidArguments_CreatesObject()
+        {
+            // Arrange, Act
+            var testObject = new FileFingerprint(this.mockFileInfo.Object, this.testHash);
+
+            // Assert
+            Assert.NotNull(testObject);
+        }
+
+        [Fact]
         public void AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException()
         {
             // Arrange
