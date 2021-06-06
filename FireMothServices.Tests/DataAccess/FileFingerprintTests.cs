@@ -20,7 +20,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      *      * Ctor_NullString_ThrowsArgumentNullException
      *      * Ctor_EmptyOrWhitespaceString_ThrowsArgumentException
      * - base64Hash must be a valid base 64 string
-     *      - Ctor_InvalidBase64String_ThrowsArgumentException
+     *      * Ctor_InvalidBase64String_ThrowsArgumentException
      */
     [ExcludeFromCodeCoverage]
     public class FileFingerprintTests

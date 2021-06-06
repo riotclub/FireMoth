@@ -19,34 +19,34 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
     /*
      * Constructor:
-     *  * Null IDataAccessProvider throws exception
-     *      * Ctor_NullIDataAccessProvider_ThrowsArgumentNullException
-     *  * Null IFileHasher throws exception
-     *      * Ctor_NullIFileHasher_ThrowsArgumentNullException
-     *  * Null ILogger throws exception
-     *      * Ctor_NullILogger_ThrowsArgumentNullException
+     * - Null IDataAccessProvider throws exception
+     *      - Ctor_NullIDataAccessProvider_ThrowsArgumentNullException
+     * - Null IFileHasher throws exception
+     *      - Ctor_NullIFileHasher_ThrowsArgumentNullException
+     * - Null ILogger throws exception
+     *      - Ctor_NullILogger_ThrowsArgumentNullException
      *
      * ScanDirectory:
-     * * Null IDirectoryInfo throws exception
-     *      * ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException
-     * * Valid directory results in successful scan
-     *      * ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
-     * * Valid directory adds file fingerprint records to data provider
-     *      * ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
+     * - Null IDirectoryInfo throws exception
+     *      - ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException
+     * - Valid directory results in successful scan
+     *      - ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
+     * - Valid directory adds file fingerprint records to data provider
+     *      - ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
      * - Valid directory returns proper count of scanned files
      *      - ScanDirectory_ValidDirectory_ReturnsProperScannedFileCount
      * - Valid directory produces correct log events
      *      - ScanDirectory_ValidDirectory_LogsScanEvents
      * - Valid directory with skipped files returns proper count of scanned files
-     *      - ScanDirectory_ValidDirectoryWithSkippedFiles_CountsScannedFilesCorrectly
+     *      - ScanDirectory_ValidDirectoryWithSkippedFiles_CountsScannedFiles
      * - Valid directory with skipped files returns proper count of scanned files
-     *      - ScanDirectory_ValidDirectoryWithSkippedFiles_CountsSkippedFilesCorrectly
+     *      - ScanDirectory_ValidDirectoryWithSkippedFiles_CountsSkippedFiles
      * - Valid directory with skipped files produces log events for skipped files
      *      - ScanDirectory_ValidDirectoryWithSkippedFiles_LogsSkippedFileScanEvents
      * - Valid empty directory results in successful scan
-     *      * ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult
+     *      - ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult
      * - Valid empty directory adds no records to data provider
-     *      * ScanDirectory_EmptyDirectory_NoRecordsAddedToDataAccessProvider
+     *      - ScanDirectory_EmptyDirectory_NoRecordsAddedToDataAccessProvider
      * - Invalid directory results in failed scan
      *      - ScanDirectory_InvalidIDirectoryInfo_ReturnsScanFailureResult
      * - Authorization error while attempt to access directory produces log event
@@ -61,8 +61,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      *      - ScanDirectory_ValidDirectoryWithRecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
      * - Recursive scan returns proper count of scanned files
      *      - ScanDirectory_ValidDirectoryWithRecursiveScan_CountsScannedFilesCorrectly
-     * - Call on disposed object throws exception
-     *      - AddFileRecord_DisposedObject_ThrowsObjectDisposedException
      */
     [ExcludeFromCodeCoverage]
     public class FileScannerTests : IDisposable

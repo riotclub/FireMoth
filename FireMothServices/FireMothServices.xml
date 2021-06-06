@@ -59,7 +59,7 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
             <summary>
-            A mapping between an <see cref="!:IFileInfo"/> and CSV headers.
+            A mapping between an <see cref="T:System.IO.Abstractions.IFileInfo"/> and CSV headers.
             </summary>
             <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
         </member>
