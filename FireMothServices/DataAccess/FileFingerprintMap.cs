@@ -1,9 +1,14 @@
-﻿namespace RiotClub.FireMoth.Services.DataAccess
+﻿// <copyright file="FileFingerprintMap.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+
+namespace RiotClub.FireMoth.Services.DataAccess
 {
     using CsvHelper.Configuration;
 
     /// <summary>
-    /// A mapping between an <see cref="IFileInfo"/> and CSV headers.
+    /// A mapping between an <see cref="System.IO.Abstractions.IFileInfo"/> and CSV headers.
     /// </summary>
     /// <seealso cref="ClassMap"/>
     public class FileFingerprintMap : ClassMap<IFileFingerprint>
