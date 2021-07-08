@@ -19,22 +19,18 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
     /*
      * Constructor:
-     * - Null IDataAccessProvider throws exception
-     *      - Ctor_NullIDataAccessProvider_ThrowsArgumentNullException
-     * - Null IFileHasher throws exception
-     *      - Ctor_NullIFileHasher_ThrowsArgumentNullException
-     * - Null ILogger throws exception
-     *      - Ctor_NullILogger_ThrowsArgumentNullException
+     * * Null IDataAccessProvider throws exception
+     *      * Ctor_NullIDataAccessProvider_ThrowsArgumentNullException
+     * * Null IFileHasher throws exception
+     *      * Ctor_NullIFileHasher_ThrowsArgumentNullException
+     * * Null ILogger throws exception
+     *      * Ctor_NullILogger_ThrowsArgumentNullException
      *
      * ScanDirectory:
-     * - Null IDirectoryInfo throws exception
-     *      - ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException
-     * - Valid directory results in successful scan
-     *      - ScanDirectory_ValidDirectory_ReturnsScanSuccessResult
-     * - Valid directory adds file fingerprint records to data provider
-     *      - ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
-     * - Valid directory returns proper count of scanned files
-     *      - ScanDirectory_ValidDirectory_ReturnsProperScannedFileCount
+     * * Null IDirectoryInfo throws exception
+     *      * ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException
+     * * Valid directory adds file fingerprint records to data provider
+     *      * ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
      * - Valid directory produces correct log events
      *      - ScanDirectory_ValidDirectory_LogsScanEvents
      * - Valid directory with skipped files returns proper count of scanned files
@@ -90,7 +86,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             this.mockLogger = new Mock<ILogger<FileScanner>>();
         }
 
-        // *
         [Fact]
         public void Ctor_NullIDataAccessProvider_ThrowsArgumentNullException()
         {
@@ -99,7 +94,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 new FileScanner(null, this.mockFileHasher.Object, this.mockLogger.Object));
         }
 
-        // *
         [Fact]
         public void Ctor_NullIFileHasher_ThrowsArgumentNullException()
         {
@@ -108,7 +102,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 new FileScanner(this.mockDataAccessProvider.Object, null, this.mockLogger.Object));
         }
 
-        // *
         [Fact]
         public void Ctor_NullILogger_ThrowsArgumentNullException()
         {
@@ -118,34 +111,21 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                     this.mockDataAccessProvider.Object, this.mockFileHasher.Object, null));
         }
 
-        // *
+        // * ScanDirectory:
+        // * - Null IDirectoryInfo throws exception
+        // *      - ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException
         [Fact]
         public void ScanDirectory_NullIDirectoryInfo_ThrowsArgumentNullException()
         {
             // Arrange
-            var fileScanner = this.GetTestFileScanner();
+            var fileScanner = this.GetDefaultFileScanner();
 
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() => fileScanner.ScanDirectory(null, false));
         }
 
-        // *
-        [Fact]
-        public void ScanDirectory_ValidDirectory_ReturnsScanSuccessResult()
-        {
-            // Arrange
-            var fileScanner = this.GetTestFileScanner();
-            var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(
-                @"c:\dirwithfiles");
-
-            // Act
-            ScanResult result = fileScanner.ScanDirectory(testDirectory, false);
-
-            // Assert
-            // Assert.True(result.Success);
-        }
-
-        // *
+        // * - Valid directory adds file fingerprint records to data provider
+        // *      - ScanDirectory_ValidDirectoryWithFiles_AddsFileRecordsToDataAccessProvider
         [Theory]
         [InlineData(@"c:\dirwithfiles\")]
         [InlineData(@"c:\dirwithfiles\subdirwithfiles")]
@@ -153,21 +133,89 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             string directory)
         {
             // Arrange
-            var fileScanner = this.GetTestFileScanner();
+            var fileScanner = this.GetDefaultFileScanner();
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(directory);
             var files = testDirectory.EnumerateFiles();
+
             foreach (var file in files)
             {
-                this.mockDataAccessProvider.Setup(dap =>
-                    dap.AddFileRecord(It.Is<IFileFingerprint>(ff => ff.FileInfo.Name == file.Name)));
+                this.mockDataAccessProvider
+                    .Setup(dap =>
+                        dap.AddFileRecord(It.Is<IFileFingerprint>(ff =>
+                            ff.FileInfo.Name == file.Name)));
             }
 
             // Act
             fileScanner.ScanDirectory(testDirectory, false);
 
             // Assert
-            this.mockDataAccessProvider.Verify();
+            this.mockDataAccessProvider.VerifyAll();
         }
+
+        // * - Valid directory produces correct log events
+        // *      - ScanDirectory_ValidDirectory_LogsScanEvents
+        [Fact]
+        public void ScanDirectory_ValidDirectory_LogsScanEvents()
+        {
+            // Arrange
+            var testDirectory =
+                this.mockFileSystem.DirectoryInfo.FromDirectoryName(@"c:\dirwithfiles");
+            var fileScanner = this.GetDefaultFileScanner();
+            var files = testDirectory.EnumerateFiles();
+
+            this.mockLogger.Setup(log =>
+                log.LogInformation("Scanning directory {ScanDirectory}", testDirectory));
+
+            /*
+            foreach (var file in files)
+            {
+                this.mockLogger.Setup(log =>
+                    log.LogInformation("Scanning file {FileName}...", file.Name));
+            }
+            */
+
+            // Act
+            this.GetDefaultFileScanner().ScanDirectory(testDirectory, false);
+
+            // Assert
+            foreach (var file in files)
+            {
+
+                this.mockLogger.Setup(log =>
+                    log.LogInformation("Scanning file {FileName}...", file.Name));
+            }
+            
+            //this.mockDataAccessProvider.VerifyAll();
+        }
+
+
+        // * - Valid directory with skipped files returns proper count of scanned files
+        // *      - ScanDirectory_ValidDirectoryWithSkippedFiles_CountsScannedFiles
+        // * - Valid directory with skipped files returns proper count of scanned files
+        // *      - ScanDirectory_ValidDirectoryWithSkippedFiles_CountsSkippedFiles
+        // * - Valid directory with skipped files produces log events for skipped files
+        // *      - ScanDirectory_ValidDirectoryWithSkippedFiles_LogsSkippedFileScanEvents
+        // * - Valid empty directory results in successful scan
+        // *      - ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult
+        // * - Valid empty directory adds no records to data provider
+        // *      - ScanDirectory_EmptyDirectory_NoRecordsAddedToDataAccessProvider
+        // * - Invalid directory results in failed scan
+        // *      - ScanDirectory_InvalidIDirectoryInfo_ReturnsScanFailureResult
+        // * - Authorization error while attempt to access directory produces log event
+        // *      - ScanDirectory_AuthorizationErrorDuringDirectoryAccess_LogsError
+        // * - Authorization error while attempt to access directory increments skipped file count
+        // *      - ScanDirectory_AuthorizationErrorDuringDirectoryAccess_IncrementsSkippedFileCount
+        // * - Authorization error while attempt to access file produces log event
+        // *      - ScanDirectory_AuthorizationErrorDuringFileAccess_LogsError
+        // * - Authorization error while attempt to access file increments skipped file count
+        // *      - ScanDirectory_AuthorizationErrorDuringFileAccess_IncrementsSkippedFileCount
+        // * - Recursive scan option results in successful scan of all files and subdirectory files
+        // *      - ScanDirectory_ValidDirectoryWithRecursiveScan_AddsSubdirectoryFilesToDataAccessProvider
+        // * - Recursive scan returns proper count of scanned files
+        // *      - ScanDirectory_ValidDirectoryWithRecursiveScan_CountsScannedFilesCorrectly
+        // */
+
+        // *
 
         [Theory]
         [InlineData(@"C:\path/with|invalid/chars")]
@@ -175,7 +223,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void ScanDirectory_InvalidDirectory_ReturnsScanFailureResult(string directory)
         {
             // Arrange
-            var fileScanner = this.GetTestFileScanner();
+            var fileScanner = this.GetDefaultFileScanner();
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(directory);
 
             // Act, Assert
@@ -186,7 +234,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void ScanDirectory_EmptyDirectory_ReturnsScanSuccessResult()
         {
             // Arrange
-            var fileScanner = this.GetTestFileScanner();
+            var fileScanner = this.GetDefaultFileScanner();
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 { @"c:\testdirectory\subdir\SubdirFile.txt", new MockFileData("111") },
@@ -332,7 +380,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             return mockFileSystem;
         }
 
-        private FileScanner GetTestFileScanner()
+        private FileScanner GetDefaultFileScanner()
         {
             return new FileScanner(
                 this.mockDataAccessProvider.Object,
