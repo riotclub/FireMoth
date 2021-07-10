@@ -6,13 +6,14 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
+    using System.Collections.Generic;
     using System.IO.Abstractions;
     using RiotClub.FireMoth.Services.Extensions;
 
     /// <summary>
     /// Conatins data that uniquely identifies a file and its data.
     /// </summary>
-    public class FileFingerprint : IFileFingerprint
+    public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
@@ -51,5 +52,88 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// Gets the base-64 hash of the file's data.
         /// </summary>
         public string Base64Hash { get; }
+
+        /// <summary>
+        /// Implements the equality operator.
+        /// </summary>
+        /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for equality.
+        /// </param>
+        /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for
+        /// equality.</param>
+        /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are equal; false
+        /// otherwise.</returns>
+        public static bool operator ==(FileFingerprint? left, FileFingerprint? right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null && right is null)
+            {
+                return true;
+            }
+
+            if (left is null || right is null)
+            {
+                return false;
+            }
+
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Implements the inequality operator.
+        /// </summary>
+        /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for inequality.
+        /// </param>
+        /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for
+        /// inequality.</param>
+        /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are not equal; false
+        /// otherwise.</returns>
+        public static bool operator !=(FileFingerprint? left, FileFingerprint? right)
+        {
+            return !(left == right);
+
+            /*
+            if (ReferenceEquals(left, right))
+            {
+                return false;
+            }
+
+            if (left is null && right is null)
+            {
+                return false;
+            }
+
+            if (left is null || right is null)
+            {
+                return true;
+            }
+
+            return !left.Equals(right);
+            */
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj)
+        {
+            return this.Equals(obj as FileFingerprint);
+
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(FileFingerprint? other)
+        {
+            return other is FileFingerprint fingerprint
+                && this.FileInfo.FullName == fingerprint.FileInfo.FullName
+                && this.Base64Hash == fingerprint.Base64Hash;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.Base64Hash);
+        }
     }
 }

@@ -57,6 +57,37 @@
             Gets the base-64 hash of the file's data.
             </summary>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.op_Equality(RiotClub.FireMoth.Services.DataAccess.FileFingerprint,RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
+            <summary>
+            Implements the equality operator.
+            </summary>
+            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for equality.
+            </param>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for
+            equality.</param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/>s are equal; false
+            otherwise.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.op_Inequality(RiotClub.FireMoth.Services.DataAccess.FileFingerprint,RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
+            <summary>
+            Implements the inequality operator.
+            </summary>
+            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for inequality.
+            </param>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for
+            inequality.</param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/>s are not equal; false
+            otherwise.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Equals(RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.GetHashCode">
+            <inheritdoc/>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
             <summary>
             A mapping between an <see cref="T:System.IO.Abstractions.IFileInfo"/> and CSV headers.
