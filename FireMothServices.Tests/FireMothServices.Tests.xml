@@ -13,6 +13,55 @@
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.FileScanning.FileFingerprintTests">
+             <summary>
+             <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> unit tests.
+            
+             Test naming convention: [method]_[preconditions]_[expected result]
+            
+             Ctor
+             - IFileInfo can't be null
+                 * Ctor_NullFileInfo_ThrowsArgumentNullException
+             - base64Hash string can't be null or empty
+                 * Ctor_NullString_ThrowsArgumentNullException
+                 * Ctor_EmptyOrWhitespaceString_ThrowsArgumentException
+             - base64Hash must be a valid base 64 string
+                 * Ctor_InvalidBase64String_ThrowsArgumentException
+            
+             Equals
+             - Null FileFingerprint returns false
+                 - Equal_NullFileFingerprint_ReturnsFalse
+             - Semantically equal FileFingerprint returns true
+                 - Equal_EqualFileFingerprint_ReturnsTrue
+             - Semantically different FileFingerprint returns false
+                 - Equal_DifferentFileFingerprint_ReturnsFalse
+             - Incompatible type returns false
+                 - Equal_IncompatibleType_ReturnsFalse
+            
+             operator ==
+             - Two semantically equal FileFingerprint instances returns true
+                 - EqualityOperator_LeftOperandEqualsRightOperand_ReturnsTrue
+             - One null and one non-null FileFingerprint instance returns false
+                 - EqualityOperator_NullLeftOperandAndNonNullRightOperand_ReturnsFalse
+                 - EqualityOperator_NonNullLeftOperandAndNullRightOperand_ReturnsFalse
+             - Two null values returns true
+                 - EqualityOperator_BothOperandsNull_ReturnsTrue
+            
+             operator !=
+             - Two semantically equal FileFingerprint instances returns false
+                 - InequalityOperator_LeftOperandEqualsRightOperand_ReturnsFalse
+             - One null and one non-null FileFingerprint instance returns true
+                 - InequalityOperator_NullLeftOperandAndNonNullRightOperand_ReturnsTrue
+                 - InequalityOperator_NonNullLeftOperandAndNullRightOperand_ReturnsTrue
+             - Two null values returns false
+                 - InequalityOperator_BothOperandsNull_ReturnsFalse
+            
+             GetHashCode
+             - Semantically equal instances have equal hashes
+                  - GetHashCode_EqualInstances_ReturnEqualHashCodes
+             .
+             </summary>
+        </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.FileScanning.FileScannerTests.Dispose">
             <inheritdoc/>
         </member>
@@ -21,6 +70,18 @@
             Releases unmanaged and, optionally, managed resources.
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Extensions.MockExtensions.VerifyLogInformationCalled``1(Moq.Mock{Microsoft.Extensions.Logging.ILogger{``0}},System.String)">
+            <summary>
+            Verifies that a <see cref="M:Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(Microsoft.Extensions.Logging.ILogger,System.String,System.Object[])"/>
+            invocation with the specified message was performed on the mock.
+            </summary>
+            <typeparam name="T">The type of the <see cref="T:Microsoft.Extensions.Logging.ILogger"/>.</typeparam>
+            <param name="logger">The <see cref="T:Moq.Mock`1"/> on which the verificaation will
+            be performed.</param>
+            <param name="expectedMessage">The expected message to verify an invocation of
+            <see cref="M:Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(Microsoft.Extensions.Logging.ILogger,System.String,System.Object[])"/> with.</param>
+            <returns>The <see cref="T:Moq.Mock`1"/> on which this method was called.</returns>
         </member>
     </members>
 </doc>
