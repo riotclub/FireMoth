@@ -8,9 +8,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.IO.Abstractions;
 
     /// <summary>
-    /// Defines the public interface for a class that implements a directory scanner. A directory scanner is responsible
-    /// for reading, analyzing, and persisting a hash or other signature that uniquely identifies a file and its
-    /// contents.
+    /// Defines the public interface for a class that implements a directory scanner. A directory
+    /// scanner is responsible for reading, analyzing, and persisting a hash or other signature that
+    /// uniquely identifies a file and its contents.
     /// </summary>
     public interface IFileScanner
     {

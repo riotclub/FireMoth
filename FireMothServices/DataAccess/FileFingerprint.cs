@@ -94,25 +94,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public static bool operator !=(FileFingerprint? left, FileFingerprint? right)
         {
             return !(left == right);
-
-            /*
-            if (ReferenceEquals(left, right))
-            {
-                return false;
-            }
-
-            if (left is null && right is null)
-            {
-                return false;
-            }
-
-            if (left is null || right is null)
-            {
-                return true;
-            }
-
-            return !left.Equals(right);
-            */
         }
 
         /// <inheritdoc/>
