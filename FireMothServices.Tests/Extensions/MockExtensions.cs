@@ -15,15 +15,17 @@
         /// be performed.</param>
         /// <param name="expectedMessage">The expected message to verify an invocation of
         /// <see cref="LoggerExtensions.LogInformation(ILogger, string, object[])"/> with.</param>
+        /// <param name="logLevel">The expected log level to verify an invocation of
+        /// <see cref="LoggerExtensions.LogInformation(ILogger, string, object[])"/> with.</param>
         /// <returns>The <see cref="Mock{ILogger}"/> on which this method was called.</returns>
-        public static Mock<ILogger<T>> VerifyLogInformationCalled<T>(
-            this Mock<ILogger<T>> logger, string expectedMessage)
+        public static Mock<ILogger<T>> VerifyLogCalled<T>(
+            this Mock<ILogger<T>> logger, string expectedMessage, LogLevel logLevel)
         {
             Func<object, Type, bool> state = (v, t) => v.ToString().CompareTo(expectedMessage) == 0;
 
             logger.Verify(x =>
                 x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Information),
+                    It.Is<LogLevel>(l => l == logLevel),
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => state(v, t)),
                     It.IsAny<Exception>(),
