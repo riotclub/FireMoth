@@ -43,6 +43,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var result = new ScanResult();
             result.ScannedFiles.AddRange(a.ScannedFiles);
             result.ScannedFiles.AddRange(b.ScannedFiles);
+            result.Errors.AddRange(a.Errors);
+            result.Errors.AddRange(b.Errors);
 
             foreach (KeyValuePair<string, string> pair in a.SkippedFiles)
             {
