@@ -119,17 +119,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
                         scanResult.ScannedFiles.Add(file.FullName);
                     }
                 }
-                catch (IOException exception)
+                catch (IOException ex)
                 {
-                    var messageTemplate =
-                        "Could not add record for file {FileName} (skipping): {ExceptionMessage}";
-                    this.log.LogError(messageTemplate, file.FullName, exception.Message);
                     scanResult.SkippedFiles.Add(
                         file.FullName,
-                        string.Format(messageTemplate, file.FullName, exception.Message));
-                    scanResult.Errors.Add(
-                        new ScanError(
-                            file.FullName, "Could not add record for file", exception));
+                        $"Could not add record for file {file.FullName} (skipping): {ex.Message}");
+                    this.HandleError(
+                        file.FullName,
+                        ex,
+                        scanResult,
+                        $"Could not add record for file {file.FullName} (skipping): {ex.Message}",
+                        "Could not add record for file {FileName} (skipping): {ExceptionMessage}",
+                        file.FullName,
+                        ex.Message);
                 }
             }
         }
@@ -144,31 +146,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 result = directory.EnumerateFiles();
             }
-            catch (IOException exception)
+            catch (Exception ex)
             {
-                this.log.LogError(
-                    exception,
+                this.HandleError(
+                    directory.FullName,
+                    ex,
+                    scanResult,
+                    $"Could not enumerate files of directory {directory.FullName}: {ex.Message}",
                     "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
-                    directory,
-                    exception.Message);
-                scanResult.Errors.Add(
-                    new ScanError(
-                        directory.FullName,
-                        $"Could not enumerate files of {directory.FullName}",
-                        exception));
-            }
-            catch (SecurityException exception)
-            {
-                this.log.LogError(
-                    exception,
-                    "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
-                    directory,
-                    exception.Message);
-                scanResult.Errors.Add(
-                    new ScanError(
-                        directory.FullName,
-                        $"Could not enumerate files of {directory.FullName}",
-                        exception));
+                    directory.FullName,
+                    ex.Message);
             }
 
             return result;
@@ -184,34 +171,40 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 result = directory.EnumerateDirectories();
             }
-            catch (IOException exception)
+            catch (Exception ex)
             {
-                this.log.LogError(
-                    exception,
-                    "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
-                    directory,
-                    exception.Message);
-                scanResult.Errors.Add(
-                    new ScanError(
-                        directory.FullName,
-                        $"Could not enumerate subdirectories of {directory.FullName}",
-                        exception));
-            }
-            catch (SecurityException exception)
-            {
-                this.log.LogError(
-                    exception,
-                    "Could not enumerate subdirectories of {Directory}: {ExceptionMessage}",
-                    directory,
-                    exception.Message);
-                scanResult.Errors.Add(
-                    new ScanError(
-                        directory.FullName,
-                        $"Could not enumerate subdirectories of {directory.FullName}",
-                        exception));
+                this.HandleError(
+                    directory.FullName,
+                    ex,
+                    scanResult,
+                    $"Could not enumerate subdirectories of directory {directory.FullName}: {ex.Message}",
+                    "Could not enumerate subdirectories of directory {Directory}: {ExceptionMessage}",
+                    directory.FullName,
+                    ex.Message);
             }
 
             return result;
+        }
+
+        // Add error log message and add ScanError to ScanResult.
+        private void HandleError(
+            string path,
+            Exception exception,
+            ScanResult scanResult,
+            string scanResultMessage,
+            string logMessageTemplate,
+            params string[] logMessageArguments)
+        {
+            if (exception is null)
+            {
+                this.log.LogError(logMessageTemplate, logMessageArguments);
+            }
+            else
+            {
+                this.log.LogError(exception, logMessageTemplate, logMessageArguments);
+            }
+
+            scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
         }
 
         // Returns a base 64 representation of a data stream's hash.
