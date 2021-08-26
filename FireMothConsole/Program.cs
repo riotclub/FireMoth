@@ -6,10 +6,12 @@
 namespace RiotClub.FireMoth.Console
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.IO.Abstractions;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -52,22 +54,28 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                var scanResult =
-                    fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
-                stopwatch.Stop();
 
+                var scanResult =
+                   fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
+
+                stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
                 var outputWriter = host.Services.GetService<TextWriter>();
                 if (log != null)
                 {
                     log.LogInformation(
-                        "Scan complete. Scanned {ScannedFilesCount} files.",
+                        "Scan complete. Scanned {ScannedFilesCount} file(s).",
                         scanResult.ScannedFiles.Count);
                     if (scanResult.SkippedFiles.Count > 0)
                     {
                         log.LogInformation(
-                            "{0} files could not be scanned due to errors.",
+                            "{SkippedFileCount} file(s) could not be scanned:",
                             scanResult.SkippedFiles.Count);
+                        foreach (var file in scanResult.SkippedFiles)
+                        {
+                            log.LogInformation(
+                                "'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
+                        }
                     }
 
                     log.LogInformation("Total scan time: {ScanTime}.", timeSpan);
