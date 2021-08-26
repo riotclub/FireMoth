@@ -1,9 +1,9 @@
-﻿// <copyright file="CsvDataAccessProviderTests.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="CsvDataAccessProviderTests.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.FileScanning
+namespace RiotClub.FireMoth.Services.Tests.FileScanning
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +12,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.IO.Abstractions;
     using System.Text;
     using System.Threading.Tasks;
-    using FireMothServices.DataAccess;
     using Microsoft.Extensions.Logging;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
@@ -28,12 +27,18 @@ namespace RiotClub.FireMoth.Services.FileScanning
      * AddFileRecord
      * - IFileFingerprint can't be null
      *      * AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException
-     * - File with commas in name adds file with quotes to backing store
-     *      * AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile
      * - Valid IFileFingerprint adds record to backing store
      *      * AddFileRecord_ValidFileFingerprint_AddsRecordToStore
+     * - File with commas in name adds file with quotes to backing store
+     *      * AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile
      * - Call on disposed object throws exception
      *      * AddFileRecord_DisposedObject_ThrowsObjectDisposedException
+     *
+     * Dispose
+     * - If constructed with leaveOpen true, underlying StreamWriter object is undisposed after disposal
+     *      * Dispose_LeaveOpenTrue_StreamWriterUndisposed
+     * - If constructed with leaveOpen false, underlying StreamWriter object is disposed after disposal
+     *      - Dispose_LeaveOpenFalse_StreamWriterDisposed
      */
     [ExcludeFromCodeCoverage]
     public class CsvDataAccessProviderTests : IDisposable
@@ -80,6 +85,16 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         [Fact]
+        public void Ctor_ValidArguments_CreatesObject()
+        {
+            // Arrange, Act
+            var testObject = new FileFingerprint(this.mockFileInfo.Object, this.testHash);
+
+            // Assert
+            Assert.NotNull(testObject);
+        }
+
+        [Fact]
         public void AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException()
         {
             // Arrange
@@ -88,31 +103,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
-        }
-
-        [Fact]
-        public async void AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile()
-        {
-            // Arrange
-            var testFullPath = @"C:\dir, with, commas\file, with, commas.dat";
-            var testHash = "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=";
-
-            var testPath = Path.GetDirectoryName(testFullPath);
-            var testPathWithQuotes = '"' + testPath + '"';
-            var testFileName = Path.GetFileName(testFullPath);
-            var testFileNameWithQuotes = '"' + testFileName + '"';
-
-            var mockFileInfo = GetFileInfoMock(testPath, testFullPath, testFileName);
-
-            // Act
-            var dapOutput = await this.GetAddFileRecordOutput(
-                new FileFingerprint(mockFileInfo.Object, testHash));
-
-            // Assert
-            var expectedOutput = string.Join(
-                ',',
-                new List<string> { testPathWithQuotes, testFileNameWithQuotes, "0", testHash });
-            Assert.Contains(expectedOutput, dapOutput);
         }
 
         [Theory]
@@ -137,11 +127,34 @@ namespace RiotClub.FireMoth.Services.FileScanning
         }
 
         [Fact]
+        public async void AddFileRecord_FileWithCommas_AddsRecordWithQuotedFile()
+        {
+            // Arrange
+            var testFullPath = @"C:\dir, with, commas\file, with, commas.dat";
+            var testHash = "XdGu4hg63jhhgd84UFNM/38956NDJDIlrsMVY2jio38=";
+
+            var testPath = Path.GetDirectoryName(testFullPath);
+            var testPathWithQuotes = '"' + testPath + '"';
+            var testFileName = Path.GetFileName(testFullPath);
+            var testFileNameWithQuotes = '"' + testFileName + '"';
+            var mockFileInfo = GetFileInfoMock(testPath, testFullPath, testFileName);
+
+            // Act
+            var dapOutput = await this.GetAddFileRecordOutput(
+                new FileFingerprint(mockFileInfo.Object, testHash));
+
+            // Assert
+            var expectedOutput = string.Join(
+                ',',
+                new List<string> { testPathWithQuotes, testFileNameWithQuotes, "0", testHash });
+            Assert.Contains(expectedOutput, dapOutput);
+        }
+
+        [Fact]
         public void AddFileRecord_DisposedObject_ThrowsObjectDisposedException()
         {
             // Arrange
-            var testObject = new CsvDataAccessProvider(
-                this.testStreamWriter, this.testLogger, true);
+            var testObject = new CsvDataAccessProvider(this.testStreamWriter, this.testLogger);
 
             // Act
             testObject.Dispose();
@@ -150,6 +163,44 @@ namespace RiotClub.FireMoth.Services.FileScanning
             Assert.Throws<ObjectDisposedException>(() =>
                 testObject.AddFileRecord(
                     new FileFingerprint(this.mockFileInfo.Object, this.testHash)));
+        }
+
+        [Fact]
+        public void Dispose_LeaveOpenTrue_StreamWriterUndisposed()
+        {
+            // Arrange
+            var testString = "test$1234567890";
+            var testStream = new MemoryStream();
+            var testWriter = new StreamWriter(testStream, Encoding.UTF8);
+            CsvDataAccessProvider testDataAccessProvider =
+                new CsvDataAccessProvider(testWriter, this.testLogger, true);
+
+            // Act
+            testDataAccessProvider.Dispose();
+            testWriter.WriteLine(testString);
+            testWriter.Flush();
+            testStream.Position = 0;
+            using StreamReader reader = new StreamReader(testStream);
+            var result = reader.ReadToEnd();
+
+            // Assert
+            Assert.Contains(testString, result);
+        }
+
+        [Fact]
+        public void Dispose_LeaveOpenFalse_StreamWriterDisposed()
+        {
+            // Arrange
+            var testStream = new MemoryStream();
+            var testWriter = new StreamWriter(testStream, Encoding.UTF8);
+            CsvDataAccessProvider testDataAccessProvider =
+                new CsvDataAccessProvider(testWriter, this.testLogger, false);
+
+            // Act
+            testDataAccessProvider.Dispose();
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(() => testWriter.WriteLine());
         }
 
         /// <inheritdoc/>

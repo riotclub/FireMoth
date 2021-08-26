@@ -2,7 +2,10 @@
   "profiles": {
     "FireMothConsole": {
       "commandName": "Project",
-      "commandLineArgs": "--ScanDirectory \"D:\\FireMoth Test Data\" --RecursiveScan true"
+      "commandLineArgs": "--ScanDirectory \"D:\\FireMoth Test Data\" --RecursiveScan true",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }

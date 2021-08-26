@@ -1,9 +1,9 @@
-﻿// <copyright file="SHA256FileHasher.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="SHA256FileHasher.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace FireMothServices.DataAnalysis
+namespace RiotClub.FireMoth.Services.DataAnalysis
 {
     using System;
     using System.IO;
@@ -30,10 +30,7 @@ namespace FireMothServices.DataAnalysis
         public byte[] ComputeHashFromStream(Stream inputStream) =>
             this.hashAlgorithm.ComputeHash(inputStream);
 
-        /// <summary>
-        /// Releases all resources used by the current instance of this
-        /// <see cref="SHA256FileHasher"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void Dispose()
         {
             this.Dispose(true);

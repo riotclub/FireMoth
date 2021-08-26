@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>FireMothServices</name>
+        <name>FireMoth.Services</name>
     </assembly>
     <members>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider">
@@ -19,10 +19,10 @@
             <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not
             be closed when the <see cref="T:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider"/> is disposed.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(FireMothServices.DataAccess.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.CsvDataAccessProvider.AddFileRecord(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
             <inheritdoc/>
             <exception cref="T:System.ArgumentNullException">Thrown when provided
-            <see cref="T:FireMothServices.DataAccess.IFileFingerprint"/> reference is null.</exception>
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> reference is null.</exception>
             <exception cref="T:System.ObjectDisposedException">Thrown when object is in a disposed state.
             </exception>
         </member>
@@ -35,18 +35,153 @@
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint">
+            <summary>
+            Conatins data that uniquely identifies a file and its data.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.#ctor(System.IO.Abstractions.IFileInfo,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> class.
+            </summary>
+            <param name="fileInfo">A <see cref="T:System.IO.Abstractions.IFileInfo"/> containing information about the file.
+            </param>
+            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
+            specified file.</param>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.FileInfo">
+            <inheritdoc/>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Base64Hash">
+            <summary>
+            Gets the base-64 hash of the file's data.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.op_Equality(RiotClub.FireMoth.Services.DataAccess.FileFingerprint,RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
+            <summary>
+            Implements the equality operator.
+            </summary>
+            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for equality.
+            </param>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for
+            equality.</param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/>s are equal; false
+            otherwise.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.op_Inequality(RiotClub.FireMoth.Services.DataAccess.FileFingerprint,RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
+            <summary>
+            Implements the inequality operator.
+            </summary>
+            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for inequality.
+            </param>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> to test for
+            inequality.</param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/>s are not equal; false
+            otherwise.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Equals(RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
+            <summary>
+            A mapping between an <see cref="T:System.IO.Abstractions.IFileInfo"/> and CSV headers.
+            </summary>
+            <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap"/> class.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
             Defines the public interface for a class that implements data access and persistence
             operations.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(FireMothServices.DataAccess.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider.AddFileRecord(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
             <summary>
             Adds a file and its hash value to the backing store.
             </summary>
-            <param name="fileFingerprint">An <see cref="T:FireMothServices.DataAccess.IFileFingerprint"/> containing the
+            <param name="fileFingerprint">An <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> containing the
             properties of the file to store.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint">
+            <summary>
+            Defines the public interface for a class that implements properties that define a file and
+            its hash value.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.FileInfo">
+            <summary>
+            Gets the <see cref="T:System.IO.Abstractions.IFileInfo"/> for the file represented by this fingerprint.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.Base64Hash">
+            <summary>
+            Gets a base 64 string representation of the file's hash.
+            </summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher">
+            <summary>
+            Defines the public interface for a class that implements file hashing operations.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher.ComputeHashFromStream(System.IO.Stream)">
+            <summary>
+            Computes the hash of the provided stream's data.
+            </summary>
+            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the data to hash.</param>
+            <returns>An array of <c>byte</c> containing the value of the computed hash.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher">
+            <summary>
+            Provides file hashing services using the SHA256 algorithm.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher"/> class.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.ComputeHashFromStream(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and, optionally, managed resources.
+            </summary>
+            <param name="disposing">If true, managed resources are freed.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Extensions.StringExtensions">
+            <summary>
+            Contains extension methods for <see cref="T:System.String"/> objects.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Extensions.StringExtensions.IsEmptyOrWhiteSpace(System.String)">
+            <summary>
+            Returns <c>true</c> if the provided string is empty or contains only whitespace
+            characters.
+            </summary>
+            <param name="value">The string to check.</param>
+            <returns><c>true</c> if the provided string is empty or contains only whitespace.
+            </returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Extensions.StringExtensions.IsBase64String(System.String)">
+            <summary>
+            Returns <c>true</c> if the provided string is a valid base 64 string.
+            </summary>
+            <param name="value">The string to check.</param>
+            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.FileScanner">
             <summary>
@@ -54,73 +189,33 @@
             and hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,FireMothServices.DataAnalysis.IFileHasher,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.FileScanning.FileScanner})">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider,RiotClub.FireMoth.Services.DataAnalysis.IFileHasher,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.FileScanning.FileScanner})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/> class.
             </summary>
             <param name="dataAccessProvider">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider"/> that provides
             access to the application backing store.</param>
-            <param name="hasher">An <see cref="T:FireMothServices.DataAnalysis.IFileHasher"/> that is used to compute hash values
+            <param name="hasher">An <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher"/> that is used to compute hash values
             for scanned files.</param>
-            <param name="logWriter">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
+            <param name="log">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
             written.</param>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.FileScanner.TotalFilesScanned">
-            <summary>
-            Gets the total number of files scanned by this <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/>.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.FileScanner.TotalFilesSkipped">
-            <summary>
-            Gets the total number of files that were skpped by this <see cref="T:RiotClub.FireMoth.Services.FileScanning.FileScanner"/>.
-            </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo})">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo},RiotClub.FireMoth.Services.FileScanning.ScanResult)">
             <summary>
             Hashes a set of files and records the filename and hash string.
             </summary>
             <param name="files">The set of files to hash and record.</param>
-            <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
-            number of files skipped, respectively.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetFiles(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo}@)">
-            <summary>
-            Attempts to retrieve all files in the provided directory.
-            </summary>
-            <param name="directory">An <see cref="T:System.IO.Abstractions.IDirectoryInfo"/> representing the directory for
-            which files will be enumerated.</param>
-            <param name="files">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection containing the
-            subdirectories of the provided directory.</param>
-            <returns><c>true</c> if files were successfully enumerated and set in
-            <paramref name="files"/>.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.TryGetSubDirectories(System.IO.Abstractions.IDirectoryInfo,System.Collections.Generic.IEnumerable{System.IO.Abstractions.IDirectoryInfo}@)">
-            <summary>
-            Attempts to retrieve all immediate subdirectories of the provided directory.
-            </summary>
-            <param name="directory">An <see cref="T:System.IO.Abstractions.IDirectoryInfo"/> representing the directory for
-            which subdirectories will be enumerated.</param>
-            <param name="subdirectories">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection
-            containing the subdirectories of the provided directory.</param>
-            <returns><c>true</c> if subdirectories were successfully enumerated and set in
-            <paramref name="subdirectories"/>.</returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.FileScanner.GetBase64HashFromStream(System.IO.Stream)">
-            <summary>
-            Calculates a hash of the provided stream's data and returns a base 64 encoded string of
-            the hash.
-            </summary>
-            <param name="stream">The <see cref="T:System.IO.Stream"/> containing the data to hash.</param>
-            <returns>A base 64 encoded <see cref="T:System.String"/> of the hash.</returns>
+            <param name="scanResult">A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> to which the names of scanned and
+            skipped files will be added.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.IFileScanner">
             <summary>
-            Defines the public interface for a class that implements a directory scanner. A directory scanner is responsible
-            for reading, analyzing, and persisting a hash or other signature that uniquely identifies a file and its
-            contents.
+            Defines the public interface for a class that implements a directory scanner. A directory
+            scanner is responsible for reading, analyzing, and persisting a hash or other signature that
+            uniquely identifies a file and its contents.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.IFileScanner.ScanDirectory(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
@@ -134,124 +229,96 @@
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the directory scanning operation.
             </returns>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanError">
+            <summary>
+            Represents an error that occured during a file scan.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.#ctor(System.String,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> class.
+            </summary>
+            <param name="path">The path to the file or directory that this error pertains to.
+            </param>
+            <param name="message">A message describing this error.</param>
+            <param name="exception">Any exception associated with this error.</param>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Path">
+            <summary>
+            Gets the path to the file or directory related to this error.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Message">
+            <summary>
+            Gets the message describing this error.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanError.Exception">
+            <summary>
+            Gets the exception related to this error.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.op_Equality(RiotClub.FireMoth.Services.FileScanning.ScanError,RiotClub.FireMoth.Services.FileScanning.ScanError)">
+            <summary>
+            Implements the equality operator.
+            </summary>
+            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for equality.</param>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for equality.
+            </param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/>s are equal; false otherwise.
+            </returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.op_Inequality(RiotClub.FireMoth.Services.FileScanning.ScanError,RiotClub.FireMoth.Services.FileScanning.ScanError)">
+            <summary>
+            Implements the inequality operator.
+            </summary>
+            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for inequality.
+            </param>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for inequality.
+            </param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/>s are not equal; false otherwise.
+            </returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.Equals(RiotClub.FireMoth.Services.FileScanning.ScanError)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.GetHashCode">
+            <inheritdoc/>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanResult">
             <summary>
             Specifies the result of a file scan operation.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanSuccess">
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles">
             <summary>
-            Inidicates the file scan operation was successful.
+            Gets a list of the files that were successfully scanned during the file scan operation.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScanFailure">
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles">
             <summary>
-            Indicates the file scan operation encountered a problem that prevented it from completing successfully.
+            Gets a key-value list of the files that were skipped during the file scan operation and
+            the reason the files were skipped.
             </summary>
         </member>
-        <member name="T:FireMothServices.DataAccess.FileFingerprint">
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.Errors">
             <summary>
-            Conatins data that uniquely identifies a file and its data.
+            Gets a list of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> that occurred during the file scan operation and
+            any exceptions associated with the error.
             </summary>
         </member>
-        <member name="M:FireMothServices.DataAccess.FileFingerprint.#ctor(System.IO.Abstractions.IFileInfo,System.String)">
+        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanResult.op_Addition(RiotClub.FireMoth.Services.FileScanning.ScanResult,RiotClub.FireMoth.Services.FileScanning.ScanResult)">
             <summary>
-            Initializes a new instance of the <see cref="T:FireMothServices.DataAccess.FileFingerprint"/> class.
+            Combines two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> objects by combining their
+            <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles"/> and <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles"/> collections.
             </summary>
-            <param name="fileInfo">A <see cref="T:System.IO.Abstractions.IFileInfo"/> containing information about the file.
-            </param>
-            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
-            specified file.</param>
-        </member>
-        <member name="P:FireMothServices.DataAccess.FileFingerprint.DirectoryName">
-            <summary>
-            Gets the directory's full path.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.FileFingerprint.Name">
-            <summary>
-            Gets the name of the file.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.FileFingerprint.Length">
-            <summary>
-            Gets the size, in bytes, of the file.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.FileFingerprint.Base64Hash">
-            <summary>
-            Gets or sets the base-64 hash of the file's data.
-            </summary>
-        </member>
-        <member name="M:FireMothServices.DataAccess.FileFingerprint.IsBase64String(System.String)">
-            <summary>
-            Returns <c>true</c> if the provided string is a valid base 64 string.
-            </summary>
-            <param name="base64">The string to check.</param>
-            <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
-        </member>
-        <member name="T:FireMothServices.DataAccess.IFileFingerprint">
-            <summary>
-            Defines the public interface for a class that implements properties that define a file and
-            its hash value.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.IFileFingerprint.DirectoryName">
-            <summary>
-            Gets the directory that the file resides in.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.IFileFingerprint.Name">
-            <summary>
-            Gets the name of the file.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.IFileFingerprint.Length">
-            <summary>
-            Gets the size, in bytes, of the file.
-            </summary>
-        </member>
-        <member name="P:FireMothServices.DataAccess.IFileFingerprint.Base64Hash">
-            <summary>
-            Gets a base 64 string representation of the file's hash.
-            </summary>
-        </member>
-        <member name="T:FireMothServices.DataAnalysis.IFileHasher">
-            <summary>
-            Defines the public interface for a class that implements file hashing operations.
-            </summary>
-        </member>
-        <member name="M:FireMothServices.DataAnalysis.IFileHasher.ComputeHashFromStream(System.IO.Stream)">
-            <summary>
-            Computes the hash of the provided stream's data.
-            </summary>
-            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the data to hash.</param>
-            <returns>An array of <c>byte</c> containing the value of the computed hash.</returns>
-        </member>
-        <member name="T:FireMothServices.DataAnalysis.SHA256FileHasher">
-            <summary>
-            Provides file hashing services using the SHA256 algorithm.
-            </summary>
-        </member>
-        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/> class.
-            </summary>
-        </member>
-        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.ComputeHashFromStream(System.IO.Stream)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose">
-            <summary>
-            Releases all resources used by the current instance of this
-            <see cref="T:FireMothServices.DataAnalysis.SHA256FileHasher"/>.
-            </summary>
-        </member>
-        <member name="M:FireMothServices.DataAnalysis.SHA256FileHasher.Dispose(System.Boolean)">
-            <summary>
-            Releases unmanaged and, optionally, managed resources.
-            </summary>
-            <param name="disposing">If true, managed resources are freed.</param>
+            <param name="a">The first of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
+            <param name="b">The second of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
+            <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.
+            </returns>
         </member>
     </members>
 </doc>

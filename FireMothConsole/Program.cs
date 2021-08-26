@@ -1,22 +1,24 @@
-﻿// <copyright file="Program.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="Program.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
 namespace RiotClub.FireMoth.Console
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.IO.Abstractions;
+    using System.Linq;
     using System.Threading.Tasks;
-    using FireMothServices.DataAnalysis;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
 
     /// <summary>
@@ -52,22 +54,28 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                var scanResult =
-                    fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
-                stopwatch.Stop();
 
+                var scanResult =
+                   fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
+
+                stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
                 var outputWriter = host.Services.GetService<TextWriter>();
                 if (log != null)
                 {
                     log.LogInformation(
-                        "Scan complete. Scanned {ScannedFilesCount} files.",
-                        fileScanner.TotalFilesScanned);
-                    if (fileScanner.TotalFilesSkipped > 0)
+                        "Scan complete. Scanned {ScannedFilesCount} file(s).",
+                        scanResult.ScannedFiles.Count);
+                    if (scanResult.SkippedFiles.Count > 0)
                     {
                         log.LogInformation(
-                            "{0} files could not be scanned due to errors.",
-                            fileScanner.TotalFilesSkipped);
+                            "{SkippedFileCount} file(s) could not be scanned:",
+                            scanResult.SkippedFiles.Count);
+                        foreach (var file in scanResult.SkippedFiles)
+                        {
+                            log.LogInformation(
+                                "'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
+                        }
                     }
 
                     log.LogInformation("Total scan time: {ScanTime}.", timeSpan);
@@ -96,8 +104,11 @@ namespace RiotClub.FireMoth.Console
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.AddConsole();
-                    logging.SetMinimumLevel(LogLevel.Debug);
+                    logging.AddSimpleConsole(options =>
+                    {
+                        options.SingleLine = true;
+                    });
+                    logging.SetMinimumLevel(LogLevel.Information);
                 })
                 .UseConsoleLifetime()
                 .ConfigureServices((hostContext, services) =>

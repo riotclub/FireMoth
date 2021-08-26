@@ -1,5 +1,5 @@
-﻿// <copyright file="CsvDataAccessProvider.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="CsvDataAccessProvider.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
@@ -9,7 +9,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
     using System.Globalization;
     using System.IO;
     using CsvHelper;
-    using FireMothServices.DataAccess;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
@@ -42,6 +41,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
             }
 
             this.csvWriter = new CsvWriter(outputWriter, CultureInfo.InvariantCulture, leaveOpen);
+            this.csvWriter.Context.RegisterClassMap<FileFingerprintMap>();
             this.csvWriter.WriteHeader<FileFingerprint>();
             this.csvWriter.NextRecord();
         }
@@ -65,9 +65,11 @@ namespace RiotClub.FireMoth.Services.DataAccess
             }
 
             var fullPath =
-                fingerprint.DirectoryName + Path.DirectorySeparatorChar + fingerprint.Name;
+                fingerprint.FileInfo.DirectoryName
+                + Path.DirectorySeparatorChar
+                + fingerprint.FileInfo.Name;
             this.logger.LogDebug(
-                "Writing record for file {FileName} with hash {HashString}.",
+                "Writing fingerprint for file {FileName} with hash {HashString}.",
                 fullPath,
                 fingerprint.Base64Hash);
             this.csvWriter.WriteRecord(fingerprint);

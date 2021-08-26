@@ -1,10 +1,11 @@
-﻿// <copyright file="ScanResult.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="ScanResult.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
 namespace RiotClub.FireMoth.Services.FileScanning
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -13,18 +14,49 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class ScanResult
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the file scan was successful.
-        /// </summary>
-        public bool Success { get; set; }
-
-        /// <summary>
         /// Gets a list of the files that were successfully scanned during the file scan operation.
         /// </summary>
-        public List<string> FilesScanned { get; } = new List<string>();
+        public List<string> ScannedFiles { get; } = new List<string>();
 
         /// <summary>
-        /// Gets a list of the files that were skipped during the file scan operation.
+        /// Gets a key-value list of the files that were skipped during the file scan operation and
+        /// the reason the files were skipped.
         /// </summary>
-        public List<string> FilesSkipped { get; } = new List<string>();
+        public Dictionary<string, string> SkippedFiles { get; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Gets a list of <see cref="ScanError"/> that occurred during the file scan operation and
+        /// any exceptions associated with the error.
+        /// </summary>
+        public List<ScanError> Errors { get; } = new List<ScanError>();
+
+        /// <summary>
+        /// Combines two <see cref="ScanResult"/> objects by combining their
+        /// <see cref="ScannedFiles"/> and <see cref="SkippedFiles"/> collections.
+        /// </summary>
+        /// <param name="a">The first of two <see cref="ScanResult"/> operands to sum.</param>
+        /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>
+        /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.
+        /// </returns>
+        public static ScanResult operator +(ScanResult a, ScanResult b)
+        {
+            var result = new ScanResult();
+            result.ScannedFiles.AddRange(a.ScannedFiles);
+            result.ScannedFiles.AddRange(b.ScannedFiles);
+            result.Errors.AddRange(a.Errors);
+            result.Errors.AddRange(b.Errors);
+
+            foreach (KeyValuePair<string, string> pair in a.SkippedFiles)
+            {
+                result.SkippedFiles.TryAdd(pair.Key, pair.Value);
+            }
+
+            foreach (KeyValuePair<string, string> pair in b.SkippedFiles)
+            {
+                result.SkippedFiles.TryAdd(pair.Key, pair.Value);
+            }
+
+            return result;
+        }
     }
 }
