@@ -1,22 +1,18 @@
-﻿// <copyright file="FileScanner.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="FileScanner.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.IO.Abstractions;
-    using System.Linq;
     using System.Security;
-    using System.Security.Cryptography;
-    using Microsoft.Extensions.FileProviders;
+    using Microsoft.Extensions.Logging;
     using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAnalysis;
 
     /// <summary>
     /// Directory scanner implementation that reads the files in a directory and writes the file
@@ -25,150 +21,207 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class FileScanner : IFileScanner
     {
         private readonly IDataAccessProvider dataAccessProvider;
-        private readonly HashAlgorithm hasher;
-        private readonly TextWriter logWriter;
+        private readonly IFileHasher hasher;
+        private readonly ILogger<FileScanner> log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileScanner"/> class.
         /// </summary>
         /// <param name="dataAccessProvider">A <see cref="IDataAccessProvider"/> that provides
         /// access to the application backing store.</param>
-        /// <param name="hasher">A <see cref="HashAlgorithm"/> that is used to compute hash values
+        /// <param name="hasher">An <see cref="IFileHasher"/> that is used to compute hash values
         /// for scanned files.</param>
-        /// <param name="logWriter">A <see cref="TextWriter"/> to which logging output will be
+        /// <param name="log">A <see cref="TextWriter"/> to which logging output will be
         /// written.</param>
         public FileScanner(
-            IDataAccessProvider dataAccessProvider, HashAlgorithm hasher, TextWriter logWriter)
+            IDataAccessProvider dataAccessProvider, IFileHasher hasher, ILogger<FileScanner> log)
         {
             this.dataAccessProvider =
                 dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
-            this.hasher =
-                hasher ?? throw new ArgumentNullException(nameof(hasher));
-            this.logWriter =
-                logWriter ?? throw new ArgumentNullException(nameof(logWriter));
+            this.hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
+            this.log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
-        /// <summary>
-        /// Gets the total number of files scanned by this <see cref="FileScanner"/>.
-        /// </summary>
-        public int TotalFilesScanned { get; private set; }
-
-        /// <summary>
-        /// Gets the total number of files that were skpped by this <see cref="FileScanner"/>.
-        /// </summary>
-        public int TotalFilesSkipped { get; private set; }
-
         /// <inheritdoc/>
-        public ScanResult ScanDirectory(IDirectoryInfo directory, bool recursive)
+        public ScanResult ScanDirectory(IDirectoryInfo directory, bool recursive = false)
         {
             if (directory == null)
             {
                 throw new ArgumentNullException(nameof(directory));
             }
 
-            if (!directory.Exists)
-            {
-                this.logWriter.WriteLine("Error: \"{0}\" is not a valid directory.", directory);
-                return ScanResult.ScanFailure;
-            }
+            this.log.LogInformation("Scanning directory '{ScanDirectory}'", directory);
 
-            this.logWriter.WriteLine($"Scanning directory \"{directory}\"...");
+            ScanResult scanResult = new ScanResult();
 
             if (recursive)
             {
-                IEnumerable<IDirectoryInfo> subdirectories;
-                try
-                {
-                    subdirectories = directory.EnumerateDirectories();
-                }
-                catch (IOException ex)
-                {
-                    this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories (I/O): {ex.Message}");
-                    return ScanResult.ScanFailure;
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories (unauthorized): {ex.Message}");
-                    return ScanResult.ScanFailure;
-                }
-                catch (SecurityException ex)
-                {
-                    this.logWriter.WriteLine(
-                        $"Could not enumerate subdirectories (security): {ex.Message}");
-                    return ScanResult.ScanFailure;
-                }
+                this.log.LogDebug(
+                    "Recursive scan requested; enumerating subdirectories of '{ScanDirectory}'",
+                    directory);
 
-                if (subdirectories.Any())
+                var subDirectories = this.GetSubDirectories(directory, scanResult);
+                if (subDirectories != null)
                 {
-                    foreach (IDirectoryInfo subDirectory in subdirectories)
+                    foreach (IDirectoryInfo subDirectory in subDirectories)
                     {
-                        this.ScanDirectory(subDirectory, true);
+                        scanResult += this.ScanDirectory(subDirectory, true);
                     }
                 }
             }
 
-            (int scannedFiles, int skippedFiles) scanCount =
-                this.ProcessFiles(directory.EnumerateFiles());
-            this.logWriter.WriteLine(
-                "Completed scanning \"{0}\" ({1}/{2} file(s) scanned).",
-                directory.FullName,
-                scanCount.scannedFiles,
-                scanCount.scannedFiles + scanCount.skippedFiles);
-            this.TotalFilesScanned += scanCount.scannedFiles;
-            this.TotalFilesSkipped += scanCount.skippedFiles;
+            this.log.LogDebug("Enumerating files of '{ScanDirectory}'", directory);
+            var files = this.GetFiles(directory, scanResult);
+            if (files == null)
+            {
+                this.log.LogDebug("Skipping empty directory '{ScanDirectory}'", directory);
+                return scanResult;
+            }
 
-            return ScanResult.ScanSuccess;
+            this.ProcessFiles(files, scanResult);
+            this.log.LogInformation(
+                "Completed scanning '{DirectoryName}' ({ScannedFileCount}/{TotalFileCount} file(s) scanned)",
+                directory.FullName,
+                scanResult.ScannedFiles.Count,
+                scanResult.ScannedFiles.Count + scanResult.SkippedFiles.Count);
+
+            return scanResult;
         }
 
         /// <summary>
         /// Hashes a set of files and records the filename and hash string.
         /// </summary>
         /// <param name="files">The set of files to hash and record.</param>
-        /// <returns>An tuple <c>(int, int)</c> indicating the number of files scanned and the
-        /// number of files skipped, respectively.</returns>
-        protected internal virtual (int scannedFiles, int skippedFiles) ProcessFiles(
-            IEnumerable<System.IO.Abstractions.IFileInfo> files)
+        /// <param name="scanResult">A <see cref="ScanResult"/> to which the names of scanned and
+        /// skipped files will be added.</param>
+        protected internal virtual void ProcessFiles(
+            IEnumerable<IFileInfo> files, ScanResult scanResult)
         {
-            Contract.Requires(files != null);
-
-            int scannedFiles = 0;
-            int skippedFiles = 0;
-
-            foreach (System.IO.Abstractions.IFileInfo file in files)
+            foreach (IFileInfo file in files)
             {
+                this.log.LogInformation("Scanning file '{FileName}'...", file.Name);
                 try
                 {
                     using (Stream fileStream = file.OpenRead())
                     {
-                        this.logWriter.Write(file.FullName);
+                        this.log.LogDebug(
+                            "Computing hash for file '{FileName}' using hasher {Hasher}",
+                            file.FullName,
+                            this.hasher.GetType().FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
-                        this.dataAccessProvider.AddFileRecord(file, hashString);
-                        this.logWriter.WriteLine($" [{hashString}]");
-                        scannedFiles++;
+
+                        this.log.LogDebug(
+                            "Adding fingerprint for file '{FileName}' to data access provider",
+                            file.FullName,
+                            hashString);
+                        this.dataAccessProvider.AddFileRecord(
+                            new FileFingerprint(file, hashString));
+                        scanResult.ScannedFiles.Add(file.FullName);
                     }
                 }
-                catch (IOException exception)
+                catch (Exception ex) when (
+                    ex is IOException
+                    || ex is UnauthorizedAccessException)
                 {
-                    this.logWriter.WriteLine(
-                        $"Could not read from \"{file.FullName}\": {exception.Message}");
-                    skippedFiles++;
+                    scanResult.SkippedFiles.Add(
+                        file.FullName,
+                        $"Could not add record for file '{file.FullName}': {ex.Message}; skipping file.");
+                    this.HandleError(
+                        file.FullName,
+                        ex,
+                        scanResult,
+                        $"Could not add record for file '{file.FullName}': {ex.Message}; skipping file.",
+                        "Could not add record for file '{FileName}': {ExceptionMessage}; skipping file.",
+                        file.FullName,
+                        ex.Message);
                 }
             }
-
-            return (scannedFiles, skippedFiles);
         }
 
-        /// <summary>
-        /// Calculates a hash of the provided stream's data and returns a base 64 encoded string of
-        /// the hash.
-        /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> containing the data to hash.</param>
-        /// <returns>A base 64 encoded <see cref="string"/> of the hash.</returns>
+        // Attempts to retrieve all files in the provided directory.
+        private IEnumerable<IFileInfo>? GetFiles(
+            IDirectoryInfo directory, ScanResult scanResult)
+        {
+            IEnumerable<IFileInfo>? result = null;
+
+            try
+            {
+                result = directory.EnumerateFiles();
+            }
+            catch (Exception ex) when (
+                ex is ArgumentException
+                || ex is IOException
+                || ex is UnauthorizedAccessException)
+            {
+                this.HandleError(
+                    directory.FullName,
+                    ex,
+                    scanResult,
+                    $"Could not enumerate files of directory '{directory.FullName}': {ex.Message}",
+                    "Could not enumerate files of directory '{Directory}': {ExceptionMessage}",
+                    directory.FullName,
+                    ex.Message);
+            }
+
+            return result;
+        }
+
+        // Attempts to retrieve all immediate subdirectories of the provided directory.
+        private IEnumerable<IDirectoryInfo>? GetSubDirectories(
+            IDirectoryInfo directory, ScanResult scanResult)
+        {
+            IEnumerable<IDirectoryInfo>? result = null;
+
+            try
+            {
+                result = directory.EnumerateDirectories();
+            }
+            catch (Exception ex) when (
+                ex is ArgumentException
+                || ex is IOException
+                || ex is UnauthorizedAccessException
+                || ex is NotSupportedException)
+            {
+                this.HandleError(
+                    directory.FullName,
+                    ex,
+                    scanResult,
+                    $"Could not enumerate subdirectories of directory '{directory.FullName}': {ex.Message}",
+                    "Could not enumerate subdirectories of directory '{Directory}': {ExceptionMessage}",
+                    directory.FullName,
+                    ex.Message);
+            }
+
+            return result;
+        }
+
+        // Add error log message and add ScanError to ScanResult.
+        private void HandleError(
+            string path,
+            Exception exception,
+            ScanResult scanResult,
+            string scanResultMessage,
+            string logMessageTemplate,
+            params string[] logMessageArguments)
+        {
+
+            if (exception is null)
+            {
+                this.log.LogError(logMessageTemplate, logMessageArguments);
+            }
+            else
+            {
+                this.log.LogError(exception, logMessageTemplate, logMessageArguments);
+                // this.log.LogError(logMessageTemplate, logMessageArguments);
+            }
+
+            scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
+        }
+
+        // Returns a base 64 representation of a data stream's hash.
         private string GetBase64HashFromStream(Stream stream)
         {
-            byte[] hashBytes = this.hasher.ComputeHash(stream);
+            byte[] hashBytes = this.hasher.ComputeHashFromStream(stream);
             return Convert.ToBase64String(hashBytes);
         }
     }

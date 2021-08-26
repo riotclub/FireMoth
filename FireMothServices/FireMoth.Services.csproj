@@ -1,13 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\Jason\source\repos\firemoth\FireMothServices\FireMothServices.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DebugType>Full</DebugType>
+    <RootNamespace>RiotClub.FireMoth.Services</RootNamespace>
+    <AssemblyName>FireMoth.Services</AssemblyName>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="stylecop.json" />
   </ItemGroup>
@@ -17,14 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.5" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.5" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.1.5" />
-    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
+    <PackageReference Include="CsvHelper" Version="27.0.2" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="12.2.19">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -32,7 +36,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="12.0.10" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
   </ItemGroup>
 
 </Project>

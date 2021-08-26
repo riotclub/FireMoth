@@ -1,5 +1,5 @@
-﻿// <copyright file="IFileScanner.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="IFileScanner.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
@@ -8,9 +8,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.IO.Abstractions;
 
     /// <summary>
-    /// Defines the public interface for a class that implements a directory scanner. A directory scanner is responsible
-    /// for reading, analyzing, and persisting a hash or other signature that uniquely identifies a file and its
-    /// contents.
+    /// Defines the public interface for a class that implements a directory scanner. A directory
+    /// scanner is responsible for reading, analyzing, and persisting a hash or other signature that
+    /// uniquely identifies a file and its contents.
     /// </summary>
     public interface IFileScanner
     {

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>FireMothConsole.Tests</name>
+        <name>FireMoth.Console.Tests</name>
     </assembly>
     <members>
     </members>

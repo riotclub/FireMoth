@@ -1,42 +1,131 @@
-﻿// <copyright file="Program.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="Program.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
 namespace RiotClub.FireMoth.Console
 {
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.IO.Abstractions;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAnalysis;
+    using RiotClub.FireMoth.Services.FileScanning;
 
     /// <summary>
     /// Application entry point.
     /// </summary>
     public static class Program
     {
+        private const string DefaultFilePrefix = "FireMothData_";
+        private const string DefaultFileExtension = "csv";
+        private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
+
+        private static IServiceCollection serviceCollection;
+
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
         /// configuration, and invokes the directory scanning process.
         /// </summary>
-        /// <param name="args">Command-line arguments. A single argument, --directory, is currently
-        /// supported and required. This value must be a well-formed and existing directory path.
-        /// </param>
+        /// <param name="args">Command-line arguments.</param>
         /// <returns>An <c>int</c> return code indicating invocation result.</returns>
-        public static int Main(string[] args)
+        /// <seealso cref="CommandLineOptions"/>
+        public static async Task Main(string[] args)
         {
-            var initializer = new Initializer(args, Console.Out);
-            bool initResult = initializer.Initialize();
+            using var host = CreateHostBuilder(args).Build();
+            await host.StartAsync();
 
-            if (initResult)
+            var log = host.Services.GetService<ILoggerFactory>().CreateLogger(nameof(Program));
+            try
             {
-                ExitState exitState = initializer.Start();
-#pragma warning disable CA1303 // Do not pass literals as localized parameters
-                Console.WriteLine("Process completed with exit state: {0}.", exitState);
-#pragma warning restore CA1303 // Do not pass literals as localized parameters
-                return 0;
+                var fileScanner = host.Services.GetRequiredService<FileScanner>();
+                var options = host.Services.GetRequiredService<IOptions<CommandLineOptions>>();
+                var scanDirectory = new FileSystem().DirectoryInfo.FromDirectoryName(
+                    options.Value.ScanDirectory);
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                var scanResult =
+                   fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
+
+                stopwatch.Stop();
+                TimeSpan timeSpan = stopwatch.Elapsed;
+                var outputWriter = host.Services.GetService<TextWriter>();
+                if (log != null)
+                {
+                    log.LogInformation(
+                        "Scan complete. Scanned {ScannedFilesCount} file(s).",
+                        scanResult.ScannedFiles.Count);
+                    if (scanResult.SkippedFiles.Count > 0)
+                    {
+                        log.LogInformation(
+                            "{SkippedFileCount} file(s) could not be scanned:",
+                            scanResult.SkippedFiles.Count);
+                        foreach (var file in scanResult.SkippedFiles)
+                        {
+                            log.LogInformation(
+                                "'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
+                        }
+                    }
+
+                    log.LogInformation("Total scan time: {ScanTime}.", timeSpan);
+                }
             }
-            else
+            catch (Exception exception)
             {
-                return -1;
+                log.LogCritical(
+                    exception, "Scan interrupted: {ExceptionMessage}", exception.Message);
+            }
+            finally
+            {
+                var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+                lifetime.StopApplication();
+                await host.WaitForShutdownAsync();
             }
         }
+
+        /// <summary>
+        /// Creates the host builder.
+        /// </summary>
+        /// <param name="args">Arguments to supply to the host builder.</param>
+        /// <returns>The configured <see cref="IHostBuilder"/>.</returns>
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddSimpleConsole(options =>
+                    {
+                        options.SingleLine = true;
+                    });
+                    logging.SetMinimumLevel(LogLevel.Information);
+                })
+                .UseConsoleLifetime()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    serviceCollection = services;
+
+                    // Configure services and add them to the IoC container here.
+                    services.Configure<CommandLineOptions>(hostContext.Configuration);
+                    services.AddSingleton<FileScanner>();
+                    services.AddTransient<IFileHasher, SHA256FileHasher>();
+                    services.AddTransient<IDataAccessProvider, CsvDataAccessProvider>();
+                    services.AddTransient(provider =>
+                        new StreamWriter(
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                            + Path.DirectorySeparatorChar + DefaultFilePrefix
+                            + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
+                            + '.' + DefaultFileExtension));
+                });
     }
 }

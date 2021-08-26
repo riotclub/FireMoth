@@ -1,39 +1,120 @@
-﻿// <copyright file="FileFingerprint.cs" company="Dark Hours Development">
-// Copyright (c) Dark Hours Development. All rights reserved.
+﻿// <copyright file="FileFingerprint.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace FireMothServices.DataAccess
+namespace RiotClub.FireMoth.Services.DataAccess
 {
-    using CsvHelper.Configuration.Attributes;
+    using System;
+    using System.Collections.Generic;
+    using System.IO.Abstractions;
+    using RiotClub.FireMoth.Services.Extensions;
 
     /// <summary>
     /// Conatins data that uniquely identifies a file and its data.
     /// </summary>
-    public class FileFingerprint
+    public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     {
         /// <summary>
-        /// Gets or sets a string representing the directory's full path.
+        /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
         /// </summary>
-        [Index(0)]
-        public string DirectoryName { get; set; }
+        /// <param name="fileInfo">A <see cref="IFileInfo"/> containing information about the file.
+        /// </param>
+        /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the
+        /// specified file.</param>
+        public FileFingerprint(IFileInfo fileInfo, string base64Hash)
+        {
+            this.FileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
+
+            if (base64Hash == null)
+            {
+                throw new ArgumentNullException(nameof(base64Hash));
+            }
+
+            if (base64Hash.IsEmptyOrWhiteSpace())
+            {
+                throw new ArgumentException("Hash string cannot be empty.");
+            }
+
+            if (!base64Hash.IsBase64String())
+            {
+                throw new ArgumentException(
+                    "Hash string is not a valid base 64 string.", nameof(base64Hash));
+            }
+
+            this.Base64Hash = base64Hash;
+        }
+
+        /// <inheritdoc/>
+        public IFileInfo FileInfo { get; }
 
         /// <summary>
-        /// Gets or sets the name of the file.
+        /// Gets the base-64 hash of the file's data.
         /// </summary>
-        [Index(1)]
-        public string Name { get; set; }
+        public string Base64Hash { get; }
 
         /// <summary>
-        /// Gets or sets the size, in bytes, of the file.
+        /// Implements the equality operator.
         /// </summary>
-        [Index(2)]
-        public long Length { get; set; }
+        /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for equality.
+        /// </param>
+        /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for
+        /// equality.</param>
+        /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are equal; false
+        /// otherwise.</returns>
+        public static bool operator ==(FileFingerprint? left, FileFingerprint? right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null && right is null)
+            {
+                return true;
+            }
+
+            if (left is null || right is null)
+            {
+                return false;
+            }
+
+            return left.Equals(right);
+        }
 
         /// <summary>
-        /// Gets or sets the base-64 hash of the file's data.
+        /// Implements the inequality operator.
         /// </summary>
-        [Index(3)]
-        public string Base64Hash { get; set; }
+        /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for inequality.
+        /// </param>
+        /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for
+        /// inequality.</param>
+        /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are not equal; false
+        /// otherwise.</returns>
+        public static bool operator !=(FileFingerprint? left, FileFingerprint? right)
+        {
+            return !(left == right);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj)
+        {
+            return this.Equals(obj as FileFingerprint);
+
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(FileFingerprint? other)
+        {
+            return other is FileFingerprint fingerprint
+                && this.FileInfo.FullName == fingerprint.FileInfo.FullName
+                && this.Base64Hash == fingerprint.Base64Hash;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.Base64Hash);
+        }
     }
 }
