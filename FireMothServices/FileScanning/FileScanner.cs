@@ -50,14 +50,14 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 throw new ArgumentNullException(nameof(directory));
             }
 
-            this.log.LogInformation("Scanning directory {ScanDirectory}", directory);
+            this.log.LogInformation("Scanning directory '{ScanDirectory}'", directory);
 
             ScanResult scanResult = new ScanResult();
 
             if (recursive)
             {
                 this.log.LogDebug(
-                    "Recursive scan requested; enumerating subdirectories of {ScanDirectory}",
+                    "Recursive scan requested; enumerating subdirectories of '{ScanDirectory}'",
                     directory);
 
                 var subDirectories = this.GetSubDirectories(directory, scanResult);
@@ -70,17 +70,17 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 }
             }
 
-            this.log.LogDebug("Enumerating files of {ScanDirectory}", directory);
+            this.log.LogDebug("Enumerating files of '{ScanDirectory}'", directory);
             var files = this.GetFiles(directory, scanResult);
             if (files == null)
             {
-                this.log.LogDebug("Skipping empty directory {ScanDirectory}", directory);
+                this.log.LogDebug("Skipping empty directory '{ScanDirectory}'", directory);
                 return scanResult;
             }
 
             this.ProcessFiles(files, scanResult);
             this.log.LogInformation(
-                "Completed scanning {DirectoryName} ({ScannedFileCount}/{TotalFileCount} file(s) scanned)",
+                "Completed scanning '{DirectoryName}' ({ScannedFileCount}/{TotalFileCount} file(s) scanned)",
                 directory.FullName,
                 scanResult.ScannedFiles.Count,
                 scanResult.ScannedFiles.Count + scanResult.SkippedFiles.Count);
@@ -99,19 +99,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
         {
             foreach (IFileInfo file in files)
             {
-                this.log.LogInformation("Scanning file {FileName}...", file.Name);
+                this.log.LogInformation("Scanning file '{FileName}'...", file.Name);
                 try
                 {
                     using (Stream fileStream = file.OpenRead())
                     {
                         this.log.LogDebug(
-                            "Computing hash for file {FileName} using hasher {Hasher}",
+                            "Computing hash for file '{FileName}' using hasher {Hasher}",
                             file.FullName,
                             this.hasher.GetType().FullName);
                         var hashString = this.GetBase64HashFromStream(fileStream);
 
                         this.log.LogDebug(
-                            "Adding fingerprint for file {FileName} to data access provider",
+                            "Adding fingerprint for file '{FileName}' to data access provider",
                             file.FullName,
                             hashString);
                         this.dataAccessProvider.AddFileRecord(
@@ -119,17 +119,19 @@ namespace RiotClub.FireMoth.Services.FileScanning
                         scanResult.ScannedFiles.Add(file.FullName);
                     }
                 }
-                catch (IOException ex)
+                catch (Exception ex) when (
+                    ex is IOException
+                    || ex is UnauthorizedAccessException)
                 {
                     scanResult.SkippedFiles.Add(
                         file.FullName,
-                        $"Could not add record for file {file.FullName} (skipping): {ex.Message}");
+                        $"Could not add record for file '{file.FullName}': {ex.Message}; skipping file.");
                     this.HandleError(
                         file.FullName,
                         ex,
                         scanResult,
-                        $"Could not add record for file {file.FullName} (skipping): {ex.Message}",
-                        "Could not add record for file {FileName} (skipping): {ExceptionMessage}",
+                        $"Could not add record for file '{file.FullName}': {ex.Message}; skipping file.",
+                        "Could not add record for file '{FileName}': {ExceptionMessage}; skipping file.",
                         file.FullName,
                         ex.Message);
                 }
@@ -146,14 +148,17 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 result = directory.EnumerateFiles();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (
+                ex is ArgumentException
+                || ex is IOException
+                || ex is UnauthorizedAccessException)
             {
                 this.HandleError(
                     directory.FullName,
                     ex,
                     scanResult,
-                    $"Could not enumerate files of directory {directory.FullName}: {ex.Message}",
-                    "Could not enumerate files of directory {Directory}: {ExceptionMessage}",
+                    $"Could not enumerate files of directory '{directory.FullName}': {ex.Message}",
+                    "Could not enumerate files of directory '{Directory}': {ExceptionMessage}",
                     directory.FullName,
                     ex.Message);
             }
@@ -171,14 +176,18 @@ namespace RiotClub.FireMoth.Services.FileScanning
             {
                 result = directory.EnumerateDirectories();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (
+                ex is ArgumentException
+                || ex is IOException
+                || ex is UnauthorizedAccessException
+                || ex is NotSupportedException)
             {
                 this.HandleError(
                     directory.FullName,
                     ex,
                     scanResult,
-                    $"Could not enumerate subdirectories of directory {directory.FullName}: {ex.Message}",
-                    "Could not enumerate subdirectories of directory {Directory}: {ExceptionMessage}",
+                    $"Could not enumerate subdirectories of directory '{directory.FullName}': {ex.Message}",
+                    "Could not enumerate subdirectories of directory '{Directory}': {ExceptionMessage}",
                     directory.FullName,
                     ex.Message);
             }
@@ -195,6 +204,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             string logMessageTemplate,
             params string[] logMessageArguments)
         {
+
             if (exception is null)
             {
                 this.log.LogError(logMessageTemplate, logMessageArguments);
@@ -202,6 +212,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             else
             {
                 this.log.LogError(exception, logMessageTemplate, logMessageArguments);
+                // this.log.LogError(logMessageTemplate, logMessageArguments);
             }
 
             scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
