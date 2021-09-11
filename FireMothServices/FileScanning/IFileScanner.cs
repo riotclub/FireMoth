@@ -15,14 +15,14 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public interface IFileScanner
     {
         /// <summary>
-        /// Scans the provided directory, analyzing and storing hashes or signatures that uniquely identify the files
-        /// contained within.
+        /// Scans the provided directory, analyzing and storing signatures that uniquely identify
+        /// the files contained within.
         /// </summary>
         /// <param name="directory">The path of the directory to scan.</param>
         /// <param name="recursive">Determines whether subdirectories of the provided directory are
         /// recursively scanned.</param>
-        /// <returns>A <see cref="ScanResult"/> value indicating the result of the directory scanning operation.
-        /// </returns>
+        /// <returns>A <see cref="ScanResult"/> value indicating the result of the directory
+        /// scanning operation.</returns>
         public ScanResult ScanDirectory(IDirectoryInfo directory, bool recursive);
     }
 }
