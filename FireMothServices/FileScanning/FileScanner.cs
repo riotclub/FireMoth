@@ -99,7 +99,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         {
             foreach (IFileInfo file in files)
             {
-                this.log.LogInformation("Scanning file '{FileName}'...", file.Name);
+                this.log.LogInformation("Scanning file '{FileName}'", file.Name);
                 try
                 {
                     using (Stream fileStream = file.OpenRead())
