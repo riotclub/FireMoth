@@ -15,11 +15,11 @@ namespace RiotClub.FireMoth.Console
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
+    using Serilog;
 
     /// <summary>
     /// Application entry point.
@@ -30,8 +30,6 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileExtension = "csv";
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-        private static IServiceCollection serviceCollection;
-
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
         /// configuration, and invokes the directory scanning process.
@@ -41,12 +39,18 @@ namespace RiotClub.FireMoth.Console
         /// <seealso cref="CommandLineOptions"/>
         public static async Task Main(string[] args)
         {
-            using var host = CreateHostBuilder(args).Build();
-            await host.StartAsync();
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File("./bootstrap.log")
+                .CreateBootstrapLogger();
 
-            var log = host.Services.GetService<ILoggerFactory>().CreateLogger(nameof(Program));
             try
             {
+                Log.Information("FireMoth.Console starting up...");
+                using var host = CreateHostBuilder(args).Build();
+                await host.StartAsync();
+
                 var fileScanner = host.Services.GetRequiredService<FileScanner>();
                 var options = host.Services.GetRequiredService<IOptions<CommandLineOptions>>();
                 var scanDirectory = new FileSystem().DirectoryInfo.FromDirectoryName(
@@ -54,68 +58,61 @@ namespace RiotClub.FireMoth.Console
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-
                 var scanResult =
                    fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
-
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
-                var outputWriter = host.Services.GetService<TextWriter>();
-                if (log != null)
-                {
-                    log.LogInformation(
-                        "Scan complete. Scanned {ScannedFilesCount} file(s).",
-                        scanResult.ScannedFiles.Count);
-                    if (scanResult.SkippedFiles.Count > 0)
-                    {
-                        log.LogInformation(
-                            "{SkippedFileCount} file(s) could not be scanned:",
-                            scanResult.SkippedFiles.Count);
-                        foreach (var file in scanResult.SkippedFiles)
-                        {
-                            log.LogInformation(
-                                "'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
-                        }
-                    }
 
-                    log.LogInformation("Total scan time: {ScanTime}.", timeSpan);
-                }
+                LogScanResult(scanResult);
+                Log.Information("Total scan time: {ScanTime}.", timeSpan);
             }
             catch (Exception exception)
             {
-                log.LogCritical(
-                    exception, "Scan interrupted: {ExceptionMessage}", exception.Message);
+                Log.Fatal(exception, "FireMoth.Console startup failed.", exception.Message);
             }
             finally
             {
-                var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-                lifetime.StopApplication();
-                await host.WaitForShutdownAsync();
+                Log.Information("Shutting down");
+                Log.CloseAndFlush();
             }
         }
 
-        /// <summary>
-        /// Creates the host builder.
-        /// </summary>
-        /// <param name="args">Arguments to supply to the host builder.</param>
-        /// <returns>The configured <see cref="IHostBuilder"/>.</returns>
+        private static void LogScanResult(ScanResult scanResult)
+        {
+            Log.Information(
+                "Scan complete. Scanned {ScannedFilesCount} file(s).",
+                scanResult.ScannedFiles.Count);
+            if (scanResult.SkippedFiles.Count > 0)
+            {
+                Log.Information(
+                    "{SkippedFileCount} file(s) could not be scanned:",
+                    scanResult.SkippedFiles.Count);
+                foreach (var file in scanResult.SkippedFiles)
+                {
+                    Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
+                }
+            }
+        }
+
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.AddSimpleConsole(options =>
-                    {
-                        options.SingleLine = true;
-                    });
-                    logging.SetMinimumLevel(LogLevel.Information);
-                })
                 .UseConsoleLifetime()
+                .ConfigureHostConfiguration(configuration =>
+                {
+                    // Perform configuration needed when building the host here.
+                })
+                .ConfigureAppConfiguration((hostContext, configuration) =>
+                {
+                    // Perform app configuration here (after the host is built).
+                })
+                .UseSerilog((context, services, configuration) =>
+                    configuration
+                        .ReadFrom.Configuration(context.Configuration)
+                        .ReadFrom.Services(services)
+                        .WriteTo.Console()
+                        .WriteTo.Seq("http://localhost:5341"))
                 .ConfigureServices((hostContext, services) =>
                 {
-                    serviceCollection = services;
-
-                    // Configure services and add them to the IoC container here.
                     services.Configure<CommandLineOptions>(hostContext.Configuration);
                     services.AddSingleton<FileScanner>();
                     services.AddTransient<IFileHasher, SHA256FileHasher>();
