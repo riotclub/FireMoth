@@ -174,7 +174,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             foreach (var file in files)
             {
                 this.mockLogger.VerifyLogCalled(
-                    $"Scanning file '{file.Name}'...", LogLevel.Information);
+                    $"Scanning file '{file.Name}'", LogLevel.Information);
             }
         }
 
@@ -190,7 +190,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             expectedFiles.RemoveAll(fileInfo =>
                     errorFiles.Contains(
                         new FileFingerprint(fileInfo, Convert.ToBase64String(this.testHashData))));
-            var testFileScanner = this.GetFileScannerWithErroredFiles(errorFiles, new IOException());
+            var testFileScanner = this.GetFileScannerWithErroredFiles(
+                errorFiles, new IOException());
 
             // Act
             var result = testFileScanner.ScanDirectory(testDirectory, false);
@@ -210,7 +211,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(
                 @"c:\dirwithfiles");
             var errorFiles = GetFileFingerprints(testDirectory, "eep");
-            var testFileScanner = this.GetFileScannerWithErroredFiles(errorFiles, new IOException());
+            var testFileScanner = this.GetFileScannerWithErroredFiles(
+                errorFiles, new IOException());
 
             // Act
             var result = testFileScanner.ScanDirectory(testDirectory, false);
