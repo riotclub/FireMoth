@@ -6,12 +6,10 @@
 namespace RiotClub.FireMoth.Console
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.IO.Abstractions;
-    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -93,11 +91,12 @@ namespace RiotClub.FireMoth.Console
                 }
             }
         }
+        }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
                 .UseConsoleLifetime()
                 .ConfigureHostConfiguration(configuration =>
+                .ConfigureLogging(logging =>
                 {
                     // Perform configuration needed when building the host here.
                 })
