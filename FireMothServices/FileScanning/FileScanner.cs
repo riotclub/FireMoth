@@ -204,7 +204,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             string logMessageTemplate,
             params string[] logMessageArguments)
         {
-
             if (exception is null)
             {
                 this.log.LogError(logMessageTemplate, logMessageArguments);
@@ -212,7 +211,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             else
             {
                 this.log.LogError(exception, logMessageTemplate, logMessageArguments);
-                // this.log.LogError(logMessageTemplate, logMessageArguments);
             }
 
             scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
