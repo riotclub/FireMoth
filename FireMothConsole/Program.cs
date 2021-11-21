@@ -11,6 +11,7 @@ namespace RiotClub.FireMoth.Console
     using System.IO;
     using System.IO.Abstractions;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
@@ -28,6 +29,9 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileExtension = "csv";
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
+        private const int BootstrapLogRetainedFileCountLimit = 2;
+        private const uint BootstrapLogFileSizeLimit = 1 << 25;
+
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
         /// configuration, and invokes the directory scanning process.
@@ -40,7 +44,11 @@ namespace RiotClub.FireMoth.Console
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File("./bootstrap.log")
+                .WriteTo.File(
+                    "./bootstrap.log",
+                    fileSizeLimitBytes: BootstrapLogFileSizeLimit,
+                    rollOnFileSizeLimit: true,
+                    retainedFileCountLimit: BootstrapLogRetainedFileCountLimit)
                 .CreateBootstrapLogger();
 
             try
@@ -104,11 +112,18 @@ namespace RiotClub.FireMoth.Console
                     // Perform app configuration here (after the host is built).
                 })
                 .UseSerilog((context, services, configuration) =>
+                {
                     configuration
                         .ReadFrom.Configuration(context.Configuration)
                         .ReadFrom.Services(services)
-                        .WriteTo.Console()
-                        .WriteTo.Seq("http://localhost:5341"))
+                        .WriteTo.Console();
+
+                    var seqHost = context.Configuration["SeqHost"];
+                    if (seqHost is not null)
+                    {
+                        configuration.WriteTo.Seq(seqHost);
+                    }
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.Configure<CommandLineOptions>(hostContext.Configuration);
