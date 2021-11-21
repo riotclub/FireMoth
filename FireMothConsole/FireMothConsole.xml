@@ -54,12 +54,5 @@
             <returns>An <c>int</c> return code indicating invocation result.</returns>
             <seealso cref="T:RiotClub.FireMoth.Console.CommandLineOptions"/>
         </member>
-        <member name="M:RiotClub.FireMoth.Console.Program.CreateHostBuilder(System.String[])">
-            <summary>
-            Creates the host builder.
-            </summary>
-            <param name="args">Arguments to supply to the host builder.</param>
-            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostBuilder"/>.</returns>
-        </member>
     </members>
 </doc>

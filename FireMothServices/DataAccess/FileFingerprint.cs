@@ -100,7 +100,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public override bool Equals(object? obj)
         {
             return this.Equals(obj as FileFingerprint);
-
         }
 
         /// <inheritdoc/>

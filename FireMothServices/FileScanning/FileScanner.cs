@@ -99,7 +99,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
         {
             foreach (IFileInfo file in files)
             {
-                this.log.LogInformation("Scanning file '{FileName}'...", file.Name);
+                this.log.LogInformation("Scanning file '{FileName}'", file.Name);
                 try
                 {
                     using (Stream fileStream = file.OpenRead())
@@ -204,7 +204,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             string logMessageTemplate,
             params string[] logMessageArguments)
         {
-
             if (exception is null)
             {
                 this.log.LogError(logMessageTemplate, logMessageArguments);
@@ -212,7 +211,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             else
             {
                 this.log.LogError(exception, logMessageTemplate, logMessageArguments);
-                // this.log.LogError(logMessageTemplate, logMessageArguments);
             }
 
             scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));

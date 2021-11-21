@@ -1,4 +1,9 @@
-﻿namespace RiotClub.FireMoth.Services.Tests.Extensions
+﻿// <copyright file="MockExtensions.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+
+namespace RiotClub.FireMoth.Services.Tests.Extensions
 {
     using System;
     using Microsoft.Extensions.Logging;
