@@ -91,18 +91,21 @@ namespace RiotClub.FireMoth.Console
                 }
             }
         }
-        }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
                 .UseConsoleLifetime()
                 .ConfigureHostConfiguration(configuration =>
-                .ConfigureLogging(logging =>
                 {
-                    // Perform configuration needed when building the host here.
+
                 })
                 .ConfigureAppConfiguration((hostContext, configuration) =>
                 {
                     // Perform app configuration here (after the host is built).
+                })
+                .ConfigureLogging(logging =>
+                {
+                    // Perform configuration needed when building the host here.
                 })
                 .UseSerilog((context, services, configuration) =>
                     configuration
