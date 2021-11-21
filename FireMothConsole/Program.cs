@@ -97,15 +97,11 @@ namespace RiotClub.FireMoth.Console
                 .UseConsoleLifetime()
                 .ConfigureHostConfiguration(configuration =>
                 {
-
+                    // Perform any configuration needed when building the host here.
                 })
                 .ConfigureAppConfiguration((hostContext, configuration) =>
                 {
                     // Perform app configuration here (after the host is built).
-                })
-                .ConfigureLogging(logging =>
-                {
-                    // Perform configuration needed when building the host here.
                 })
                 .UseSerilog((context, services, configuration) =>
                     configuration
