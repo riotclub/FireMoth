@@ -295,25 +295,24 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles">
             <summary>
-            Gets a list of the files that were successfully scanned during the file scan operation.
+            Gets a list of <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/>s for files that have been successfully scanned.
             </summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles">
             <summary>
-            Gets a key-value list of the files that were skipped during the file scan operation and
-            the reason the files were skipped.
+            Gets a key-value list of files that were skipped and the reason for the skip.
             </summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.Errors">
             <summary>
-            Gets a list of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> that occurred during the file scan operation and
-            any exceptions associated with the error.
+            Gets a list of errors that occurred.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanResult.op_Addition(RiotClub.FireMoth.Services.FileScanning.ScanResult,RiotClub.FireMoth.Services.FileScanning.ScanResult)">
             <summary>
             Combines two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> objects by combining their
-            <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles"/> and <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles"/> collections.
+            <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.ScannedFiles"/>, <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.SkippedFiles"/>, and <see cref="P:RiotClub.FireMoth.Services.FileScanning.ScanResult.Errors"/>
+            collections.
             </summary>
             <param name="a">The first of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
             <param name="b">The second of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>

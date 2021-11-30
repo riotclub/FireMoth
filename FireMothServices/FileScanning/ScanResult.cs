@@ -5,8 +5,8 @@
 
 namespace RiotClub.FireMoth.Services.FileScanning
 {
-    using System;
     using System.Collections.Generic;
+    using RiotClub.FireMoth.Services.DataAccess;
 
     /// <summary>
     /// Specifies the result of a file scan operation.
@@ -14,25 +14,29 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class ScanResult
     {
         /// <summary>
-        /// Gets a list of the files that were successfully scanned during the file scan operation.
+        /// Gets a list of the files that were successfully scanned.
         /// </summary>
-        public List<string> ScannedFiles { get; } = new List<string>();
+        // public List<string> ScannedFiles { get; } = new List<string>();
 
         /// <summary>
-        /// Gets a key-value list of the files that were skipped during the file scan operation and
-        /// the reason the files were skipped.
+        /// Gets a list of <see cref="FileFingerprint"/>s for files that have been successfully scanned.
+        /// </summary>
+        public List<FileFingerprint> ScannedFiles { get; } = new List<FileFingerprint>();
+
+        /// <summary>
+        /// Gets a key-value list of files that were skipped and the reason for the skip.
         /// </summary>
         public Dictionary<string, string> SkippedFiles { get; } = new Dictionary<string, string>();
 
         /// <summary>
-        /// Gets a list of <see cref="ScanError"/> that occurred during the file scan operation and
-        /// any exceptions associated with the error.
+        /// Gets a list of errors that occurred.
         /// </summary>
         public List<ScanError> Errors { get; } = new List<ScanError>();
 
         /// <summary>
         /// Combines two <see cref="ScanResult"/> objects by combining their
-        /// <see cref="ScannedFiles"/> and <see cref="SkippedFiles"/> collections.
+        /// <see cref="ScannedFiles"/>, <see cref="SkippedFiles"/>, and <see cref="Errors"/>
+        /// collections.
         /// </summary>
         /// <param name="a">The first of two <see cref="ScanResult"/> operands to sum.</param>
         /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>

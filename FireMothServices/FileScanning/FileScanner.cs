@@ -9,7 +9,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using System.Collections.Generic;
     using System.IO;
     using System.IO.Abstractions;
-    using System.Security;
     using Microsoft.Extensions.Logging;
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.DataAnalysis;
@@ -34,7 +33,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <param name="log">A <see cref="TextWriter"/> to which logging output will be
         /// written.</param>
         public FileScanner(
-            IDataAccessProvider dataAccessProvider, IFileHasher hasher, ILogger<FileScanner> log)
+            IDataAccessProvider dataAccessProvider,
+            IFileHasher hasher,
+            ILogger<FileScanner> log)
         {
             this.dataAccessProvider =
                 dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
@@ -114,9 +115,9 @@ namespace RiotClub.FireMoth.Services.FileScanning
                             "Adding fingerprint for file '{FileName}' to data access provider",
                             file.FullName,
                             hashString);
-                        this.dataAccessProvider.AddFileRecord(
-                            new FileFingerprint(file, hashString));
-                        scanResult.ScannedFiles.Add(file.FullName);
+                        var fingerprint = new FileFingerprint(file, hashString);
+                        this.dataAccessProvider.AddFileRecord(fingerprint);
+                        scanResult.ScannedFiles.Add(fingerprint);
                     }
                 }
                 catch (Exception ex) when (
@@ -138,7 +139,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             }
         }
 
-        // Attempts to retrieve all files in the provided directory.
         private IEnumerable<IFileInfo>? GetFiles(
             IDirectoryInfo directory, ScanResult scanResult)
         {
@@ -166,7 +166,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             return result;
         }
 
-        // Attempts to retrieve all immediate subdirectories of the provided directory.
         private IEnumerable<IDirectoryInfo>? GetSubDirectories(
             IDirectoryInfo directory, ScanResult scanResult)
         {
@@ -195,7 +194,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             return result;
         }
 
-        // Add error log message and add ScanError to ScanResult.
         private void HandleError(
             string path,
             Exception exception,
@@ -216,7 +214,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
             scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
         }
 
-        // Returns a base 64 representation of a data stream's hash.
         private string GetBase64HashFromStream(Stream stream)
         {
             byte[] hashBytes = this.hasher.ComputeHashFromStream(stream);
