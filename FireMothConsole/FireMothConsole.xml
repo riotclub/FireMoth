@@ -20,6 +20,12 @@
             will be recursively scanned in addition to its file contents.
             </summary>
         </member>
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicatesOnly">
+            <summary>
+            Gets or sets a value indicating whether the output should include only files that have
+            duplicate hash values.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Console.ExitState">
             <summary>
             Specifies the cause of program termination.

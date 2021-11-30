@@ -20,5 +20,11 @@ namespace RiotClub.FireMoth.Console
         /// will be recursively scanned in addition to its file contents.
         /// </summary>
         public bool RecursiveScan { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the output should include only files that have
+        /// duplicate hash values.
+        /// </summary>
+        public bool DuplicatesOnly { get; set; }
     }
 }
