@@ -199,7 +199,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Assert
             foreach (var expectedFile in expectedFiles)
             {
-                Assert.Contains(expectedFile.FullName, result.ScannedFiles);
+                Assert.Contains(
+                    result.ScannedFiles, fp => fp.FileInfo.FullName == expectedFile.FullName);
             }
         }
 
