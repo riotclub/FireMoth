@@ -23,6 +23,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
         private readonly IFileHasher hasher;
         private readonly ILogger<FileScanner> log;
 
+        private readonly IList<IFileInfo> duplicateFiles;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FileScanner"/> class.
         /// </summary>
@@ -41,48 +43,53 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
             this.hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
             this.log = log ?? throw new ArgumentNullException(nameof(log));
+
+            this.duplicateFiles = new List<IFileInfo>();
         }
 
         /// <inheritdoc/>
-        public ScanResult ScanDirectory(IDirectoryInfo directory, bool recursive = false)
+        public ScanResult ScanDirectory(IScanOptions scanOptions)
         {
-            if (directory == null)
+            if (scanOptions is null)
             {
-                throw new ArgumentNullException(nameof(directory));
+                throw new ArgumentNullException(nameof(scanOptions));
             }
 
-            this.log.LogInformation("Scanning directory '{ScanDirectory}'", directory);
+            this.log.LogInformation(
+                "Scanning directory '{ScanDirectory}'", scanOptions.ScanDirectory);
 
             ScanResult scanResult = new ScanResult();
 
-            if (recursive)
+            if (scanOptions.RecursiveScan)
             {
                 this.log.LogDebug(
                     "Recursive scan requested; enumerating subdirectories of '{ScanDirectory}'",
-                    directory);
+                    scanOptions.ScanDirectory);
 
-                var subDirectories = this.GetSubDirectories(directory, scanResult);
+                var subDirectories = this.GetSubDirectories(scanOptions.ScanDirectory, scanResult);
                 if (subDirectories != null)
                 {
                     foreach (IDirectoryInfo subDirectory in subDirectories)
                     {
-                        scanResult += this.ScanDirectory(subDirectory, true);
+                        scanResult += this.ScanDirectory(
+                            new ScanOptions(subDirectory, true, scanOptions.OutputOption));
                     }
                 }
             }
 
-            this.log.LogDebug("Enumerating files of '{ScanDirectory}'", directory);
-            var files = this.GetFiles(directory, scanResult);
+            this.log.LogDebug("Enumerating files of '{ScanDirectory}'", scanOptions.ScanDirectory);
+            var files = this.GetFiles(scanOptions.ScanDirectory, scanResult);
             if (files == null)
             {
-                this.log.LogDebug("Skipping empty directory '{ScanDirectory}'", directory);
+                this.log.LogDebug(
+                    "Skipping empty directory '{ScanDirectory}'", scanOptions.ScanDirectory);
                 return scanResult;
             }
 
             this.ProcessFiles(files, scanResult);
             this.log.LogInformation(
                 "Completed scanning '{DirectoryName}' ({ScannedFileCount}/{TotalFileCount} file(s) scanned)",
-                directory.FullName,
+                scanOptions.ScanDirectory.FullName,
                 scanResult.ScannedFiles.Count,
                 scanResult.ScannedFiles.Count + scanResult.SkippedFiles.Count);
 
@@ -139,8 +146,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             }
         }
 
-        private IEnumerable<IFileInfo>? GetFiles(
-            IDirectoryInfo directory, ScanResult scanResult)
+        private IEnumerable<IFileInfo>? GetFiles(IDirectoryInfo directory, ScanResult scanResult)
         {
             IEnumerable<IFileInfo>? result = null;
 

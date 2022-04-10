@@ -11,7 +11,6 @@ namespace RiotClub.FireMoth.Console
     using System.IO;
     using System.IO.Abstractions;
     using System.Threading.Tasks;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
@@ -30,7 +29,7 @@ namespace RiotClub.FireMoth.Console
         private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
         private const int BootstrapLogRetainedFileCountLimit = 2;
-        private const uint BootstrapLogFileSizeLimit = 1 << 25;
+        private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 1 << 25 = 32 MB
 
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
@@ -58,14 +57,17 @@ namespace RiotClub.FireMoth.Console
                 await host.StartAsync();
 
                 var fileScanner = host.Services.GetRequiredService<FileScanner>();
-                var options = host.Services.GetRequiredService<IOptions<CommandLineOptions>>();
-                var scanDirectory = new FileSystem().DirectoryInfo.FromDirectoryName(
-                    options.Value.ScanDirectory);
+                var commandLineOptions =
+                    host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
+                var scanOptions = new ScanOptions(
+                    new FileSystem().DirectoryInfo.FromDirectoryName(
+                        commandLineOptions.ScanDirectory),
+                    commandLineOptions.RecursiveScan,
+                    commandLineOptions.DuplicatesOnly ? OutputOption.Duplicates : OutputOption.All);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                var scanResult =
-                   fileScanner.ScanDirectory(scanDirectory, options.Value.RecursiveScan);
+                var scanResult = fileScanner.ScanDirectory(scanOptions);
                 stopwatch.Stop();
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
