@@ -3,8 +3,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-
 namespace RiotClub.FireMoth.Services.Tests.FileScanning
 {
     using System;
@@ -99,7 +97,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 new FileScanner(null, this.mockFileHasher.Object, this.mockLogger.Object));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         // Ctor: Null IFileHasher throws exception
@@ -108,7 +108,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 new FileScanner(this.mockDataAccessProvider.Object, null, this.mockLogger.Object));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         // Ctor: Null ILogger throws exception
@@ -118,7 +120,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
                 new FileScanner(
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                     this.mockDataAccessProvider.Object, this.mockFileHasher.Object, null));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         // ScanDirectory: Null ScanOptions throws exception

@@ -73,7 +73,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() => new CsvDataAccessProvider(
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 null, this.testLogger, true));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Fact]
@@ -81,7 +83,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() => new CsvDataAccessProvider(
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 this.testStreamWriter, null, true));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Fact]
@@ -102,7 +106,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 new CsvDataAccessProvider(this.testStreamWriter, this.testLogger, true);
 
             // Act, Assert
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Theory]
