@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30128.74
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Console", "FireMothConsole\FireMoth.Console.csproj", "{7CE462EF-B2A2-4D6D-9851-D20D73130CEB}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Services", "FireMothServices\FireMoth.Services.csproj", "{AE104B2C-0186-4415-9421-E0CA2022CE76}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Services.Tests", "FireMothServices.Tests\FireMoth.Services.Tests.csproj", "{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3C0CF8FC-0954-477C-A2E9-5C278EC1D005}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DCEF8C2F-B64A-4D46-8969-320A4E143A61} = {3C0CF8FC-0954-477C-A2E9-5C278EC1D005}
+		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8} = {3C0CF8FC-0954-477C-A2E9-5C278EC1D005}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8C143A4-3940-43DA-A0DE-B1C757892A8A}
