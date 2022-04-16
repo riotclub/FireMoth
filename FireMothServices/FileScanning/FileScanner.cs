@@ -37,8 +37,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
             IFileHasher hasher,
             ILogger<FileScanner> log)
         {
-            this.dataAccessProvider =
-                dataAccessProvider ?? throw new ArgumentNullException(nameof(dataAccessProvider));
+            this.dataAccessProvider = dataAccessProvider
+                ?? throw new ArgumentNullException(nameof(dataAccessProvider));
             this.hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
             this.log = log ?? throw new ArgumentNullException(nameof(log));
         }
