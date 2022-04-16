@@ -23,8 +23,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
         private readonly IFileHasher hasher;
         private readonly ILogger<FileScanner> log;
 
-        private readonly IList<IFileInfo> duplicateFiles;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileScanner"/> class.
         /// </summary>
