@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+
 namespace RiotClub.FireMoth.Services.Tests.FileScanning
 {
     using System;
@@ -15,7 +17,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     using Microsoft.Extensions.Logging;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
-    using RiotClub.FireMoth.Services.DataAccess.Model;
     using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
     using RiotClub.FireMoth.Services.Tests.Extensions;
@@ -370,7 +371,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                     Assert.StartsWith(
                         "Could not enumerate subdirectories of directory", subdirError.Message);
                     Assert.True(
-                        subdirError.Exception.GetType() == typeof(NotSupportedException)
+                        subdirError.Exception!.GetType() == typeof(NotSupportedException)
                         || subdirError.Exception.GetType() == typeof(ArgumentException));
                 },
                 fileError =>

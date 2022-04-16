@@ -14,11 +14,6 @@ namespace RiotClub.FireMoth.Services.FileScanning
     public class ScanResult
     {
         /// <summary>
-        /// Gets a list of the files that were successfully scanned.
-        /// </summary>
-        // public List<string> ScannedFiles { get; } = new List<string>();
-
-        /// <summary>
         /// Gets a list of <see cref="FileFingerprint"/>s for files that have been successfully scanned.
         /// </summary>
         public List<FileFingerprint> ScannedFiles { get; } = new List<FileFingerprint>();
