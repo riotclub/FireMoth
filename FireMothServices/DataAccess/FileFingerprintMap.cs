@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using CsvHelper.Configuration;
+    using RiotClub.FireMoth.Services.DataAccess.Model;
 
     /// <summary>
     /// A mapping between an <see cref="System.IO.Abstractions.IFileInfo"/> and CSV headers.

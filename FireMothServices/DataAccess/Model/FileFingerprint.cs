@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess
+namespace RiotClub.FireMoth.Services.DataAccess.Model
 {
     using System;
     using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// specified file.</param>
         public FileFingerprint(IFileInfo fileInfo, string base64Hash)
         {
-            this.FileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
+            FileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
 
             if (base64Hash == null)
             {
@@ -42,7 +42,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
                     "Hash string is not a valid base 64 string.", nameof(base64Hash));
             }
 
-            this.Base64Hash = base64Hash;
+            Base64Hash = base64Hash;
         }
 
         /// <inheritdoc/>
@@ -99,21 +99,21 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <inheritdoc/>
         public override bool Equals(object? obj)
         {
-            return this.Equals(obj as FileFingerprint);
+            return Equals(obj as FileFingerprint);
         }
 
         /// <inheritdoc/>
         public bool Equals(FileFingerprint? other)
         {
             return other is FileFingerprint fingerprint
-                && this.FileInfo.FullName == fingerprint.FileInfo.FullName
-                && this.Base64Hash == fingerprint.Base64Hash;
+                && FileInfo.FullName == fingerprint.FileInfo.FullName
+                && Base64Hash == fingerprint.Base64Hash;
         }
 
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.Base64Hash);
+            return HashCode.Combine(Base64Hash);
         }
     }
 }

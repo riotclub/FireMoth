@@ -15,6 +15,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     using Microsoft.Extensions.Logging;
     using Moq;
     using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAccess.Model;
     using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
     using RiotClub.FireMoth.Services.Tests.Extensions;
