@@ -6,7 +6,7 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System.Collections.Generic;
-    using RiotClub.FireMoth.Services.DataAccess.Model;
+    using RiotClub.FireMoth.Services.DataAccess;
 
     /// <summary>
     /// Specifies the result of a file scan operation.

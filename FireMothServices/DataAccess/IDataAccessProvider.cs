@@ -5,8 +5,6 @@
 
 namespace RiotClub.FireMoth.Services.DataAccess
 {
-    using RiotClub.FireMoth.Services.DataAccess.Model;
-
     /// <summary>
     /// Defines the public interface for a class that implements data access and persistence
     /// operations.

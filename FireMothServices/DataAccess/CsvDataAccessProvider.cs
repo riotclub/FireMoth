@@ -10,7 +10,6 @@ namespace RiotClub.FireMoth.Services.DataAccess
     using System.IO;
     using CsvHelper;
     using Microsoft.Extensions.Logging;
-    using RiotClub.FireMoth.Services.DataAccess.Model;
 
     /// <summary>
     /// Implementation of a data access provider that persists data to a stream in CSV format.
