@@ -7,12 +7,18 @@ namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Defines the public interface for a class that implements a repository for
+    /// <see cref="IFileFingerprint"/> entities.
+    /// </summary>
     internal interface IFileFingerprintRepository
     {
         void Add(IFileFingerprint fileFingerprint);
 
-        IFileFingerprint GetByPath(string filePath);
+        IEnumerable<IFileFingerprint> GetByPath(string filePath);
 
         IEnumerable<IFileFingerprint> GetByHash(string hash);
+
+        IEnumerable<IFileFingerprint> GetFilesWithDuplicateHashes();
     }
 }
