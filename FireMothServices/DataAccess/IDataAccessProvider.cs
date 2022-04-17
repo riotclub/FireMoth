@@ -9,7 +9,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     /// Defines the public interface for a class that implements data access and persistence
     /// operations.
     /// </summary>
-    internal interface IDataAccessProvider
+    public interface IDataAccessProvider
     {
         /// <summary>
         /// Adds a file and its hash value to the backing store.

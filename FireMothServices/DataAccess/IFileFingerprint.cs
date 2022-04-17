@@ -11,7 +11,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     /// Defines the public interface for a class that implements properties that define a file and
     /// its hash value.
     /// </summary>
-    internal interface IFileFingerprint
+    public interface IFileFingerprint
     {
         /// <summary>
         /// Gets the <see cref="IFileInfo"/> for the file represented by this fingerprint.

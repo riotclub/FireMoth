@@ -3,6 +3,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("FireMoth.Services.Tests")]
+
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using System;
@@ -14,7 +18,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     /// Defines the public interface for a class that implements a repository of
     /// <see cref="IFileFingerprint"/>s.
     /// </summary>
-    internal interface IFileFingerprintRepository
+    public interface IFileFingerprintRepository
     {
         /// <summary>
         /// Adds a file fingerprint to the repository.

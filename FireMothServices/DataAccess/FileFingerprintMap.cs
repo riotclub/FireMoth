@@ -11,7 +11,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     /// A mapping between an <see cref="System.IO.Abstractions.IFileInfo"/> and CSV headers.
     /// </summary>
     /// <seealso cref="ClassMap"/>
-    public class FileFingerprintMap : ClassMap<IFileFingerprint>
+    internal class FileFingerprintMap : ClassMap<IFileFingerprint>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileFingerprintMap"/> class.

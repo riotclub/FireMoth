@@ -10,7 +10,7 @@ namespace RiotClub.FireMoth.Services.DataAnalysis
     /// <summary>
     /// Defines the public interface for a class that implements file hashing operations.
     /// </summary>
-    internal interface IFileHasher
+    public interface IFileHasher
     {
         /// <summary>
         /// Computes the hash of the provided stream's data.
