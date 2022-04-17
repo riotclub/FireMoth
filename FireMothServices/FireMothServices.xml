@@ -101,9 +101,18 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository">
             <summary>
-            Defines the public interface for a class that implements a repository of
-            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/>s.
+            A repository of <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/>s utilizing Entity Framework as a backing
+            store.
             </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository.Get(System.Linq.Expressions.Expression{System.Func{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint,System.Boolean}},System.Func{System.Linq.IQueryable{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint},System.Linq.IOrderedQueryable{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint}})">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository.RiotClub#FireMoth#Services#DataAccess#IFileFingerprintRepository#Delete(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository.RiotClub#FireMoth#Services#DataAccess#IFileFingerprintRepository#Insert(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
+            <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
@@ -140,7 +149,7 @@
             <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/>s.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Add(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Insert(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
             <summary>
             Adds a file fingerprint to the repository.
             </summary>
@@ -149,11 +158,23 @@
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Get(System.Linq.Expressions.Expression{System.Func{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint,System.Boolean}},System.Func{System.Linq.IQueryable{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint},System.Linq.IOrderedQueryable{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint}})">
             <summary>
-            Retrieves all file fingerprints with paths matching the specified path.
+            Retrieves file fingerprints from the repository.
             </summary>
-            <param name="filter">Filter.</param>
-            <param name="orderBy">OrderBy.</param>
+            <param name="filter">A lambda expression that specifies a filter condition.</param>
+            <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>IEnumerable collection of file fingerprints.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Update(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
+            <summary>
+            Updates a file fingerprint in the repository.
+            </summary>
+            <param name="fileFingerprint">The <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> to update.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Delete(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
+            <summary>
+            Deletes a file fingerprint from the repository.
+            </summary>
+            <param name="fileFingerprint">The <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> to delete.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher">
             <summary>
