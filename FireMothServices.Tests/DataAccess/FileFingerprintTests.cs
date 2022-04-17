@@ -84,7 +84,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 new FileFingerprint(null, this.testBase64Hash));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         // Ctor: base64Hash string can't be null or empty
@@ -93,7 +95,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 new FileFingerprint(this.mockFileInfo, null));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         // Ctor: base64Hash string can't be null or empty
@@ -197,7 +201,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             FileFingerprint left = new FileFingerprint(
                 new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
                 "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
-            FileFingerprint right = null;
+            FileFingerprint? right = null;
 
             // Act, Assert
             Assert.False(left == right);
@@ -208,7 +212,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void EqualityOperator_NullLeftOperandAndNonNullRightOperand_ReturnsFalse()
         {
             // Arrange
-            FileFingerprint left = null;
+            FileFingerprint? left = null;
             FileFingerprint right = new FileFingerprint(
                 new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
                 "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
@@ -222,8 +226,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void EqualityOperator_BothOperandsNull_ReturnsTrue()
         {
             // Arrange
-            FileFingerprint left = null;
-            FileFingerprint right = null;
+            FileFingerprint? left = null;
+            FileFingerprint? right = null;
 
             // Act, Assert
             Assert.True(left == right);
@@ -253,7 +257,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             FileFingerprint left = new FileFingerprint(
                 new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
                 "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
-            FileFingerprint right = null;
+            FileFingerprint? right = null;
 
             // Act, Assert
             Assert.True(left != right);
@@ -264,7 +268,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void InequalityOperator_NullLeftOperandAndNonNullRightOperand_ReturnsTrue()
         {
             // Arrange
-            FileFingerprint left = null;
+            FileFingerprint? left = null;
             FileFingerprint right = new FileFingerprint(
                 new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
                 "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
@@ -278,8 +282,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void InequalityOperator_BothOperandsNull_ReturnsFalse()
         {
             // Arrange
-            FileFingerprint left = null;
-            FileFingerprint right = null;
+            FileFingerprint? left = null;
+            FileFingerprint? right = null;
 
             // Act, Assert
             Assert.False(left != right);

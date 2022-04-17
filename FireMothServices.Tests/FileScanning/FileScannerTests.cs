@@ -383,8 +383,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                     Assert.Equal(testDirectory.FullName, fileError.Path);
                     Assert.StartsWith("Could not enumerate files of directory", fileError.Message);
                     Assert.True(
-                        fileError.Exception.GetType() == typeof(NotSupportedException)
-                        || fileError.Exception.GetType() == typeof(ArgumentException));
+                        fileError?.Exception?.GetType() == typeof(NotSupportedException)
+                        || fileError?.Exception?.GetType() == typeof(ArgumentException));
                 });
         }
 
@@ -560,6 +560,23 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             this.disposed = true;
         }
 
+        private static Mock<IScanOptions> GetMockScanOptions(
+            Mock<IDirectoryInfo> mockDirectory, bool recursive, OutputOption outputOption)
+        {
+            var mockScanOptions = new Mock<IScanOptions>();
+            mockScanOptions
+                .SetupGet(scanOptions => scanOptions.ScanDirectory)
+                .Returns(mockDirectory.Object);
+            mockScanOptions
+                .SetupGet(scanOptions => scanOptions.RecursiveScan)
+                .Returns(recursive);
+            mockScanOptions
+                .SetupGet(scanOptions => scanOptions.OutputOption)
+                .Returns(outputOption);
+
+            return mockScanOptions;
+        }
+
         private static MockFileSystem BuildMockFileSystem()
         {
             var mockFileSystem = new MockFileSystem(
@@ -632,23 +649,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             }
 
             return mockDirectory;
-        }
-
-        private static Mock<IScanOptions> GetMockScanOptions(
-            Mock<IDirectoryInfo> mockDirectory, bool recursive, OutputOption outputOption)
-        {
-            var mockScanOptions = new Mock<IScanOptions>();
-            mockScanOptions
-                .SetupGet(scanOptions => scanOptions.ScanDirectory)
-                .Returns(mockDirectory.Object);
-            mockScanOptions
-                .SetupGet(scanOptions => scanOptions.RecursiveScan)
-                .Returns(recursive);
-            mockScanOptions
-                .SetupGet(scanOptions => scanOptions.OutputOption)
-                .Returns(outputOption);
-
-            return mockScanOptions;
         }
 
         private FileScanner GetDefaultFileScanner()

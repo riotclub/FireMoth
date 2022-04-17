@@ -120,7 +120,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange
             var testPath = Path.GetDirectoryName(file);
             var testFileName = Path.GetFileName(file);
-            var mockFileInfo = GetFileInfoMock(testPath, file, testFileName);
+            var mockFileInfo = GetFileInfoMock(testPath!, file, testFileName);
 
             // Act
             var dapOutput = await this.GetAddFileRecordOutput(
@@ -128,7 +128,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             // Assert
             var expectedOutput = string.Join(
-                ',', new List<string> { testPath, testFileName, "0", hash });
+                ',', new List<string> { testPath!, testFileName, "0", hash });
             Assert.Contains(expectedOutput, dapOutput);
         }
 
@@ -143,7 +143,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var testPathWithQuotes = '"' + testPath + '"';
             var testFileName = Path.GetFileName(testFullPath);
             var testFileNameWithQuotes = '"' + testFileName + '"';
-            var mockFileInfo = GetFileInfoMock(testPath, testFullPath, testFileName);
+            var mockFileInfo = GetFileInfoMock(testPath!, testFullPath, testFileName);
 
             // Act
             var dapOutput = await this.GetAddFileRecordOutput(

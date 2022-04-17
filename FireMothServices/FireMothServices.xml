@@ -128,6 +128,27 @@
             Gets a base 64 string representation of the file's hash.
             </summary>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository">
+            <summary>
+            Defines the public interface for a class that implements a repository of
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/>s.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Add(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
+            <summary>
+            Adds a file fingerprint to the repository.
+            </summary>
+            <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> to add to the repository.
+            </param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository.Get(System.Linq.Expressions.Expression{System.Func{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint,System.Boolean}},System.Func{System.Linq.IQueryable{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint},System.Linq.IOrderedQueryable{RiotClub.FireMoth.Services.DataAccess.IFileFingerprint}})">
+            <summary>
+            Retrieves all file fingerprints with paths matching the specified path.
+            </summary>
+            <param name="filter">Filter.</param>
+            <param name="orderBy">OrderBy.</param>
+            <returns>IEnumerable collection of file fingerprints.</returns>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher">
             <summary>
             Defines the public interface for a class that implements file hashing operations.

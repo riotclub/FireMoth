@@ -26,7 +26,7 @@ namespace RiotClub.FireMoth.Services.Tests.Extensions
         public static Mock<ILogger<T>> VerifyLogCalled<T>(
             this Mock<ILogger<T>> logger, string expectedMessage, LogLevel logLevel)
         {
-            Func<object, Type, bool> state = (v, t) => v.ToString().CompareTo(expectedMessage) == 0;
+            Func<object, Type?, bool> state = (v, t) => v?.ToString()?.CompareTo(expectedMessage) == 0;
 
             logger.Verify(x =>
                 x.Log(
