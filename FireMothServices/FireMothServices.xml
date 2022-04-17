@@ -99,6 +99,12 @@
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap"/> class.
             </summary>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository">
+            <summary>
+            Defines the public interface for a class that implements a repository of
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/>s.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
             Defines the public interface for a class that implements data access and persistence

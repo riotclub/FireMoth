@@ -25,16 +25,28 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// </summary>
         /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to add to the repository.
         /// </param>
-        void Add(IFileFingerprint fileFingerprint);
+        public void Insert(IFileFingerprint fileFingerprint);
 
         /// <summary>
-        /// Retrieves all file fingerprints with paths matching the specified path.
+        /// Retrieves file fingerprints from the repository.
         /// </summary>
-        /// <param name="filter">Filter.</param>
-        /// <param name="orderBy">OrderBy.</param>
+        /// <param name="filter">A lambda expression that specifies a filter condition.</param>
+        /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
         /// <returns>IEnumerable collection of file fingerprints.</returns>
-        IEnumerable<IFileFingerprint> Get(
+        public IEnumerable<IFileFingerprint> Get(
             Expression<Func<IFileFingerprint, bool>>? filter = null,
             Func<IQueryable<IFileFingerprint>, IOrderedQueryable<IFileFingerprint>>? orderBy = null);
+
+        /// <summary>
+        /// Updates a file fingerprint in the repository.
+        /// </summary>
+        /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to update.</param>
+        public void Update(IFileFingerprint fileFingerprint);
+
+        /// <summary>
+        /// Deletes a file fingerprint from the repository.
+        /// </summary>
+        /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to delete.</param>
+        public void Delete(IFileFingerprint fileFingerprint);
     }
 }
