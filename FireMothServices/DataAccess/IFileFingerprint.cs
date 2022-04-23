@@ -5,6 +5,7 @@
 
 namespace RiotClub.FireMoth.Services.DataAccess
 {
+    using System;
     using System.IO.Abstractions;
 
     /// <summary>
@@ -16,11 +17,16 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <summary>
         /// Gets the <see cref="IFileInfo"/> for the file represented by this fingerprint.
         /// </summary>
-        IFileInfo FileInfo { get; }
+        public IFileInfo FileInfo { get; }
 
         /// <summary>
         /// Gets a base 64 string representation of the file's hash.
         /// </summary>
-        string Base64Hash { get; }
+        public string Base64Hash { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> at which this file fingerprint was created.
+        /// </summary>
+        public DateTime CreatedDateTime { get; }
     }
 }

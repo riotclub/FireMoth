@@ -53,6 +53,12 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public string Base64Hash { get; }
 
         /// <summary>
+        /// Gets the UTC <see cref="DateTime"/> at which this <see cref="FileFingerprint"/> was
+        /// created.
+        /// </summary>
+        public DateTime CreatedDateTime { get; } = DateTime.UtcNow;
+
+        /// <summary>
         /// Implements the equality operator.
         /// </summary>
         /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for equality.
