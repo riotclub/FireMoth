@@ -8,7 +8,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
     using CsvHelper.Configuration;
 
     /// <summary>
-    /// A mapping between an <see cref="System.IO.Abstractions.IFileInfo"/> and CSV headers.
+    /// A mapping between an <see cref="IFileFingerprint"/> and CSV headers.
     /// </summary>
     /// <seealso cref="ClassMap"/>
     internal class FileFingerprintMap : ClassMap<IFileFingerprint>
@@ -18,13 +18,13 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// </summary>
         public FileFingerprintMap()
         {
-            this.Map(fingerprint => fingerprint.FileInfo.DirectoryName)
-                .Name("DirectoryName")
-                .Index(0);
-            this.Map(fingerprint => fingerprint.FileInfo.Name)
+            this.Map(fingerprint => fingerprint.FileName)
                 .Name("Name")
+                .Index(0);
+            this.Map(fingerprint => fingerprint.DirectoryName)
+                .Name("DirectoryName")
                 .Index(1);
-            this.Map(fingerprint => fingerprint.FileInfo.Length)
+            this.Map(fingerprint => fingerprint.FileSize)
                 .Name("Length")
                 .Index(2);
             this.Map(fingerprint => fingerprint.Base64Hash)

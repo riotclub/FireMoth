@@ -20,8 +20,6 @@
              Test naming convention: [method]_[preconditions]_[expected result]
             
              Ctor
-             - IFileInfo can't be null
-                 * Ctor_NullFileInfo_ThrowsArgumentNullException
              - base64Hash string can't be null or empty
                  * Ctor_NullString_ThrowsArgumentNullException
                  * Ctor_EmptyOrWhitespaceString_ThrowsArgumentException

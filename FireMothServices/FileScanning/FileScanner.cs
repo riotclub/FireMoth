@@ -116,9 +116,8 @@ namespace RiotClub.FireMoth.Services.FileScanning
 
                         this.log.LogDebug(
                             "Adding fingerprint for file '{FileName}' to data access provider",
-                            file.FullName,
-                            hashString);
-                        var fingerprint = new FileFingerprint(file, hashString);
+                            file.FullName);
+                        var fingerprint = new FileFingerprint(file.Name, file.DirectoryName, file.Length, hashString);
                         this.dataAccessProvider.AddFileRecord(fingerprint);
                         scanResult.ScannedFiles.Add(fingerprint);
                     }

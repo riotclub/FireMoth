@@ -43,7 +43,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     [ExcludeFromCodeCoverage]
     public class CsvDataAccessProviderTests : IDisposable
     {
-        private readonly Mock<IFileInfo> mockFileInfo;
+        // private readonly Mock<IFileInfo> mockFileInfo;
         private readonly StreamWriter testStreamWriter;
         private readonly string testFilePath = @"C:\TestDir";
         private readonly string testFileName = "TestFile.txt";
@@ -53,14 +53,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
         public CsvDataAccessProviderTests()
         {
-            this.mockFileInfo = new Mock<IFileInfo>();
-            this.mockFileInfo
-                .SetupGet(mock => mock.FullName)
-                .Returns(this.testFilePath + Path.DirectorySeparatorChar + this.testFileName);
-            this.mockFileInfo
-                .SetupGet(mock => mock.Name)
-                .Returns(this.testFileName);
-
             this.testStreamWriter = new StreamWriter(new MemoryStream(), Encoding.UTF8);
 
             this.testLogger = LoggerFactory
@@ -92,7 +84,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void Ctor_ValidArguments_CreatesObject()
         {
             // Arrange, Act
-            var testObject = new FileFingerprint(this.mockFileInfo.Object, this.testHash);
+            var testObject = new FileFingerprint(
+                this.testFilePath, this.testFileName, 100, this.testHash);
 
             // Assert
             Assert.NotNull(testObject);
@@ -120,15 +113,14 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange
             var testPath = Path.GetDirectoryName(file);
             var testFileName = Path.GetFileName(file);
-            var mockFileInfo = GetFileInfoMock(testPath!, file, testFileName);
 
             // Act
             var dapOutput = await this.GetAddFileRecordOutput(
-                new FileFingerprint(mockFileInfo.Object, hash));
+                new FileFingerprint(testFileName, testPath!, 100, hash));
 
             // Assert
             var expectedOutput = string.Join(
-                ',', new List<string> { testPath!, testFileName, "0", hash });
+                ',', new List<string> { testFileName, testPath!, "100", hash });
             Assert.Contains(expectedOutput, dapOutput);
         }
 
@@ -143,16 +135,15 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var testPathWithQuotes = '"' + testPath + '"';
             var testFileName = Path.GetFileName(testFullPath);
             var testFileNameWithQuotes = '"' + testFileName + '"';
-            var mockFileInfo = GetFileInfoMock(testPath!, testFullPath, testFileName);
 
             // Act
             var dapOutput = await this.GetAddFileRecordOutput(
-                new FileFingerprint(mockFileInfo.Object, testHash));
+                new FileFingerprint(testFileName, testPath!, 100, testHash));
 
             // Assert
             var expectedOutput = string.Join(
                 ',',
-                new List<string> { testPathWithQuotes, testFileNameWithQuotes, "0", testHash });
+                new List<string> { testFileNameWithQuotes, testPathWithQuotes, "100", testHash });
             Assert.Contains(expectedOutput, dapOutput);
         }
 
@@ -168,7 +159,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Assert
             Assert.Throws<ObjectDisposedException>(() =>
                 testObject.AddFileRecord(
-                    new FileFingerprint(this.mockFileInfo.Object, this.testHash)));
+                    new FileFingerprint(this.testFilePath, this.testFileName, 100, this.testHash)));
         }
 
         [Fact]

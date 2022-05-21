@@ -40,22 +40,30 @@
             Conatins data that uniquely identifies a file and its data.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.#ctor(System.IO.Abstractions.IFileInfo,System.String)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.#ctor(System.String,System.String,System.Int64,System.String)">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> class.
             </summary>
-            <param name="fileInfo">A <see cref="T:System.IO.Abstractions.IFileInfo"/> containing information about the file.
-            </param>
+            <param name="fileName">The name of the file.</param>
+            <param name="directoryName">The full path of the directory containing the file.</param>
+            <param name="fileSize">The size of the file in bytes.</param>
             <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
             specified file.</param>
         </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.FileInfo">
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.DirectoryName">
+            <inheritdoc/>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.FileName">
+            <inheritdoc/>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.FileSize">
             <inheritdoc/>
         </member>
         <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.Base64Hash">
-            <summary>
-            Gets the base-64 hash of the file's data.
-            </summary>
+            <inheritdoc/>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.FullPath">
+            <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.op_Equality(RiotClub.FireMoth.Services.DataAccess.FileFingerprint,RiotClub.FireMoth.Services.DataAccess.FileFingerprint)">
             <summary>
@@ -88,9 +96,12 @@
         <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.GetHashCode">
             <inheritdoc/>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprint.ToString">
+            <inheritdoc/>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
             <summary>
-            A mapping between an <see cref="T:System.IO.Abstractions.IFileInfo"/> and CSV headers.
+            A mapping between an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> and CSV headers.
             </summary>
             <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
         </member>
@@ -114,6 +125,21 @@
         <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository.RiotClub#FireMoth#Services#DataAccess#IFileFingerprintRepository#Insert(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
             <inheritdoc/>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.DataAccess.FileFingerprint})">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FireMothContext.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FireMothContext"/> class.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FireMothContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc/>
+            <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintTypeConfiguration"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+            <inheritdoc/>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
             <summary>
             Defines the public interface for a class that implements data access and persistence
@@ -133,14 +159,29 @@
             its hash value.
             </summary>
         </member>
-        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.FileInfo">
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.FileName">
             <summary>
-            Gets the <see cref="T:System.IO.Abstractions.IFileInfo"/> for the file represented by this fingerprint.
+            Gets the name of the file represented by this file fingerprint.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.DirectoryName">
+            <summary>
+            Gets the name of the full directory path for the file represented by this file fingerprint.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.FileSize">
+            <summary>
+            Gets the size, in bytes, for the file represented by this file fingerprint.
             </summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.Base64Hash">
             <summary>
-            Gets a base 64 string representation of the file's hash.
+            Gets a base 64 string representation of the hash for the file data represented by this file fingerprint.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint.FullPath">
+            <summary>
+            Gets the fully qualified path to the file represented by this file fingerprint.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprintRepository">

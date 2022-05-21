@@ -151,7 +151,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 this.mockDataAccessProvider
                     .Setup(dap =>
                         dap.AddFileRecord(It.Is<IFileFingerprint>(ff =>
-                            ff.FileInfo.Name == file.Name)));
+                            ff.FileName == file.Name)));
             }
 
             // Act
@@ -192,8 +192,11 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var errorFiles = GetFileFingerprints(this.testDirectory, "eep");
             var expectedFiles = this.testDirectory.EnumerateFiles().ToList();
             expectedFiles.RemoveAll(fileInfo =>
-                errorFiles.Contains(
-                    new FileFingerprint(fileInfo, Convert.ToBase64String(this.testHashData))));
+                errorFiles.Contains(new FileFingerprint(
+                    fileInfo.Name,
+                    fileInfo.DirectoryName,
+                    fileInfo.Length,
+                    Convert.ToBase64String(this.testHashData))));
             var testFileScanner = this.GetFileScannerWithErroredFiles(
                 errorFiles, new IOException());
 
@@ -205,7 +208,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             {
                 Assert.Contains(
                     result.ScannedFiles,
-                    fileInfo => fileInfo.FileInfo.FullName == expectedFile.FullName);
+                    fingerprint => fingerprint.FileName == expectedFile.Name);
             }
         }
 
@@ -227,8 +230,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Equal(errorFiles.Count(), result.SkippedFiles.Count);
             foreach (var file in errorFiles)
             {
-                Assert.Contains(
-                    file.FileInfo.FullName, (IDictionary<string, string>)result.SkippedFiles);
+                Assert.Contains(file.FullPath, (IDictionary<string, string>)result.SkippedFiles);
             }
         }
 
@@ -255,9 +257,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Assert
             var resultErrorFiles = scanResult.Errors.Select(e => e.Path);
             Assert.Equal(errorFiles.Count(), resultErrorFiles.Count());
-            foreach (var errorFile in errorFiles)
+            foreach (var errorFileFingerprint in errorFiles)
             {
-                Assert.Contains(errorFile.FileInfo.FullName, resultErrorFiles);
+                Assert.Contains(errorFileFingerprint.FullPath, resultErrorFiles);
             }
         }
 
@@ -266,11 +268,12 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void ScanDirectory_DirectoryWithErroredFiles_LogsErrorEvents()
         {
             // Arrange
+            var errorFileNamePattern = "eep";
+
             var mockDirectory = this.GetMockDirectory(fullPath: this.testDirectory.FullName);
-            var errorFiles = GetFileFingerprints(this.testDirectory, "eep");
-            mockDirectory
-                .Setup(dir => dir.EnumerateFiles())
-                .Returns(errorFiles.Select(fingerprint => fingerprint.FileInfo));
+            var errorFiles = GetFileFingerprints(this.testDirectory, errorFileNamePattern);
+            var errorFileInfo = this.testDirectory.EnumerateFiles('*' + errorFileNamePattern + '*');
+            mockDirectory.Setup(dir => dir.EnumerateFiles()).Returns(errorFileInfo);
             var mockScanOptions = GetMockScanOptions(mockDirectory, true, OutputOption.All);
             var testFileScanner = this.GetFileScannerWithErroredFiles(
                 errorFiles, new IOException());
@@ -282,7 +285,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             foreach (var file in errorFiles)
             {
                 this.mockLogger.VerifyLogCalled(
-                    $"Could not add record for file '{file.FileInfo.FullName}': I/O error occurred.; skipping file.",
+                    $"Could not add record for file '{file.FullPath}': I/O error occurred.; skipping file.",
                     LogLevel.Error);
             }
         }
@@ -295,8 +298,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var errorFiles = GetFileFingerprints(this.testDirectory, "AnotherFile");
             foreach (var errorFile in errorFiles)
             {
-                this.mockFileSystem.GetFile(errorFile.FileInfo.FullName).AllowedFileShare
-                    = FileShare.None;
+                this.mockFileSystem.GetFile(errorFile.FullPath).AllowedFileShare = FileShare.None;
             }
 
             var mockDataAccessProvider = new Mock<IDataAccessProvider>(MockBehavior.Loose);
@@ -442,7 +444,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             foreach (var file in errorFiles)
             {
                 this.mockLogger.VerifyLogCalled(
-                    $"Could not add record for file '{file.FileInfo.FullName}': Attempted to " +
+                    $"Could not add record for file '{file.FullPath}': Attempted to " +
                         $"perform an unauthorized operation.; skipping file.",
                     LogLevel.Error);
             }
@@ -465,8 +467,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Equal(errorFiles.Count(), result.SkippedFiles.Count);
             foreach (var file in errorFiles)
             {
-                Assert.Contains(
-                    file.FileInfo.FullName, (IDictionary<string, string>)result.SkippedFiles);
+                Assert.Contains(file.FullPath, (IDictionary<string, string>)result.SkippedFiles);
             }
         }
 
@@ -488,7 +489,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Equal(errorFiles.Count(), resultErrorFiles.Count());
             foreach (var errorFile in errorFiles)
             {
-                Assert.Contains(errorFile.FileInfo.FullName, resultErrorFiles);
+                Assert.Contains(errorFile.FullPath, resultErrorFiles);
             }
         }
 
@@ -509,8 +510,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             {
                 this.mockDataAccessProvider.Verify(dap =>
                     dap.AddFileRecord(It.Is<IFileFingerprint>(fingerprint =>
-                        fingerprint.FileInfo.FullName.Equals(
-                            file, StringComparison.OrdinalIgnoreCase))));
+                        fingerprint.FullPath.Equals(file, StringComparison.OrdinalIgnoreCase))));
             }
         }
 
@@ -529,7 +529,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             this.mockDataAccessProvider.Verify(
                 dap => dap.AddFileRecord(
                     It.Is<IFileFingerprint>(file =>
-                        file.FileInfo.DirectoryName.StartsWith(
+                        file.DirectoryName.StartsWith(
                             @"c:\dirwithfiles\subdirwithfiles",
                             StringComparison.OrdinalIgnoreCase))),
                 Times.Never);
@@ -610,7 +610,10 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             return files.Select(fileInfo =>
                 new FileFingerprint(
-                    fileInfo, Convert.ToBase64String(new byte[] { 0x20, 0x20, 0x20 })));
+                    fileInfo.Name,
+                    fileInfo.DirectoryName,
+                    fileInfo.Length,
+                    Convert.ToBase64String(new byte[] { 0x20, 0x20, 0x20 })));
         }
 
         private Mock<IDirectoryInfo> GetMockDirectory(

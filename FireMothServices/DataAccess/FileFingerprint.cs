@@ -17,13 +17,18 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <summary>
         /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
         /// </summary>
-        /// <param name="fileInfo">A <see cref="IFileInfo"/> containing information about the file.
-        /// </param>
+        /// <param name="fileName">The name of the file.</param>
+        /// <param name="directoryName">The full path of the directory containing the file.</param>
+        /// <param name="fileSize">The size of the file in bytes.</param>
         /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the
         /// specified file.</param>
-        public FileFingerprint(IFileInfo fileInfo, string base64Hash)
+        public FileFingerprint(
+            string fileName, string directoryName, long fileSize, string base64Hash)
         {
-            this.FileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
+            this.DirectoryName = directoryName
+                ?? throw new ArgumentNullException(nameof(directoryName));
+            this.FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+            this.FileSize = fileSize;
 
             if (base64Hash == null)
             {
@@ -45,18 +50,25 @@ namespace RiotClub.FireMoth.Services.DataAccess
         }
 
         /// <inheritdoc/>
-        public IFileInfo FileInfo { get; }
+        public string DirectoryName { get; }
 
-        /// <summary>
-        /// Gets the base-64 hash of the file's data.
-        /// </summary>
+        /// <inheritdoc/>
+        public string FileName { get; }
+
+        /// <inheritdoc/>
+        public long FileSize { get; }
+
+        /// <inheritdoc/>
         public string Base64Hash { get; }
 
-        /// <summary>
-        /// Gets the UTC <see cref="DateTime"/> at which this <see cref="FileFingerprint"/> was
-        /// created.
-        /// </summary>
-        public DateTime CreatedDateTime { get; } = DateTime.UtcNow;
+        /// <inheritdoc/>
+        public string FullPath
+        {
+            get
+            {
+                return System.IO.Path.Combine(this.DirectoryName, this.FileName);
+            }
+        }
 
         /// <summary>
         /// Implements the equality operator.
@@ -96,29 +108,31 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// inequality.</param>
         /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are not equal; false
         /// otherwise.</returns>
-        public static bool operator !=(FileFingerprint? left, FileFingerprint? right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(FileFingerprint? left, FileFingerprint? right) =>
+            !(left == right);
 
         /// <inheritdoc/>
-        public override bool Equals(object? obj)
-        {
-            return this.Equals(obj as FileFingerprint);
-        }
+        public override bool Equals(object? obj) => this.Equals(obj as FileFingerprint);
 
         /// <inheritdoc/>
-        public bool Equals(FileFingerprint? other)
-        {
-            return other is FileFingerprint fingerprint
-                && this.FileInfo.FullName == fingerprint.FileInfo.FullName
-                && this.Base64Hash == fingerprint.Base64Hash;
-        }
+        public bool Equals(FileFingerprint? other) =>
+            other is FileFingerprint fingerprint
+            && this.FileName == fingerprint.FileName
+            && this.DirectoryName == fingerprint.DirectoryName
+            && this.FileSize == fingerprint.FileSize
+            && this.Base64Hash == fingerprint.Base64Hash;
 
         /// <inheritdoc/>
-        public override int GetHashCode()
+        public override int GetHashCode() => HashCode.Combine(
+            this.FileName, this.DirectoryName, this.FileSize, this.Base64Hash);
+
+        /// <inheritdoc/>
+        public override string ToString()
         {
-            return HashCode.Combine(this.Base64Hash);
+            return
+                "File:" + System.IO.Path.Combine(this.DirectoryName, this.FileName)
+                + ",FileSize:" + this.FileSize
+                + ",Hash:" + this.Base64Hash;
         }
     }
 }

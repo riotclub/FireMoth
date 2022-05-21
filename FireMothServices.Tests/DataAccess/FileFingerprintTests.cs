@@ -19,8 +19,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     /// Test naming convention: [method]_[preconditions]_[expected result]
     ///
     /// Ctor
-    /// - IFileInfo can't be null
-    ///     * Ctor_NullFileInfo_ThrowsArgumentNullException
     /// - base64Hash string can't be null or empty
     ///     * Ctor_NullString_ThrowsArgumentNullException
     ///     * Ctor_EmptyOrWhitespaceString_ThrowsArgumentException
@@ -78,17 +76,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             this.mockFileInfo = new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt");
         }
 
-        // Ctor: IFileInfo can't be null
-        [Fact]
-        public void Ctor_NullFileInfo_ThrowsArgumentNullException()
-        {
-            // Arrange, Act, Assert
-            Assert.Throws<ArgumentNullException>(() =>
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                new FileFingerprint(null, this.testBase64Hash));
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-        }
-
         // Ctor: base64Hash string can't be null or empty
         [Fact]
         public void Ctor_NullString_ThrowsArgumentNullException()
@@ -96,7 +83,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                new FileFingerprint(this.mockFileInfo, null));
+                new FileFingerprint(string.Empty, string.Empty, 0, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -108,7 +95,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentException>(() =>
-                new FileFingerprint(this.mockFileInfo, value));
+                new FileFingerprint(string.Empty, string.Empty, 0, value));
         }
 
         // Ctor: base64Hash must be a valid base 64 string
@@ -117,18 +104,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentException>(() =>
-                new FileFingerprint(this.mockFileInfo, "asdf!!!000"));
-        }
-
-        // Equals: Null FileFingerprint returns false
-        [Fact]
-        public void Equal_NullFileFingerprint_ReturnsFalse()
-        {
-            // Arrange
-            var testObject = new FileFingerprint(this.mockFileInfo, this.testBase64Hash);
-
-            // Act, Assert
-            Assert.False(testObject.Equals(null));
+                new FileFingerprint(string.Empty, string.Empty, 0, "asdf!!!000"));
         }
 
         // Equals: Semantically equal FileFingerprint returns true
@@ -137,11 +113,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var testObject = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 1, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             var testComparator = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 1, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.True(testObject.Equals(testComparator));
@@ -153,11 +127,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var testObject = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "AAA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "AAA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             var testComparator = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\AnotherFile.dat"),
-                "BBB2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "AnotherFile.dat", 200, "BBB2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.False(testObject.Equals(testComparator));
@@ -169,8 +141,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var testObject = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "AAA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "AAA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             var testComparator = new SHA256FileHasher();
 
             // Act, Assert
@@ -183,11 +154,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var left = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 1, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             var right = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 1, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.True(left == right);
@@ -199,8 +168,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             FileFingerprint left = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             FileFingerprint? right = null;
 
             // Act, Assert
@@ -214,8 +182,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange
             FileFingerprint? left = null;
             FileFingerprint right = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.False(left == right);
@@ -239,11 +206,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var left = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 1, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             var right = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 1, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.False(left != right);
@@ -255,8 +220,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             FileFingerprint left = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             FileFingerprint? right = null;
 
             // Act, Assert
@@ -270,8 +234,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange
             FileFingerprint? left = null;
             FileFingerprint right = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.True(left != right);
@@ -295,11 +258,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var left = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
             var right = new FileFingerprint(
-                new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt"),
-                "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
+                @"c:\test", "SomeFile.txt", 100, "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=");
 
             // Act, Assert
             Assert.True(left.GetHashCode() == right.GetHashCode());
