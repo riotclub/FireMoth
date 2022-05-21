@@ -42,7 +42,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
 
             this.csvWriter = new CsvWriter(outputWriter, CultureInfo.InvariantCulture, leaveOpen);
             this.csvWriter.Context.RegisterClassMap<FileFingerprintMap>();
-            this.csvWriter.WriteHeader<FileFingerprint>();
+            this.csvWriter.WriteHeader<IFileFingerprint>();
             this.csvWriter.NextRecord();
         }
 
@@ -64,10 +64,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
                 throw new ArgumentNullException(nameof(fingerprint));
             }
 
-            var fullPath =
-                fingerprint.FileInfo.DirectoryName
-                + Path.DirectorySeparatorChar
-                + fingerprint.FileInfo.Name;
+            var fullPath = Path.Combine(fingerprint.DirectoryName, fingerprint.FileName);
             this.logger.LogDebug(
                 "Writing fingerprint for file {FileName} with hash {HashString}.",
                 fullPath,
