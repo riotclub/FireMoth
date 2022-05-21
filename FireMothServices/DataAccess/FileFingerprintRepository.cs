@@ -1,7 +1,7 @@
-﻿/// <summary>
-/// Defines the public interface for a class that implements a repository of
-/// <see cref="IFileFingerprint"/>s.
-/// </summary>
+﻿// <copyright file="FileFingerprintRepository.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
 namespace RiotClub.FireMoth.Services.DataAccess
 {
