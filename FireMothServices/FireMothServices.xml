@@ -125,19 +125,7 @@
         <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository.RiotClub#FireMoth#Services#DataAccess#IFileFingerprintRepository#Insert(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.DataAccess.FileFingerprint})">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FireMothContext.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FireMothContext"/> class.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FireMothContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc/>
-            <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintTypeConfiguration"/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintRepository.RiotClub#FireMoth#Services#DataAccess#IFileFingerprintRepository#Update(RiotClub.FireMoth.Services.DataAccess.IFileFingerprint)">
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessProvider">
@@ -216,6 +204,21 @@
             Deletes a file fingerprint from the repository.
             </summary>
             <param name="fileFingerprint">The <see cref="T:RiotClub.FireMoth.Services.DataAccess.IFileFingerprint"/> to delete.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.DataAccess.FileFingerprint})">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext"/> class.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc/>
+            <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+            <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher">
             <summary>

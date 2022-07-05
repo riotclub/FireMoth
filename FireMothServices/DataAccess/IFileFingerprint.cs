@@ -5,8 +5,6 @@
 
 namespace RiotClub.FireMoth.Services.DataAccess
 {
-    using System;
-
     /// <summary>
     /// Defines the public interface for a class that implements properties that define a file and
     /// its hash value.

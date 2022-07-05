@@ -36,6 +36,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         void IFileFingerprintRepository.Update(IFileFingerprint fileFingerprint)
         {
             throw new NotImplementedException();

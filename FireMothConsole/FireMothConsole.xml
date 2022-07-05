@@ -33,7 +33,7 @@
         </member>
         <member name="F:RiotClub.FireMoth.Console.ExitState.Normal">
             <summary>
-            Inidicates nominal program execution and shutdown.
+            Inidicates nominal program shutdown.
             </summary>
         </member>
         <member name="F:RiotClub.FireMoth.Console.ExitState.StartupError">

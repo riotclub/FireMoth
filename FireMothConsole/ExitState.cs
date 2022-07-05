@@ -11,7 +11,7 @@ namespace RiotClub.FireMoth.Console
     public enum ExitState
     {
         /// <summary>
-        /// Inidicates nominal program execution and shutdown.
+        /// Inidicates nominal program shutdown.
         /// </summary>
         Normal,
 

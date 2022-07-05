@@ -2,7 +2,7 @@
   "profiles": {
     "FireMothConsole": {
       "commandName": "Project",
-      "commandLineArgs": "--ScanDirectory \"D:\\FireMoth Test Data\" --RecursiveScan true",
+      "commandLineArgs": "--ScanDirectory \"C:\\Users\\Jason\\Pictures\\Animals\" --RecursiveScan true",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
