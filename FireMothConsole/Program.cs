@@ -17,6 +17,7 @@ namespace RiotClub.FireMoth.Console
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
+    using RiotClub.FireMoth.Services.Output;
     using Serilog;
 
     /// <summary>
@@ -24,10 +25,6 @@ namespace RiotClub.FireMoth.Console
     /// </summary>
     public static class Program
     {
-        private const string DefaultFilePrefix = "FireMothData_";
-        private const string DefaultFileExtension = "csv";
-        private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
-
         private const int BootstrapLogRetainedFileCountLimit = 2;
         private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 1 << 25 = 32 MB
 
@@ -62,13 +59,15 @@ namespace RiotClub.FireMoth.Console
                 var scanOptions = new ScanOptions(
                     new FileSystem().DirectoryInfo.FromDirectoryName(
                         commandLineOptions.ScanDirectory),
-                    commandLineOptions.RecursiveScan,
-                    commandLineOptions.DuplicatesOnly ? OutputOption.Duplicates : OutputOption.All);
+                    commandLineOptions.RecursiveScan);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 var scanResult = fileScanner.ScanDirectory(scanOptions);
                 stopwatch.Stop();
+
+
+
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
                 LogScanResult(scanResult);
@@ -129,15 +128,7 @@ namespace RiotClub.FireMoth.Console
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.Configure<CommandLineOptions>(hostContext.Configuration);
-                    services.AddSingleton<FileScanner>();
-                    services.AddTransient<IFileHasher, SHA256FileHasher>();
-                    services.AddTransient<IDataAccessProvider, CsvDataAccessProvider>();
-                    services.AddTransient(provider =>
-                        new StreamWriter(
-                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
-                            + Path.DirectorySeparatorChar + DefaultFilePrefix
-                            + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
-                            + '.' + DefaultFileExtension));
+                    services.AddFireMothServices(hostContext.Configuration);
                 });
     }
 }
