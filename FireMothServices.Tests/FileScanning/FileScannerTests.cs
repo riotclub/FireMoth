@@ -17,6 +17,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
+    using RiotClub.FireMoth.Services.Output;
     using RiotClub.FireMoth.Services.Tests.Extensions;
     using Xunit;
 
@@ -188,7 +189,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var mockDirectory = this.GetMockDirectory(fullPath: this.testDirectory.FullName);
-            var mockScanOptions = GetMockScanOptions(mockDirectory, false, OutputOption.All);
+            var mockScanOptions = GetMockScanOptions(mockDirectory, false, OutputDuplicateFileFingerprintsOption.All);
             var errorFiles = GetFileFingerprints(this.testDirectory, "eep");
             var expectedFiles = this.testDirectory.EnumerateFiles().ToList();
             expectedFiles.RemoveAll(fileInfo =>
@@ -218,7 +219,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var mockDirectory = this.GetMockDirectory(fullPath: this.testDirectory.FullName);
-            var mockScanOptions = GetMockScanOptions(mockDirectory, false, OutputOption.All);
+            var mockScanOptions = GetMockScanOptions(mockDirectory, false, OutputDuplicateFileFingerprintsOption.All);
             var errorFiles = GetFileFingerprints(this.testDirectory, "eep");
             var testFileScanner = this.GetFileScannerWithErroredFiles(
                 errorFiles, new IOException());
@@ -240,7 +241,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var mockDirectory = this.GetMockDirectory(fullPath: this.testDirectory.FullName);
-            var mockScanOptions = GetMockScanOptions(mockDirectory, false, OutputOption.All);
+            var mockScanOptions = GetMockScanOptions(mockDirectory, false, OutputDuplicateFileFingerprintsOption.All);
             var directoryFiles = this.mockFileSystem.DirectoryInfo
                 .FromDirectoryName(this.testDirectory.FullName)
                 .EnumerateFiles();
@@ -274,7 +275,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var errorFiles = GetFileFingerprints(this.testDirectory, errorFileNamePattern);
             var errorFileInfo = this.testDirectory.EnumerateFiles('*' + errorFileNamePattern + '*');
             mockDirectory.Setup(dir => dir.EnumerateFiles()).Returns(errorFileInfo);
-            var mockScanOptions = GetMockScanOptions(mockDirectory, true, OutputOption.All);
+            var mockScanOptions = GetMockScanOptions(mockDirectory, true, OutputDuplicateFileFingerprintsOption.All);
             var testFileScanner = this.GetFileScannerWithErroredFiles(
                 errorFiles, new IOException());
 
@@ -399,7 +400,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 fullPath: this.testDirectory.FullName,
                 throwOnDirectoryEnumeration: new UnauthorizedAccessException(),
                 throwOnFileEnumeration: new UnauthorizedAccessException());
-            var mockScanOptions = GetMockScanOptions(mockDirectory, true, OutputOption.All);
+            var mockScanOptions = GetMockScanOptions(mockDirectory, true, OutputDuplicateFileFingerprintsOption.All);
             this.mockDataAccessProvider = new Mock<IDataAccessProvider>();
 
             // Act
@@ -561,7 +562,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         }
 
         private static Mock<IScanOptions> GetMockScanOptions(
-            Mock<IDirectoryInfo> mockDirectory, bool recursive, OutputOption outputOption)
+            Mock<IDirectoryInfo> mockDirectory, bool recursive, OutputDuplicateFileFingerprintsOption outputOption)
         {
             var mockScanOptions = new Mock<IScanOptions>();
             mockScanOptions
@@ -570,9 +571,6 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             mockScanOptions
                 .SetupGet(scanOptions => scanOptions.RecursiveScan)
                 .Returns(recursive);
-            mockScanOptions
-                .SetupGet(scanOptions => scanOptions.OutputOption)
-                .Returns(outputOption);
 
             return mockScanOptions;
         }

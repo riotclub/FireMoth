@@ -67,8 +67,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 {
                     foreach (IDirectoryInfo subDirectory in subDirectories)
                     {
-                        scanResult += this.ScanDirectory(
-                            new ScanOptions(subDirectory, true, scanOptions.OutputOption));
+                        scanResult += this.ScanDirectory(new ScanOptions(subDirectory, true));
                     }
                 }
             }
