@@ -9,8 +9,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO.Abstractions.TestingHelpers;
-    using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.DataAnalysis;
+    using RiotClub.FireMoth.Services.Repository;
     using Xunit;
 
     /// <summary>

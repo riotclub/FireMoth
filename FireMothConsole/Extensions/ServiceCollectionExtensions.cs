@@ -3,6 +3,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using RiotClub.FireMoth.Services.DataAccess;
+    using RiotClub.FireMoth.Services.DataAccess.Csv;
     using RiotClub.FireMoth.Services.DataAnalysis;
     using RiotClub.FireMoth.Services.FileScanning;
     using RiotClub.FireMoth.Services.Output;
@@ -24,7 +25,7 @@
             //    : OutputDuplicateFileFingerprintsOption.All;
             services.AddSingleton<FileScanner>();
             services.AddTransient<IFileHasher, SHA256FileHasher>();
-            services.AddTransient<IDataAccessProvider, CsvDataAccessProvider>();
+            services.AddTransient<IDataAccessLayer, CsvDataAccessLayer>();
             services.AddTransient(provider =>
                 new StreamWriter(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)

@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess
+namespace RiotClub.FireMoth.Services.Repository
 {
     using System;
     using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// </summary>
         /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to add to the repository.
         /// </param>
-        public void Insert(IFileFingerprint fileFingerprint);
+        public void Add(IFileFingerprint fileFingerprint);
 
         /// <summary>
         /// Retrieves file fingerprints from the repository.
@@ -30,8 +30,8 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
         /// <returns>IEnumerable collection of file fingerprints.</returns>
         public IEnumerable<IFileFingerprint> Get(
-            Expression<Func<IFileFingerprint, bool>>? filter = null,
-            Func<IQueryable<IFileFingerprint>, IOrderedQueryable<IFileFingerprint>>? orderBy = null);
+            Func<IFileFingerprint, bool>? filter = null,
+            Func<IFileFingerprint, string>? orderBy = null);
 
         /// <summary>
         /// Updates a file fingerprint in the repository.

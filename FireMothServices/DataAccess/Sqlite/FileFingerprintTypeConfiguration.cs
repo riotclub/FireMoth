@@ -7,6 +7,7 @@ namespace RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
+    using RiotClub.FireMoth.Services.Repository;
     using System.IO.Abstractions;
 
     internal class FileFingerprintTypeConfiguration : IEntityTypeConfiguration<FileFingerprint>

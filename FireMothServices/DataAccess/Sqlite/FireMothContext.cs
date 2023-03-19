@@ -7,6 +7,7 @@ namespace RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite
 {
     using System;
     using Microsoft.EntityFrameworkCore;
+    using RiotClub.FireMoth.Services.Repository;
 
     internal class FireMothContext : DbContext
     {

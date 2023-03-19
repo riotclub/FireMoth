@@ -26,7 +26,7 @@ namespace RiotClub.FireMoth.Console
     public static class Program
     {
         private const int BootstrapLogRetainedFileCountLimit = 2;
-        private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 1 << 25 = 32 MB
+        private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 32 MB
 
         /// <summary>
         /// Class and application entry point. Validates command-line arguments, performs startup
@@ -54,19 +54,15 @@ namespace RiotClub.FireMoth.Console
                 await host.StartAsync();
 
                 var fileScanner = host.Services.GetRequiredService<FileScanner>();
-                var commandLineOptions =
-                    host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
+                var commandLineOptions = host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
                 var scanOptions = new ScanOptions(
-                    new FileSystem().DirectoryInfo.FromDirectoryName(
-                        commandLineOptions.ScanDirectory),
+                    new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),
                     commandLineOptions.RecursiveScan);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 var scanResult = fileScanner.ScanDirectory(scanOptions);
                 stopwatch.Stop();
-
-
 
                 TimeSpan timeSpan = stopwatch.Elapsed;
 

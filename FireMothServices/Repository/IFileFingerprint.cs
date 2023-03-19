@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess
+namespace RiotClub.FireMoth.Services.Repository
 {
     /// <summary>
     /// Defines the public interface for a class that implements properties that define a file and

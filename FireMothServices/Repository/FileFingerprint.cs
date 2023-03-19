@@ -3,14 +3,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess
+namespace RiotClub.FireMoth.Services.Repository
 {
     using System;
-    using System.IO.Abstractions;
-    using RiotClub.FireMoth.Services.Extensions;
+    using Extensions;
 
     /// <summary>
-    /// Conatins data that uniquely identifies a file and its data.
+    /// Contains data that uniquely identifies a file and its data.
     /// </summary>
     public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     {
@@ -25,28 +24,13 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public FileFingerprint(
             string fileName, string directoryName, long fileSize, string base64Hash)
         {
-            this.DirectoryName = directoryName
+            DirectoryName = directoryName
                 ?? throw new ArgumentNullException(nameof(directoryName));
-            this.FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
-            this.FileSize = fileSize;
+            FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+            FileSize = fileSize;
 
-            if (base64Hash == null)
-            {
-                throw new ArgumentNullException(nameof(base64Hash));
-            }
-
-            if (base64Hash.IsEmptyOrWhiteSpace())
-            {
-                throw new ArgumentException("Hash string cannot be empty.");
-            }
-
-            if (!base64Hash.IsBase64String())
-            {
-                throw new ArgumentException(
-                    "Hash string is not a valid base 64 string.", nameof(base64Hash));
-            }
-
-            this.Base64Hash = base64Hash;
+            ThrowIfHashInvalid(base64Hash);
+            Base64Hash = base64Hash;
         }
 
         /// <inheritdoc/>
@@ -62,13 +46,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public string Base64Hash { get; }
 
         /// <inheritdoc/>
-        public string FullPath
-        {
-            get
-            {
-                return System.IO.Path.Combine(this.DirectoryName, this.FileName);
-            }
-        }
+        public string FullPath => System.IO.Path.Combine(DirectoryName, FileName);
 
         /// <summary>
         /// Implements the equality operator.
@@ -112,27 +90,46 @@ namespace RiotClub.FireMoth.Services.DataAccess
             !(left == right);
 
         /// <inheritdoc/>
-        public override bool Equals(object? obj) => this.Equals(obj as FileFingerprint);
+        public override bool Equals(object? obj) => Equals(obj as FileFingerprint);
 
         /// <inheritdoc/>
         public bool Equals(FileFingerprint? other) =>
             other is FileFingerprint fingerprint
-            && this.FileName == fingerprint.FileName
-            && this.DirectoryName == fingerprint.DirectoryName
-            && this.FileSize == fingerprint.FileSize
-            && this.Base64Hash == fingerprint.Base64Hash;
+            && FileName == fingerprint.FileName
+            && DirectoryName == fingerprint.DirectoryName
+            && FileSize == fingerprint.FileSize
+            && Base64Hash == fingerprint.Base64Hash;
 
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(
-            this.FileName, this.DirectoryName, this.FileSize, this.Base64Hash);
+            FileName, DirectoryName, FileSize, Base64Hash);
 
         /// <inheritdoc/>
         public override string ToString()
         {
             return
-                "File:" + System.IO.Path.Combine(this.DirectoryName, this.FileName)
-                + ",FileSize:" + this.FileSize
-                + ",Hash:" + this.Base64Hash;
+                "File:" + System.IO.Path.Combine(DirectoryName, FileName)
+                + ",FileSize:" + FileSize
+                + ",Hash:" + Base64Hash;
+        }
+
+        private static void ThrowIfHashInvalid(string base64Hash)
+        {
+            if (base64Hash == null)
+            {
+                throw new ArgumentNullException(nameof(base64Hash));
+            }
+
+            if (base64Hash.IsEmptyOrWhiteSpace())
+            {
+                throw new ArgumentException("Hash string cannot be empty.");
+            }
+
+            if (!base64Hash.IsBase64String())
+            {
+                throw new ArgumentException(
+                    "Hash string is not a valid base 64 string.", nameof(base64Hash));
+            }
         }
     }
 }

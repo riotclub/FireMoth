@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using CsvHelper.Configuration;
+    using RiotClub.FireMoth.Services.Repository;
 
     /// <summary>
     /// A mapping between an <see cref="IFileFingerprint"/> and CSV headers.

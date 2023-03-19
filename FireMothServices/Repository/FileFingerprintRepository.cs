@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess
+namespace RiotClub.FireMoth.Services.Repository
 {
     using System;
     using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         }
 
         /// <inheritdoc/>
-        void IFileFingerprintRepository.Insert(IFileFingerprint fileFingerprint)
+        void IFileFingerprintRepository.Add(IFileFingerprint fileFingerprint)
         {
             throw new NotImplementedException();
         }
