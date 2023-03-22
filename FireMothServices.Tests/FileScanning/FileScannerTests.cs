@@ -77,11 +77,13 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private readonly IDirectoryInfo testDirectory;
 
         private Mock<IDataAccessLayer<IFileFingerprint>> mockDataAccessProvider;
+        private Mock<IFileFingerprintRepository> mockFileFingerprintRepository;
         private bool disposed = false;
 
         public FileScannerTests()
         {
             this.mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>(MockBehavior.Strict);
+            mockFileFingerprintRepository = new Mock<IFileFingerprintRepository>();
             this.mockFileHasher = new Mock<IFileHasher>();
             this.mockFileHasher
                 .Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
@@ -111,7 +113,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                new FileScanner(this.mockDataAccessProvider.Object, null, this.mockLogger.Object));
+                new FileScanner(mockFileFingerprintRepository.Object, null, this.mockLogger.Object));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -123,7 +125,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Throws<ArgumentNullException>(() =>
                 new FileScanner(
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                    this.mockDataAccessProvider.Object, this.mockFileHasher.Object, null));
+                    mockFileFingerprintRepository.Object, this.mockFileHasher.Object, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -306,7 +308,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>(MockBehavior.Loose);
             mockDataAccessProvider.Setup(dap => dap.Add(It.IsAny<IFileFingerprint>()));
             var testFileScanner = new FileScanner(
-                mockDataAccessProvider.Object, this.mockFileHasher.Object, this.mockLogger.Object);
+                mockFileFingerprintRepository.Object, this.mockFileHasher.Object, this.mockLogger.Object);
 
             // Act
             var scanResult = testFileScanner.ScanDirectory(
@@ -345,7 +347,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(@"c:\emptydir");
             var mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
             var fileScanner = new FileScanner(
-                mockDataAccessProvider.Object, this.mockFileHasher.Object, this.mockLogger.Object);
+                mockFileFingerprintRepository.Object, this.mockFileHasher.Object, this.mockLogger.Object);
 
             // Act
             var result = fileScanner.ScanDirectory(new ScanOptions(testDirectory));
@@ -656,7 +658,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private FileScanner GetDefaultFileScanner()
         {
             return new FileScanner(
-                this.mockDataAccessProvider.Object,
+                mockFileFingerprintRepository.Object,
                 this.mockFileHasher.Object,
                 this.mockLogger.Object);
         }
@@ -664,7 +666,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private FileScanner GetFileScannerWithErroredFiles(
             IEnumerable<IFileFingerprint> errorFiles, Exception thrownException)
         {
-            var looseMockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
+            var looseMockDataAccessProvider = new Mock<IFileFingerprintRepository>();
             looseMockDataAccessProvider.Setup(dap =>
                 dap.Add(It.IsIn(errorFiles))).Throws(thrownException);
             return new FileScanner(
