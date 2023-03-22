@@ -14,8 +14,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using Moq;
-    using RiotClub.FireMoth.Services.DataAccess;
     using RiotClub.FireMoth.Services.DataAccess.Csv;
+    using RiotClub.FireMoth.Services.Repository;
     using Xunit;
 
     /*
@@ -25,7 +25,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      *  * ILogger can't be null
      *      * Ctor_NullILogger_ThrowsArgumentNullException
      *
-     * AddFileRecord
+     * Add
      * - IFileFingerprint can't be null
      *      * AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException
      * - Valid IFileFingerprint adds record to backing store
@@ -101,7 +101,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             // Act, Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => testObject.AddFileRecord(null));
+            Assert.Throws<ArgumentNullException>(() => testObject.Add(null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -143,8 +143,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             // Assert
             var expectedOutput = string.Join(
-                ',',
-                new List<string> { testFileNameWithQuotes, testPathWithQuotes, "100", testHash });
+                ',', new List<string> { testFileNameWithQuotes, testPathWithQuotes, "100", testHash });
             Assert.Contains(expectedOutput, dapOutput);
         }
 
@@ -159,8 +158,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             // Assert
             Assert.Throws<ObjectDisposedException>(() =>
-                testObject.AddFileRecord(
-                    new FileFingerprint(this.testFilePath, this.testFileName, 100, this.testHash)));
+                testObject.Add(new FileFingerprint(this.testFilePath, this.testFileName, 100, this.testHash)));
         }
 
         [Fact]
@@ -238,7 +236,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             return mockFileInfo;
         }
 
-        // Given an IFileFingerprint, creates a CsvDataAccessLayer, calls AddFileRecord, and
+        // Given an IFileFingerprint, creates a CsvDataAccessLayer, calls Add, and
         // returns the output generated from the DAP.
         private async Task<string> GetAddFileRecordOutput(IFileFingerprint fileFingerprint)
         {
@@ -250,7 +248,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             using (CsvDataAccessLayer dataAccessLayer =
                 new CsvDataAccessLayer(testWriter, this.testLogger, true))
             {
-                dataAccessLayer.AddFileRecord(fileFingerprint);
+                dataAccessLayer.Add(fileFingerprint);
             }
 
             testStream.Position = 0;

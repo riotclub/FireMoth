@@ -6,7 +6,7 @@
 namespace RiotClub.FireMoth.Services.FileScanning
 {
     using System.Collections.Generic;
-    using RiotClub.FireMoth.Services.Repository;
+    using Repository;
 
     /// <summary>
     /// Specifies the result of a file scan operation.
@@ -16,17 +16,17 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <summary>
         /// Gets a list of <see cref="FileFingerprint"/>s for files that have been successfully scanned.
         /// </summary>
-        public List<FileFingerprint> ScannedFiles { get; } = new List<FileFingerprint>();
+        public List<FileFingerprint> ScannedFiles { get; } = new();
 
         /// <summary>
         /// Gets a key-value list of files that were skipped and the reason for the skip.
         /// </summary>
-        public Dictionary<string, string> SkippedFiles { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> SkippedFiles { get; } = new();
 
         /// <summary>
         /// Gets a list of errors that occurred.
         /// </summary>
-        public List<ScanError> Errors { get; } = new List<ScanError>();
+        public List<ScanError> Errors { get; } = new();
 
         /// <summary>
         /// Combines two <see cref="ScanResult"/> objects by combining their
@@ -45,12 +45,12 @@ namespace RiotClub.FireMoth.Services.FileScanning
             result.Errors.AddRange(a.Errors);
             result.Errors.AddRange(b.Errors);
 
-            foreach (KeyValuePair<string, string> pair in a.SkippedFiles)
+            foreach (var pair in a.SkippedFiles)
             {
                 result.SkippedFiles.TryAdd(pair.Key, pair.Value);
             }
 
-            foreach (KeyValuePair<string, string> pair in b.SkippedFiles)
+            foreach (var pair in b.SkippedFiles)
             {
                 result.SkippedFiles.TryAdd(pair.Key, pair.Value);
             }

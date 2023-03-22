@@ -76,12 +76,12 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private readonly byte[] testHashData = new byte[] { 0x20, 0x20, 0x20 };
         private readonly IDirectoryInfo testDirectory;
 
-        private Mock<IDataAccessLayer> mockDataAccessProvider;
+        private Mock<IDataAccessLayer<IFileFingerprint>> mockDataAccessProvider;
         private bool disposed = false;
 
         public FileScannerTests()
         {
-            this.mockDataAccessProvider = new Mock<IDataAccessLayer>(MockBehavior.Strict);
+            this.mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>(MockBehavior.Strict);
             this.mockFileHasher = new Mock<IFileHasher>();
             this.mockFileHasher
                 .Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
@@ -152,7 +152,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             {
                 this.mockDataAccessProvider
                     .Setup(dap =>
-                        dap.AddFileRecord(It.Is<IFileFingerprint>(ff =>
+                        dap.Add(It.Is<IFileFingerprint>(ff =>
                             ff.FileName == file.Name)));
             }
 
@@ -169,7 +169,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             this.mockDataAccessProvider.Setup(dap =>
-                dap.AddFileRecord(It.IsAny<IFileFingerprint>()));
+                dap.Add(It.IsAny<IFileFingerprint>()));
             var files = this.testDirectory.EnumerateFiles();
 
             // Act
@@ -303,8 +303,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 this.mockFileSystem.GetFile(errorFile.FullPath).AllowedFileShare = FileShare.None;
             }
 
-            var mockDataAccessProvider = new Mock<IDataAccessLayer>(MockBehavior.Loose);
-            mockDataAccessProvider.Setup(dap => dap.AddFileRecord(It.IsAny<IFileFingerprint>()));
+            var mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>(MockBehavior.Loose);
+            mockDataAccessProvider.Setup(dap => dap.Add(It.IsAny<IFileFingerprint>()));
             var testFileScanner = new FileScanner(
                 mockDataAccessProvider.Object, this.mockFileHasher.Object, this.mockLogger.Object);
 
@@ -316,7 +316,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             foreach (var errorFile in errorFiles)
             {
                 mockDataAccessProvider.Verify(
-                    dap => dap.AddFileRecord(errorFile), Times.Never);
+                    dap => dap.Add(errorFile), Times.Never);
             }
         }
 
@@ -343,7 +343,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(@"c:\emptydir");
-            var mockDataAccessProvider = new Mock<IDataAccessLayer>();
+            var mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
             var fileScanner = new FileScanner(
                 mockDataAccessProvider.Object, this.mockFileHasher.Object, this.mockLogger.Object);
 
@@ -352,7 +352,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             // Assert
             mockDataAccessProvider.Verify(
-                dap => dap.AddFileRecord(It.IsAny<IFileFingerprint>()), Times.Never);
+                dap => dap.Add(It.IsAny<IFileFingerprint>()), Times.Never);
         }
 
         // ScanDirectory: Invalid directory returns correct scan result
@@ -402,7 +402,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 throwOnDirectoryEnumeration: new UnauthorizedAccessException(),
                 throwOnFileEnumeration: new UnauthorizedAccessException());
             var mockScanOptions = GetMockScanOptions(mockDirectory, true, OutputDuplicateFileFingerprintsOption.All);
-            this.mockDataAccessProvider = new Mock<IDataAccessLayer>();
+            this.mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
 
             // Act
             var result = this.GetDefaultFileScanner().ScanDirectory(mockScanOptions.Object);
@@ -500,7 +500,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void ScanDirectory_RecursiveScan_AddsSubdirectoryFilesToDataAccessProvider()
         {
             // Arrange
-            this.mockDataAccessProvider = new Mock<IDataAccessLayer>();
+            this.mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
 
             // Act
             var scanResult = this.GetDefaultFileScanner().ScanDirectory(
@@ -511,7 +511,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             foreach (var file in expectedFiles)
             {
                 this.mockDataAccessProvider.Verify(dap =>
-                    dap.AddFileRecord(It.Is<IFileFingerprint>(fingerprint =>
+                    dap.Add(It.Is<IFileFingerprint>(fingerprint =>
                         fingerprint.FullPath.Equals(file, StringComparison.OrdinalIgnoreCase))));
             }
         }
@@ -521,7 +521,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void ScanDirectory_NonRecursiveScan_IgnoresSubdirectories()
         {
             // Arrange
-            this.mockDataAccessProvider = new Mock<IDataAccessLayer>();
+            this.mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
 
             // Act
             var scanResult = this.GetDefaultFileScanner().ScanDirectory(
@@ -529,7 +529,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             // Assert
             this.mockDataAccessProvider.Verify(
-                dap => dap.AddFileRecord(
+                dap => dap.Add(
                     It.Is<IFileFingerprint>(file =>
                         file.DirectoryName.StartsWith(
                             @"c:\dirwithfiles\subdirwithfiles",
@@ -664,9 +664,9 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private FileScanner GetFileScannerWithErroredFiles(
             IEnumerable<IFileFingerprint> errorFiles, Exception thrownException)
         {
-            var looseMockDataAccessProvider = new Mock<IDataAccessLayer>();
+            var looseMockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
             looseMockDataAccessProvider.Setup(dap =>
-                dap.AddFileRecord(It.IsIn(errorFiles))).Throws(thrownException);
+                dap.Add(It.IsIn(errorFiles))).Throws(thrownException);
             return new FileScanner(
                 looseMockDataAccessProvider.Object,
                 this.mockFileHasher.Object,

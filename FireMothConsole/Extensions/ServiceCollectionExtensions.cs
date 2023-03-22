@@ -1,4 +1,6 @@
-﻿namespace RiotClub.FireMoth.Console
+﻿using RiotClub.FireMoth.Services.Repository;
+
+namespace RiotClub.FireMoth.Console
 {
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -23,9 +25,10 @@
             //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
             //    ? OutputDuplicateFileFingerprintsOption.Duplicates
             //    : OutputDuplicateFileFingerprintsOption.All;
-            services.AddSingleton<FileScanner>();
+            services.AddTransient<IFileScanner, FileScanner>();
             services.AddTransient<IFileHasher, SHA256FileHasher>();
-            services.AddTransient<IDataAccessLayer, CsvDataAccessLayer>();
+            services.AddTransient<IDataAccessLayer<IFileFingerprint>, CsvDataAccessLayer>();
+            services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
             services.AddTransient(provider =>
                 new StreamWriter(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)

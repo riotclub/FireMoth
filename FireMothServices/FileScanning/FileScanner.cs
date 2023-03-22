@@ -16,31 +16,30 @@ namespace RiotClub.FireMoth.Services.FileScanning
     using DataAnalysis;
 
     /// <summary>
-    /// Directory scanner implementation that reads the files in a directory and writes the file
-    /// and hash to an <see cref="IDataAccessLayer"/>.
+    /// Directory scanner implementation that reads the files in a directory and writes the file and hash to an
+    /// <see cref="IDataAccessLayer{IFileFingerprint}"/>.
     /// </summary>
     public class FileScanner : IFileScanner
     {
-        private readonly IDataAccessLayer<IFileFingerprint> _dataAccessLayer;
+        private readonly IFileFingerprintRepository _fileFingerprintRepository;
         private readonly IFileHasher _hasher;
         private readonly ILogger<FileScanner> _log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileScanner"/> class.
         /// </summary>
-        /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer"/> that provides
-        /// access to the application backing store.</param>
-        /// <param name="hasher">An <see cref="IFileHasher"/> that is used to compute hash values
-        /// for scanned files.</param>
-        /// <param name="log">A <see cref="TextWriter"/> to which logging output will be
-        /// written.</param>
+        /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> that provides access to
+        /// the application backing store.</param>
+        /// <param name="hasher">An <see cref="IFileHasher"/> that is used to compute hash values for scanned files.
+        /// </param>
+        /// <param name="log">An <see cref="ILogger{FileScanner}"/> to which logging output will be written.</param>
         public FileScanner(
-            IDataAccessLayer<IFileFingerprint> dataAccessLayer,
+            IFileFingerprintRepository fileFingerprintRepository,
             IFileHasher hasher,
             ILogger<FileScanner> log)
         {
-            _dataAccessLayer = dataAccessLayer
-                ?? throw new ArgumentNullException(nameof(dataAccessLayer));
+            _fileFingerprintRepository = fileFingerprintRepository
+                                         ?? throw new ArgumentNullException(nameof(fileFingerprintRepository));
             _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
@@ -48,15 +47,11 @@ namespace RiotClub.FireMoth.Services.FileScanning
         /// <inheritdoc/>
         public ScanResult ScanDirectory(IScanOptions scanOptions)
         {
-            if (scanOptions is null)
-            {
-                throw new ArgumentNullException(nameof(scanOptions));
-            }
+            if (scanOptions is null) throw new ArgumentNullException(nameof(scanOptions));
 
-            _log.LogInformation(
-                "Scanning directory '{ScanDirectory}'", scanOptions.ScanDirectory);
+            _log.LogInformation("Scanning directory '{ScanDirectory}'", scanOptions.ScanDirectory);
 
-            ScanResult scanResult = new ScanResult();
+            var scanResult = new ScanResult();
 
             if (scanOptions.RecursiveScan)
             {
@@ -67,7 +62,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 var subDirectories = GetSubDirectories(scanOptions.ScanDirectory, scanResult);
                 if (subDirectories != null)
                 {
-                    foreach (IDirectoryInfo subDirectory in subDirectories)
+                    foreach (var subDirectory in subDirectories)
                     {
                         scanResult += ScanDirectory(new ScanOptions(subDirectory, true));
                     }
@@ -78,8 +73,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
             var files = GetFiles(scanOptions.ScanDirectory, scanResult);
             if (files == null)
             {
-                _log.LogDebug(
-                    "Skipping empty directory '{ScanDirectory}'", scanOptions.ScanDirectory);
+                _log.LogDebug("Skipping empty directory '{ScanDirectory}'", scanOptions.ScanDirectory);
                 return scanResult;
             }
 
@@ -102,30 +96,26 @@ namespace RiotClub.FireMoth.Services.FileScanning
         protected internal virtual void ProcessFiles(
             IEnumerable<IFileInfo> files, ScanResult scanResult)
         {
-            foreach (IFileInfo file in files)
+            foreach (var file in files)
             {
                 _log.LogInformation("Scanning file '{FileName}'", file.Name);
                 try
                 {
-                    using (Stream fileStream = file.OpenRead())
-                    {
-                        _log.LogDebug(
-                            "Computing hash for file '{FileName}' using hasher {Hasher}",
-                            file.FullName,
-                            _hasher.GetType().FullName);
-                        var hashString = GetBase64HashFromStream(fileStream);
+                    using var fileStream = file.OpenRead();
+                    _log.LogDebug(
+                        "Computing hash for file '{FileName}' using hasher {Hasher}",
+                        file.FullName,
+                        _hasher.GetType().FullName);
+                    var hashString = GetBase64HashFromStream(fileStream);
 
-                        _log.LogDebug(
-                            "Adding fingerprint for file '{FileName}' to data access provider",
-                            file.FullName);
-                        var fingerprint = new FileFingerprint(file.Name, file.DirectoryName, file.Length, hashString);
-                        _dataAccessLayer.AddFileRecord(fingerprint);
-                        scanResult.ScannedFiles.Add(fingerprint);
-                    }
+                    _log.LogDebug(
+                        "Adding fingerprint for file '{FileName}' to data access provider",
+                        file.FullName);
+                    var fingerprint = new FileFingerprint(file.Name, file.DirectoryName, file.Length, hashString);
+                    _fileFingerprintRepository.Add(fingerprint);
+                    scanResult.ScannedFiles.Add(fingerprint);
                 }
-                catch (Exception ex) when (
-                    ex is IOException
-                    || ex is UnauthorizedAccessException)
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {
                     scanResult.SkippedFiles.Add(
                         file.FullName,
@@ -151,9 +141,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
                 result = directory.EnumerateFiles();
             }
             catch (Exception ex) when (
-                ex is ArgumentException
-                || ex is IOException
-                || ex is UnauthorizedAccessException)
+                ex is ArgumentException or IOException or UnauthorizedAccessException)
             {
                 HandleError(
                     directory.FullName,

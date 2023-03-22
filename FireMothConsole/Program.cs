@@ -53,7 +53,7 @@ namespace RiotClub.FireMoth.Console
                 using var host = CreateHostBuilder(args).Build();
                 await host.StartAsync();
 
-                var fileScanner = host.Services.GetRequiredService<FileScanner>();
+                var fileScanner = host.Services.GetRequiredService<IFileScanner>();
                 var commandLineOptions = host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
                 var scanOptions = new ScanOptions(
                     new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),
@@ -63,7 +63,6 @@ namespace RiotClub.FireMoth.Console
                 stopwatch.Start();
                 var scanResult = fileScanner.ScanDirectory(scanOptions);
                 stopwatch.Stop();
-
                 TimeSpan timeSpan = stopwatch.Elapsed;
 
                 LogScanResult(scanResult);
@@ -82,18 +81,13 @@ namespace RiotClub.FireMoth.Console
 
         private static void LogScanResult(ScanResult scanResult)
         {
-            Log.Information(
-                "Scan complete. Scanned {ScannedFilesCount} file(s).",
-                scanResult.ScannedFiles.Count);
-            if (scanResult.SkippedFiles.Count > 0)
+            Log.Information("Scan complete. Scanned {ScannedFilesCount} file(s).", scanResult.ScannedFiles.Count);
+            if (scanResult.SkippedFiles.Count == 0) return;
+
+            Log.Information("{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
+            foreach (var file in scanResult.SkippedFiles)
             {
-                Log.Information(
-                    "{SkippedFileCount} file(s) could not be scanned:",
-                    scanResult.SkippedFiles.Count);
-                foreach (var file in scanResult.SkippedFiles)
-                {
-                    Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
-                }
+                Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
             }
         }
 

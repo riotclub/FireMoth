@@ -15,7 +15,7 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tests.FileScanning.FileFingerprintTests">
              <summary>
-             <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprint"/> unit tests.
+             <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> unit tests.
             
              Test naming convention: [method]_[preconditions]_[expected result]
             

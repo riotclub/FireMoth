@@ -18,6 +18,8 @@ namespace RiotClub.FireMoth.Services.DataAccess.Csv
     /// <summary>
     /// Implementation of a data access layer that persists data to a stream in CSV format.
     /// </summary>
+    /// <remarks>This is a simplistic use of a CSV file as a backing store, and should only be used for testing. In
+    /// addition to being inefficient, it is not thread-safe.</remarks>
     public class CsvDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDisposable
     {
         private readonly CsvWriter _csvWriter;

@@ -37,12 +37,12 @@ namespace RiotClub.FireMoth.Services.Repository
         /// Updates a file fingerprint in the repository.
         /// </summary>
         /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to update.</param>
-        public void Update(IFileFingerprint fileFingerprint);
+        public bool Update(IFileFingerprint fileFingerprint);
 
         /// <summary>
         /// Deletes a file fingerprint from the repository.
         /// </summary>
         /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to delete.</param>
-        public void Delete(IFileFingerprint fileFingerprint);
+        public bool Delete(IFileFingerprint fileFingerprint);
     }
 }
