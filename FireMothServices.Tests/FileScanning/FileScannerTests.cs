@@ -77,11 +77,13 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private readonly IDirectoryInfo testDirectory;
 
         private Mock<IDataAccessLayer<IFileFingerprint>> mockDataAccessProvider;
+        private Mock<IFileFingerprintRepository> mockFileFingerprintRepository;
         private bool disposed = false;
 
         public FileScannerTests()
         {
             this.mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>(MockBehavior.Strict);
+            mockFileFingerprintRepository = new Mock<IFileFingerprintRepository>();
             this.mockFileHasher = new Mock<IFileHasher>();
             this.mockFileHasher
                 .Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
@@ -123,7 +125,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             Assert.Throws<ArgumentNullException>(() =>
                 new OnDemandScanOrchestrator(
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                    this.mockDataAccessProvider.Object, this.mockFileHasher.Object, null));
+                    mockFileFingerprintRepository.Object, this.mockFileHasher.Object, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -664,7 +666,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private OnDemandScanOrchestrator GetFileScannerWithErroredFiles(
             IEnumerable<IFileFingerprint> errorFiles, Exception thrownException)
         {
-            var looseMockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
+            var looseMockDataAccessProvider = new Mock<IFileFingerprintRepository>();
             looseMockDataAccessProvider.Setup(dap =>
                 dap.Add(It.IsIn(errorFiles))).Throws(thrownException);
             return new OnDemandScanOrchestrator(
