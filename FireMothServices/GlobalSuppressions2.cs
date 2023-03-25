@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:Field names should not begin with underscore", Justification = "<Pending>", Scope = "member", Target = "~F:RiotClub.FireMoth.Services.FileScanning.FileScanner._dataAccessLayer")]
+[assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:Field names should not begin with underscore", Justification = "<Pending>", Scope = "member", Target = "~F:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator._dataAccessLayer")]

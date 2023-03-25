@@ -49,7 +49,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         private readonly string testFilePath = @"C:\TestDir";
         private readonly string testFileName = "TestFile.txt";
         private readonly string testHash = "CyA2DbkxG5oPUX/flw2v4RZDvHmdzSQL0jKAWlrsMVY=";
-        private readonly ILogger<CsvDataAccessLayer> testLogger;
+        private readonly ILogger<MemoryDataAccessLayer> testLogger;
         private bool disposed;
 
         public CsvDataAccessProviderTests()
@@ -58,14 +58,14 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             this.testLogger = LoggerFactory
                 .Create(builder => builder.SetMinimumLevel(LogLevel.Information))
-                .CreateLogger<CsvDataAccessLayer>();
+                .CreateLogger<MemoryDataAccessLayer>();
         }
 
         [Fact]
         public void Ctor_NullStreamWriter_ThrowsArgumentNullException()
         {
             // Arrange, Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new CsvDataAccessLayer(
+            Assert.Throws<ArgumentNullException>(() => new MemoryDataAccessLayer(
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 null, this.testLogger, true));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -75,7 +75,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void Ctor_NullILogger_ThrowsArgumentNullException()
         {
             // Arrange, Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new CsvDataAccessLayer(
+            Assert.Throws<ArgumentNullException>(() => new MemoryDataAccessLayer(
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 this.testStreamWriter, null, true));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -96,8 +96,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void AddFileRecord_NullIFileFingerprint_ThrowsArgumentNullException()
         {
             // Arrange
-            using CsvDataAccessLayer testObject =
-                new CsvDataAccessLayer(this.testStreamWriter, this.testLogger, true);
+            using MemoryDataAccessLayer testObject =
+                new MemoryDataAccessLayer(this.testStreamWriter, this.testLogger, true);
 
             // Act, Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -151,7 +151,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         public void AddFileRecord_DisposedObject_ThrowsObjectDisposedException()
         {
             // Arrange
-            var testObject = new CsvDataAccessLayer(this.testStreamWriter, this.testLogger);
+            var testObject = new MemoryDataAccessLayer(this.testStreamWriter, this.testLogger);
 
             // Act
             testObject.Dispose();
@@ -168,8 +168,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             var testString = "test$1234567890";
             var testStream = new MemoryStream();
             var testWriter = new StreamWriter(testStream, Encoding.UTF8);
-            CsvDataAccessLayer testDataAccessLayer =
-                new CsvDataAccessLayer(testWriter, this.testLogger, true);
+            MemoryDataAccessLayer testDataAccessLayer =
+                new MemoryDataAccessLayer(testWriter, this.testLogger, true);
 
             // Act
             testDataAccessLayer.Dispose();
@@ -189,8 +189,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange
             var testStream = new MemoryStream();
             var testWriter = new StreamWriter(testStream, Encoding.UTF8);
-            CsvDataAccessLayer testDataAccessLayer =
-                new CsvDataAccessLayer(testWriter, this.testLogger, false);
+            MemoryDataAccessLayer testDataAccessLayer =
+                new MemoryDataAccessLayer(testWriter, this.testLogger, false);
 
             // Act
             testDataAccessLayer.Dispose();
@@ -236,7 +236,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             return mockFileInfo;
         }
 
-        // Given an IFileFingerprint, creates a CsvDataAccessLayer, calls Add, and
+        // Given an IFileFingerprint, creates a MemoryDataAccessLayer, calls Add, and
         // returns the output generated from the DAP.
         private async Task<string> GetAddFileRecordOutput(IFileFingerprint fileFingerprint)
         {
@@ -245,8 +245,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // StreamWriter disposes underlying MemoryStream when disposed
             var testWriter = new StreamWriter(testStream, Encoding.UTF8);
 
-            using (CsvDataAccessLayer dataAccessLayer =
-                new CsvDataAccessLayer(testWriter, this.testLogger, true))
+            using (MemoryDataAccessLayer dataAccessLayer =
+                new MemoryDataAccessLayer(testWriter, this.testLogger, true))
             {
                 dataAccessLayer.Add(fileFingerprint);
             }

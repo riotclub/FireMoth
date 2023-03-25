@@ -1,44 +1,47 @@
-﻿using RiotClub.FireMoth.Services.Repository;
+﻿// <copyright file="ServiceCollectionExtensions.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
-namespace RiotClub.FireMoth.Console
+using System;
+using System.Globalization;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using RiotClub.FireMoth.Services.DataAccess;
+using RiotClub.FireMoth.Services.DataAccess.Csv;
+using RiotClub.FireMoth.Services.DataAnalysis;
+using RiotClub.FireMoth.Services.FileScanning;
+using RiotClub.FireMoth.Services.Output;
+using RiotClub.FireMoth.Services.Repository;
+
+namespace RiotClub.FireMoth.Console;
+
+public static class ServiceCollectionExtensions
 {
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using RiotClub.FireMoth.Services.DataAccess;
-    using RiotClub.FireMoth.Services.DataAccess.Csv;
-    using RiotClub.FireMoth.Services.DataAnalysis;
-    using RiotClub.FireMoth.Services.FileScanning;
-    using RiotClub.FireMoth.Services.Output;
-    using System;
-    using System.Globalization;
-    using System.IO;
+    private const string DefaultFilePrefix = "FireMothData_";
+    private const string DefaultFileExtension = "csv";
+    private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddFireMothServices(
+        this IServiceCollection services, IConfiguration config)
     {
-        private const string DefaultFilePrefix = "FireMothData_";
-        private const string DefaultFileExtension = "csv";
-        private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
-
-        public static IServiceCollection AddFireMothServices(
-            this IServiceCollection services, IConfiguration config)
-        {
-            //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
-            //    ? OutputDuplicateFileFingerprintsOption.Duplicates
-            //    : OutputDuplicateFileFingerprintsOption.All;
-            services.AddTransient<IFileScanner, FileScanner>();
-            services.AddTransient<IFileHasher, SHA256FileHasher>();
-            services.AddTransient<IDataAccessLayer<IFileFingerprint>, CsvDataAccessLayer>();
-            services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
-            services.AddTransient(provider =>
-                new StreamWriter(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
-                    + Path.DirectorySeparatorChar + DefaultFilePrefix
-                    + DateTime.Now.ToString(
-                        DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
-                    + '.' + DefaultFileExtension));
-            services.AddTransient<IScanResultStreamWriter, CsvScanResultWriter>();
+        //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
+        //    ? OutputDuplicateFileFingerprintsOption.Duplicates
+        //    : OutputDuplicateFileFingerprintsOption.All;
+        services.AddTransient<IScanOrchestrator, OnDemandScanOrchestrator>();
+        services.AddTransient<IFileHasher, SHA256FileHasher>();
+        services.AddTransient<IDataAccessLayer<IFileFingerprint>, MemoryDataAccessLayer>();
+        services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
+        services.AddTransient(provider =>
+            new StreamWriter(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                + Path.DirectorySeparatorChar + DefaultFilePrefix
+                + DateTime.Now.ToString(
+                    DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
+                + '.' + DefaultFileExtension));
+        services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
             
-            return services;
-        }
+        return services;
     }
 }

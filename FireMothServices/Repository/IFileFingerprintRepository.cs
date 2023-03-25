@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Threading.Tasks;
+
 namespace RiotClub.FireMoth.Services.Repository
 {
     using System;
@@ -21,7 +23,7 @@ namespace RiotClub.FireMoth.Services.Repository
         /// </summary>
         /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to add to the repository.
         /// </param>
-        public void Add(IFileFingerprint fileFingerprint);
+        public Task AddAsync(IFileFingerprint fileFingerprint);
 
         /// <summary>
         /// Retrieves file fingerprints from the repository.
@@ -29,7 +31,7 @@ namespace RiotClub.FireMoth.Services.Repository
         /// <param name="filter">A lambda expression that specifies a filter condition.</param>
         /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
         /// <returns>IEnumerable collection of file fingerprints.</returns>
-        public IEnumerable<IFileFingerprint> Get(
+        public Task<IEnumerable<IFileFingerprint>> GetAsync(
             Func<IFileFingerprint, bool>? filter = null,
             Func<IFileFingerprint, string>? orderBy = null);
 
@@ -37,12 +39,12 @@ namespace RiotClub.FireMoth.Services.Repository
         /// Updates a file fingerprint in the repository.
         /// </summary>
         /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to update.</param>
-        public bool Update(IFileFingerprint fileFingerprint);
+        public Task<bool> UpdateAsync(IFileFingerprint fileFingerprint);
 
         /// <summary>
         /// Deletes a file fingerprint from the repository.
         /// </summary>
         /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to delete.</param>
-        public bool Delete(IFileFingerprint fileFingerprint);
+        public Task<bool> DeleteAsync(IFileFingerprint fileFingerprint);
     }
 }

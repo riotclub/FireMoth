@@ -71,7 +71,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
     public class FileScannerTests : IDisposable
     {
         private readonly Mock<IFileHasher> mockFileHasher;
-        private readonly Mock<ILogger<FileScanner>> mockLogger;
+        private readonly Mock<ILogger<OnDemandScanOrchestrator>> mockLogger;
         private readonly MockFileSystem mockFileSystem;
         private readonly byte[] testHashData = new byte[] { 0x20, 0x20, 0x20 };
         private readonly IDirectoryInfo testDirectory;
@@ -87,7 +87,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 .Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
                 .Returns(this.testHashData);
             this.mockFileSystem = BuildMockFileSystem();
-            this.mockLogger = new Mock<ILogger<FileScanner>>();
+            this.mockLogger = new Mock<ILogger<OnDemandScanOrchestrator>>();
 
             this.testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(
                 @"c:\dirwithfiles");
@@ -100,7 +100,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                new FileScanner(null, this.mockFileHasher.Object, this.mockLogger.Object));
+                new OnDemandScanOrchestrator(null, this.mockFileHasher.Object, this.mockLogger.Object));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -111,7 +111,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                new FileScanner(this.mockDataAccessProvider.Object, null, this.mockLogger.Object));
+                new OnDemandScanOrchestrator(this.mockDataAccessProvider.Object, null, this.mockLogger.Object));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -121,7 +121,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
         {
             // Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new FileScanner(
+                new OnDemandScanOrchestrator(
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                     this.mockDataAccessProvider.Object, this.mockFileHasher.Object, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -305,7 +305,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
 
             var mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>(MockBehavior.Loose);
             mockDataAccessProvider.Setup(dap => dap.Add(It.IsAny<IFileFingerprint>()));
-            var testFileScanner = new FileScanner(
+            var testFileScanner = new OnDemandScanOrchestrator(
                 mockDataAccessProvider.Object, this.mockFileHasher.Object, this.mockLogger.Object);
 
             // Act
@@ -344,7 +344,7 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             // Arrange
             var testDirectory = this.mockFileSystem.DirectoryInfo.FromDirectoryName(@"c:\emptydir");
             var mockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
-            var fileScanner = new FileScanner(
+            var fileScanner = new OnDemandScanOrchestrator(
                 mockDataAccessProvider.Object, this.mockFileHasher.Object, this.mockLogger.Object);
 
             // Act
@@ -653,21 +653,21 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             return mockDirectory;
         }
 
-        private FileScanner GetDefaultFileScanner()
+        private OnDemandScanOrchestrator GetDefaultFileScanner()
         {
-            return new FileScanner(
+            return new OnDemandScanOrchestrator(
                 this.mockDataAccessProvider.Object,
                 this.mockFileHasher.Object,
                 this.mockLogger.Object);
         }
 
-        private FileScanner GetFileScannerWithErroredFiles(
+        private OnDemandScanOrchestrator GetFileScannerWithErroredFiles(
             IEnumerable<IFileFingerprint> errorFiles, Exception thrownException)
         {
             var looseMockDataAccessProvider = new Mock<IDataAccessLayer<IFileFingerprint>>();
             looseMockDataAccessProvider.Setup(dap =>
                 dap.Add(It.IsIn(errorFiles))).Throws(thrownException);
-            return new FileScanner(
+            return new OnDemandScanOrchestrator(
                 looseMockDataAccessProvider.Object,
                 this.mockFileHasher.Object,
                 this.mockLogger.Object);

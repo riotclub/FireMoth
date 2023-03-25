@@ -3,7 +3,7 @@
     using RiotClub.FireMoth.Services.FileScanning;
     using System;
 
-    public class FileScanResultWriter : IScanResultStreamWriter
+    public class FileScanResultWriter : IScanOutputWriter
     {
         public void WriteAllAsync(ScanResult scanResult, OutputDuplicateFileFingerprintsOption outputOption)
         {

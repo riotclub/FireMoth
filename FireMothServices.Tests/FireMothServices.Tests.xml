@@ -79,7 +79,7 @@
             be performed.</param>
             <param name="expectedMessage">The expected message to verify an invocation of
             <see cref="M:Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(Microsoft.Extensions.Logging.ILogger,System.String,System.Object[])"/> with.</param>
-            <param name="logLevel">The expected log level to verify an invocation of
+            <param name="logLevel">The expected logger level to verify an invocation of
             <see cref="M:Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(Microsoft.Extensions.Logging.ILogger,System.String,System.Object[])"/> with.</param>
             <returns>The <see cref="T:Moq.Mock`1"/> on which this method was called.</returns>
         </member>

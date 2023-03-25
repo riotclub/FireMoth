@@ -53,7 +53,7 @@ namespace RiotClub.FireMoth.Console
                 using var host = CreateHostBuilder(args).Build();
                 await host.StartAsync();
 
-                var fileScanner = host.Services.GetRequiredService<IFileScanner>();
+                var fileScanner = host.Services.GetRequiredService<IScanOrchestrator>();
                 var commandLineOptions = host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
                 var scanOptions = new ScanOptions(
                     new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),

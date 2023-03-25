@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Threading.Tasks;
+
 namespace RiotClub.FireMoth.Services.DataAccess
 {
     using RiotClub.FireMoth.Services.Repository;
@@ -23,7 +25,7 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// <param name="filter">A lambda expression that specifies a filter condition.</param>
         /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
         /// <returns>A collection of values matching the specified filter with the specified ordering.</returns>
-        public IEnumerable<TValue> Get(
+        public Task<IEnumerable<TValue>> GetAsync(
             Func<IFileFingerprint, bool>? filter = null,
             Func<IFileFingerprint, string>? orderBy = null);
 
@@ -31,18 +33,18 @@ namespace RiotClub.FireMoth.Services.DataAccess
         /// Adds a value to the data layer.
         /// </summary>
         /// <param name="value">A value of type <typeparamref name="TValue"/> to add to the data layer.</param>
-        public void Add(TValue value);
+        public Task AddAsync(TValue value);
 
         /// <summary>
         /// Updates a value in the repository.
         /// </summary>
         /// <param name="value">A value of type <typeparamref name="TValue"/> to update in the data layer.</param>
-        public bool Update(TValue value);
+        public Task<bool> UpdateAsync(TValue value);
 
         /// <summary>
         /// Deletes a value from the repository.
         /// </summary>
         /// <param name="value">A value of type <typeparamref name="TValue"/> to delete from the data layer.</param>
-        public bool Delete(TValue value);
+        public Task<bool> DeleteAsync(TValue value);
     }
 }

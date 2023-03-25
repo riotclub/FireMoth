@@ -12,7 +12,7 @@ namespace RiotClub.FireMoth.Services.FileScanning
     /// <summary>
     /// Specifies options that are used when performing a file scan.
     /// </summary>
-    /// <seealso cref="IFileScanner"/>
+    /// <seealso cref="IScanOrchestrator"/>
     public class ScanOptions : IScanOptions
     {
         /// <summary>

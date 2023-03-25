@@ -3,61 +3,46 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using Microsoft.Extensions.Logging;
-using RiotClub.FireMoth.Services.DataAccess;
+namespace RiotClub.FireMoth.Services.Repository;
 
-namespace RiotClub.FireMoth.Services.Repository
+using System.Threading.Tasks;
+using DataAccess;
+using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// A repository that provides access to <see cref="IFileFingerprint"/>s.
+/// </summary>
+public class FileFingerprintRepository : IFileFingerprintRepository
 {
-    using System;
-    using System.Collections.Generic;
+    private readonly IDataAccessLayer<IFileFingerprint> _dataAccessLayer;
 
     /// <summary>
-    /// A repository of <see cref="IFileFingerprint"/>s utilizing Entity Framework as a backing
-    /// store.
+    /// Initializes a new instance of the <see cref="FileFingerprintRepository"/> class.
     /// </summary>
-    public class FileFingerprintRepository : IFileFingerprintRepository
+    /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer{IFileFingerprint}"/> implementation used to
+    /// persist data.</param>
+    /// <exception cref="ArgumentNullException">If any of the provided services are <c>null</c>.</exception>
+    public FileFingerprintRepository(IDataAccessLayer<IFileFingerprint> dataAccessLayer)
     {
-        private readonly IDataAccessLayer<IFileFingerprint> _dataAccessLayer;
-        private readonly ILogger<FileFingerprintRepository> _logger;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FileFingerprintRepository"/> class.
-        /// </summary>
-        /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer{IFileFingerprint}"/> implementation used to
-        /// persist data.</param>
-        /// <param name="logger">An <see cref="ILogger"/> implementation used to log pertinent information.</param>
-        /// <exception cref="ArgumentNullException">If any of the provided services are <c>null</c>.</exception>
-        public FileFingerprintRepository(
-            IDataAccessLayer<IFileFingerprint> dataAccessLayer,
-            ILogger<FileFingerprintRepository> logger)
-        {
-            _dataAccessLayer = dataAccessLayer ?? throw new ArgumentNullException(nameof(dataAccessLayer));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <inheritdoc/>
-        public IEnumerable<IFileFingerprint> Get(
-            Func<IFileFingerprint, bool>? filter = null, Func<IFileFingerprint, string>? orderBy = null)
-        {
-            return _dataAccessLayer.Get(filter, orderBy);
-        }
-
-        /// <inheritdoc/>
-        public bool Delete(IFileFingerprint fileFingerprint)
-        {
-            return _dataAccessLayer.Delete(fileFingerprint);
-        }
-
-        /// <inheritdoc/>
-        public void Add(IFileFingerprint fileFingerprint)
-        {
-            _dataAccessLayer.Add(fileFingerprint);
-        }
-
-        /// <inheritdoc/>
-        public bool Update(IFileFingerprint fileFingerprint)
-        {
-            return _dataAccessLayer.Update(fileFingerprint);
-        }
+        _dataAccessLayer = dataAccessLayer ?? throw new ArgumentNullException(nameof(dataAccessLayer));
     }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<IFileFingerprint>> GetAsync(
+        Func<IFileFingerprint, bool>? filter = null,
+        Func<IFileFingerprint, string>? orderBy = null) =>
+        await _dataAccessLayer.GetAsync(filter, orderBy);
+
+    /// <inheritdoc/>
+    public async Task<bool> DeleteAsync(IFileFingerprint fileFingerprint) =>
+        await _dataAccessLayer.DeleteAsync(fileFingerprint);
+
+    /// <inheritdoc/>
+    public async Task AddAsync(IFileFingerprint fileFingerprint) =>
+        await _dataAccessLayer.AddAsync(fileFingerprint);
+
+    /// <inheritdoc/>
+    public async Task<bool> UpdateAsync(IFileFingerprint fileFingerprint) =>
+        await _dataAccessLayer.UpdateAsync(fileFingerprint);
 }
