@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+namespace RiotClub.FireMoth.Console;
+
 using System;
 using System.Globalization;
 using System.IO;
@@ -11,11 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using RiotClub.FireMoth.Services.DataAccess;
 using RiotClub.FireMoth.Services.DataAccess.Csv;
 using RiotClub.FireMoth.Services.DataAnalysis;
-using RiotClub.FireMoth.Services.FileScanning;
+using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Repository;
-
-namespace RiotClub.FireMoth.Console;
+using Services.Output.Csv;
 
 public static class ServiceCollectionExtensions
 {
@@ -29,7 +30,8 @@ public static class ServiceCollectionExtensions
         //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
         //    ? OutputDuplicateFileFingerprintsOption.Duplicates
         //    : OutputDuplicateFileFingerprintsOption.All;
-        services.AddTransient<IScanOrchestrator, OnDemandScanOrchestrator>();
+        services.AddTransient<IDirectoryScanOrchestrator, DirectoryScanOrchestrator>();
+        services.AddTransient<IFileScanOrchestrator, FileScanOrchestrator>();
         services.AddTransient<IFileHasher, SHA256FileHasher>();
         services.AddTransient<IDataAccessLayer<IFileFingerprint>, MemoryDataAccessLayer>();
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
@@ -37,8 +39,7 @@ public static class ServiceCollectionExtensions
             new StreamWriter(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
                 + Path.DirectorySeparatorChar + DefaultFilePrefix
-                + DateTime.Now.ToString(
-                    DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
+                + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
                 + '.' + DefaultFileExtension));
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
             
