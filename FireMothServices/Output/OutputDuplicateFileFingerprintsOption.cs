@@ -3,22 +3,21 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Output
+namespace RiotClub.FireMoth.Services.Output;
+
+/// <summary>
+/// Options that control what file information is included in the output from a file scan
+/// operation.
+/// </summary>
+public enum OutputDuplicateFileFingerprintsOption
 {
     /// <summary>
-    /// Options that control what file information is included in the output from a file scan
-    /// operation.
+    /// Output information for all scanned files.
     /// </summary>
-    public enum OutputDuplicateFileFingerprintsOption
-    {
-        /// <summary>
-        /// Output information for all scanned files.
-        /// </summary>
-        All,
+    All,
 
-        /// <summary>
-        /// Output information for only duplicate files.
-        /// </summary>
-        Duplicates,
-    }
+    /// <summary>
+    /// Output information for only duplicate files.
+    /// </summary>
+    Duplicates,
 }

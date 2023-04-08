@@ -3,57 +3,56 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAnalysis
+namespace RiotClub.FireMoth.Services.DataAnalysis;
+
+using System;
+using System.IO;
+using System.Security.Cryptography;
+
+/// <summary>
+/// Provides file hashing services using the SHA256 algorithm.
+/// </summary>
+public class SHA256FileHasher : IFileHasher, IDisposable
 {
-    using System;
-    using System.IO;
-    using System.Security.Cryptography;
+    private readonly HashAlgorithm hashAlgorithm;
+
+    private bool disposed = false;
 
     /// <summary>
-    /// Provides file hashing services using the SHA256 algorithm.
+    /// Initializes a new instance of the <see cref="SHA256FileHasher"/> class.
     /// </summary>
-    public class SHA256FileHasher : IFileHasher, IDisposable
+    public SHA256FileHasher()
     {
-        private readonly HashAlgorithm hashAlgorithm;
+        this.hashAlgorithm = SHA256.Create();
+    }
 
-        private bool disposed = false;
+    /// <inheritdoc/>
+    public byte[] ComputeHashFromStream(Stream inputStream) =>
+        this.hashAlgorithm.ComputeHash(inputStream);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SHA256FileHasher"/> class.
-        /// </summary>
-        public SHA256FileHasher()
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases unmanaged and, optionally, managed resources.
+    /// </summary>
+    /// <param name="disposing">If true, managed resources are freed.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
         {
-            this.hashAlgorithm = SHA256.Create();
+            return;
         }
 
-        /// <inheritdoc/>
-        public byte[] ComputeHashFromStream(Stream inputStream) =>
-            this.hashAlgorithm.ComputeHash(inputStream);
-
-        /// <inheritdoc/>
-        public void Dispose()
+        if (disposing)
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
+            this.hashAlgorithm.Dispose();
         }
 
-        /// <summary>
-        /// Releases unmanaged and, optionally, managed resources.
-        /// </summary>
-        /// <param name="disposing">If true, managed resources are freed.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                this.hashAlgorithm.Dispose();
-            }
-
-            this.disposed = true;
-        }
+        this.disposed = true;
     }
 }
