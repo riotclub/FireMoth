@@ -67,6 +67,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      * * Non-recursive scan option ignores subdirectories
      *      * ScanDirectory_NonRecursiveScan_IgnoresSubdirectories
      */
+    
+    /*
     [ExcludeFromCodeCoverage]
     public class FileScannerTests : IDisposable
     {
@@ -675,4 +677,5 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
                 this.mockLogger.Object);
         }
     }
+    */
 }

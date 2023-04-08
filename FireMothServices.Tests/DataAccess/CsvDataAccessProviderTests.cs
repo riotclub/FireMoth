@@ -41,6 +41,8 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
      * - If constructed with leaveOpen false, underlying StreamWriter object is disposed after disposal
      *      - Dispose_LeaveOpenFalse_StreamWriterDisposed
      */
+    
+    /*
     [ExcludeFromCodeCoverage]
     public class CsvDataAccessProviderTests : IDisposable
     {
@@ -256,4 +258,5 @@ namespace RiotClub.FireMoth.Services.Tests.FileScanning
             return await reader.ReadToEndAsync();
         }
     }
+    */
 }

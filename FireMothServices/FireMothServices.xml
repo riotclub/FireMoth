@@ -4,23 +4,18 @@
         <name>FireMoth.Services</name>
     </assembly>
     <members>
-        <member name="T:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer">
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer">
             <summary>
-            Implementation of a data access layer that persists data to a stream in CSV format.
+            Implementation of a data access layer that persists data to memory.
             </summary>
-            <remarks>This is a simplistic use of a CSV file as a backing store, and should only be used for testing. In
-            addition to being inefficient, it is not thread-safe.</remarks>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.#ctor(System.IO.StreamWriter,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer},System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.#ctor(Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer})">
             <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer"/> class.
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer"/> class.
             </summary>
-            <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.</param>
-            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger"/> used to logger information.</param>
-            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be closed when the
-            <see cref="T:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer"/> is disposed.</param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger"/> used to log information.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.String})">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.String})">
             <summary>
             Retrieves file fingerprints from the data access layer.
             </summary>
@@ -28,7 +23,7 @@
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>IEnumerable collection of file fingerprints.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.Add(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.AddAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <summary>
             Adds the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to the data access layer.
             </summary>
@@ -37,40 +32,38 @@
             null.</exception>
             <exception cref="T:System.ObjectDisposedException">Thrown when object is in a disposed state.</exception>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.Update(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.AddManyAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
+            <summary>
+            Adds the provided collection of <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s to the data access layer.
+            </summary>
+            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing items to add.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when provided collection is null.</exception>
+            <exception cref="T:System.ObjectDisposedException">Thrown when object is in a disposed state.</exception>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.UpdateAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <summary>
             Updates the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> in the data access layer.
             </summary>
             <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to update.</param>
-            <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s full path was updated,
-            <c>false</c> if no file with a matching path could be found.</returns>
+            <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was updated, <c>false</c>
+            if no match could be found.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.Delete(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.DeleteAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <summary>
             Deletes the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> from the data access layer.
             </summary>
-            <param name="fileFingerprint"></param>
-            <returns></returns>
+            <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to delete.</param>
+            <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was deleted, <c>false</c>
+            if no match could be found.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.Dispose">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.Dispose">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.CsvDataAccessLayer.Dispose(System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Csv.MemoryDataAccessLayer.Dispose(System.Boolean)">
             <summary>
             Releases unmanaged and, optionally, managed resources.
             </summary>
             <param name="disposing">If true, managed resources are freed.</param>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap">
-            <summary>
-            A mapping between an <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> and CSV headers.
-            </summary>
-            <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.FileFingerprintMap"/> class.
-            </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1">
             <summary>
@@ -86,19 +79,25 @@
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>A collection of values matching the specified filter with the specified ordering.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.Add(`0)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.AddAsync(`0)">
             <summary>
             Adds a value to the data layer.
             </summary>
             <param name="value">A value of type <typeparamref name="TValue"/> to add to the data layer.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.Update(`0)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.AddManyAsync(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Adds a collection of values to the data layer.
+            </summary>
+            <param name="values">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to add to the data layer.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.UpdateAsync(`0)">
             <summary>
             Updates a value in the repository.
             </summary>
             <param name="value">A value of type <typeparamref name="TValue"/> to update in the data layer.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.Delete(`0)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.DeleteAsync(`0)">
             <summary>
             Deletes a value from the repository.
             </summary>
@@ -173,51 +172,6 @@
             </summary>
             <param name="value">The string to check.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator">
-            <summary>
-            Directory scanner implementation that reads the files in a directory and writes the file
-            and hash to an <see cref="!:IDataAccessLayer"/>.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer{RiotClub.FireMoth.Services.Repository.IFileFingerprint},RiotClub.FireMoth.Services.DataAnalysis.IFileHasher,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator"/> class.
-            </summary>
-            <param name="dataAccessLayer">A <see cref="!:IDataAccessLayer"/> that provides
-            access to the application backing store.</param>
-            <param name="fileHasher">An <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher"/> that is used to compute hash values
-            for scanned files.</param>
-            <param name="logger">A <see cref="T:System.IO.TextWriter"/> to which logging output will be
-            written.</param>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator.ScanDirectory(RiotClub.FireMoth.Services.FileScanning.IScanOptions)">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator.ProcessFiles(System.Collections.Generic.IEnumerable{System.IO.Abstractions.IFileInfo},RiotClub.FireMoth.Services.FileScanning.ScanResult)">
-            <summary>
-            Hashes a set of files and records the filename and hash string.
-            </summary>
-            <param name="files">The set of files to hash and record.</param>
-            <param name="scanResult">A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> to which the names of scanned and
-            skipped files will be added.</param>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.FileScanning.IScanOrchestrator">
-            <summary>
-            Defines the public interface for a class that implements a directory scanner. A directory
-            scanner is responsible for reading, analyzing, and persisting a hash or other signature that
-            uniquely identifies a file and its contents.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.IScanOrchestrator.ScanDirectory(RiotClub.FireMoth.Services.FileScanning.IScanOptions)">
-            <summary>
-            Scans the provided directory, analyzing and storing signatures that uniquely identify
-            the files contained within.
-            </summary>
-            <param name="_scanOptions">An <see cref="T:RiotClub.FireMoth.Services.FileScanning.IScanOptions"/> containing the options for the
-            scan.</param>
-            <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the directory
-            scanning operation.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.IScanOptions">
             <summary>
@@ -298,7 +252,7 @@
             <summary>
             Specifies options that are used when performing a file scan.
             </summary>
-            <seealso cref="T:RiotClub.FireMoth.Services.FileScanning.IScanOrchestrator"/>
+            <seealso cref="!:IScanOrchestrator"/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanOptions.#ctor(System.IO.Abstractions.IDirectoryInfo)">
             <summary>
@@ -352,6 +306,128 @@
             <param name="b">The second of two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> operands to sum.</param>
             <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.
             </returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator">
+            <summary>
+            Directory scanner implementation that reads the files in a directory and writes the file and hash to an
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator"/> class.
+            </summary>
+            <param name="fileScanOrchestrator">An <see cref="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator"/> that manages scanning of files.
+            </param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output will be written.
+            </param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.ScanDirectoryAsync(System.String,System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator">
+            <summary>
+            File scanner implementation that scans a collection of files and writes file fingerprint data to an
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,RiotClub.FireMoth.Services.DataAnalysis.IFileHasher,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator"/> class.
+            </summary>
+            <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> that provides access to
+            the application backing store.</param>
+            <param name="fileHasher">An <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher"/> that is used to compute hash values for scanned files.
+            </param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output will be written.
+            </param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.ScanFilesAsync(System.Collections.Generic.IEnumerable{System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.ProcessFiles(System.Collections.Generic.IEnumerable{System.String},RiotClub.FireMoth.Services.FileScanning.ScanResult)">
+            <summary>
+            Hashes a set of files and records the filename and hash string.
+            </summary>
+            <param name="files">The set of files to hash and record.</param>
+            <param name="scanResult">A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> to which the names of scanned and
+            skipped files will be added.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator">
+            <summary>
+            Defines the interface for a class that implements a directory scanner that reads the files in the specified
+            directory and writes the file's unique fingerprint data to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator.ScanDirectoryAsync(System.String,System.Boolean)">
+            <summary>
+            Scans the files in the provided directory.
+            </summary>
+            <param name="scanDirectory">A <see cref="T:System.String"/> containing the path to the directory to scan.</param>
+            <param name="recursive">If <c>true</c>, recursively scans subdirectories in the provided directory.</param>
+            <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the result of the directory scan.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator">
+            <summary>
+            Defines the public interface for a class that implements a file scan orchestrator. A file scan orchestrator is
+            responsible for analyzing a collection of files and persisting a signature that uniquely identifies each file's
+            contents.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator.ScanFilesAsync(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Scans a set of files, analyzing and storing signatures that uniquely identify them.
+            </summary>
+            <param name="files">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the full paths of the files to scan.</param>
+            <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the scanning operation.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter">
+            <summary>
+            Writes <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> data in CSV format.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter},System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> class. 
+            </summary>
+            <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.</param>
+            <param name="logger">The logger.</param>
+            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be closed when the
+            <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> is disposed.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
+            <inheritdoc />
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and, optionally, managed resources.
+            </summary>
+            <param name="disposing">If true, managed resources are freed.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Output.Csv.FileFingerprintMap">
+            <summary>
+            A mapping between an <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> and CSV headers.
+            </summary>
+            <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.FileFingerprintMap.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.FileFingerprintMap"/> class.
+            </summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Output.IFileFingerprintWriter">
+            <summary>
+            Defines the public interface for a class that implements 
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.IFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
+            <summary>
+            Writes the provided collection of file fingerprints.
+            </summary>
+            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to write.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Output.OutputDuplicateFileFingerprintsOption">
             <summary>
@@ -435,29 +511,27 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository">
             <summary>
-            A repository of <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s utilizing Entity Framework as a backing
-            store.
+            A repository that provides access to <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer{RiotClub.FireMoth.Services.Repository.IFileFingerprint},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Repository.FileFingerprintRepository})">
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository"/> class.
             </summary>
             <param name="dataAccessLayer">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/> implementation used to
             persist data.</param>
-            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger"/> implementation used to logger pertinent information.</param>
             <exception cref="T:System.ArgumentNullException">If any of the provided services are <c>null</c>.</exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.String})">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.Delete(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.Add(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.AddAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.Update(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.UpdateAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint">
@@ -497,7 +571,7 @@
             <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.Add(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.AddAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <summary>
             Adds a file fingerprint to the repository.
             </summary>
@@ -512,13 +586,13 @@
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>IEnumerable collection of file fingerprints.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.Update(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.UpdateAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <summary>
             Updates a file fingerprint in the repository.
             </summary>
             <param name="fileFingerprint">The <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to update.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.Delete(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <summary>
             Deletes a file fingerprint from the repository.
             </summary>

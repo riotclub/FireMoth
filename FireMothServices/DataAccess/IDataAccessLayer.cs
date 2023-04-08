@@ -36,6 +36,12 @@ namespace RiotClub.FireMoth.Services.DataAccess
         public Task AddAsync(TValue value);
 
         /// <summary>
+        /// Adds a collection of values to the data layer.
+        /// </summary>
+        /// <param name="values">An <see cref="IEnumerable{TValue}"/> collection to add to the data layer.</param>
+        public Task AddManyAsync(IEnumerable<TValue> values); 
+        
+        /// <summary>
         /// Updates a value in the repository.
         /// </summary>
         /// <param name="value">A value of type <typeparamref name="TValue"/> to update in the data layer.</param>

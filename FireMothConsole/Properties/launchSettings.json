@@ -2,7 +2,7 @@
   "profiles": {
     "FireMothConsole": {
       "commandName": "Project",
-      "commandLineArgs": "--ScanDirectory \"/home/bean/Desktop/pics/\" --RecursiveScan true --OutputFilter all",
+      "commandLineArgs": "--ScanDirectory \"D:\\FireMoth Test Data\" --RecursiveScan true --OutputFilter all",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

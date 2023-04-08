@@ -30,7 +30,7 @@ namespace RiotClub.FireMoth.Services.Extensions
         /// <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         public static bool IsBase64String(this string value)
         {
-            Span<byte> buffer = new Span<byte>(new byte[value.Length]);
+            var buffer = new Span<byte>(new byte[value.Length]);
             return Convert.TryFromBase64String(value, buffer, out _);
         }
     }
