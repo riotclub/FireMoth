@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-
     <AssemblyName>FireMoth.Services.Tests</AssemblyName>
-
     <RootNamespace>RiotClub.FireMoth.Services.Tests</RootNamespace>
   </PropertyGroup>
 
@@ -16,30 +14,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="OpenCover" Version="4.7.1189" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="AutoFixture" Version="4.18.0" />
+    <PackageReference Include="FluentAssertions" Version="6.10.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="Moq.AutoMock" Version="3.5.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.2.4" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="19.2.4" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="13.2.31" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="3.0.3">
+    <PackageReference Include="coverlet.collector" Version="3.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -47,6 +35,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FireMothServices\FireMoth.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataAccess\Sqlite\" />
   </ItemGroup>
 
 </Project>

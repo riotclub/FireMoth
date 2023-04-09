@@ -4,6 +4,10 @@
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Ignoring this for early development builds.", Scope = "module")]
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Style preference.", Scope = "module")]
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "Conflicts with SA1000KeywordsMustBeSpacedCorrectly", Scope = "module")]
+using static System.Formats.Asn1.AsnWriter;
+using System.Diagnostics.CodeAnalysis;
+
+[module: SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Ignoring this for early development builds.", Scope = "module")]
+[module: SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Style preference.", Scope = "module")]
+[module: SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "Conflicts with SA1000KeywordsMustBeSpacedCorrectly", Scope = "module")]
+[assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:Field names should not begin with underscore", Justification = "<Pending>", Scope = "module")]

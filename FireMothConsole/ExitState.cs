@@ -3,26 +3,25 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Console
+namespace RiotClub.FireMoth.Console;
+
+/// <summary>
+/// Specifies the cause of program termination.
+/// </summary>
+public enum ExitState
 {
     /// <summary>
-    /// Specifies the cause of program termination.
+    /// Inidicates nominal program shutdown.
     /// </summary>
-    public enum ExitState
-    {
-        /// <summary>
-        /// Inidicates nominal program execution and shutdown.
-        /// </summary>
-        Normal,
+    Normal,
 
-        /// <summary>
-        /// Inidicates an error occurred during program initialization.
-        /// </summary>
-        StartupError,
+    /// <summary>
+    /// Inidicates an error occurred during program initialization.
+    /// </summary>
+    StartupError,
 
-        /// <summary>
-        /// Indicates an error occurred after program initialization.
-        /// </summary>
-        RuntimeError,
-    }
+    /// <summary>
+    /// Indicates an error occurred after program initialization.
+    /// </summary>
+    RuntimeError,
 }

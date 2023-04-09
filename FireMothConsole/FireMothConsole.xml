@@ -20,6 +20,12 @@
             will be recursively scanned in addition to its file contents.
             </summary>
         </member>
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicatesOnly">
+            <summary>
+            Gets or sets a value indicating whether the output should include only files that have
+            duplicate hash values.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Console.ExitState">
             <summary>
             Specifies the cause of program termination.
@@ -27,7 +33,7 @@
         </member>
         <member name="F:RiotClub.FireMoth.Console.ExitState.Normal">
             <summary>
-            Inidicates nominal program execution and shutdown.
+            Inidicates nominal program shutdown.
             </summary>
         </member>
         <member name="F:RiotClub.FireMoth.Console.ExitState.StartupError">
@@ -53,13 +59,6 @@
             <param name="args">Command-line arguments.</param>
             <returns>An <c>int</c> return code indicating invocation result.</returns>
             <seealso cref="T:RiotClub.FireMoth.Console.CommandLineOptions"/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Console.Program.CreateHostBuilder(System.String[])">
-            <summary>
-            Creates the host builder.
-            </summary>
-            <param name="args">Arguments to supply to the host builder.</param>
-            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostBuilder"/>.</returns>
         </member>
     </members>
 </doc>
