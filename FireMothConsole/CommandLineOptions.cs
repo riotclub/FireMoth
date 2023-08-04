@@ -20,6 +20,12 @@ public class CommandLineOptions
     /// will be recursively scanned in addition to its file contents.
     /// </summary>
     public bool RecursiveScan { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the OutputFile option, indicating the full path of the file to which any
+    /// program output will be written.
+    /// </summary>
+    public string OutputFile { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the output should include only files that have
