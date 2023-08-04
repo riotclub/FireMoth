@@ -31,7 +31,7 @@ public static class Program
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-    private static string OutputFileName;
+    private static string _outputFileName;
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -74,7 +74,7 @@ public static class Program
             var scanResult = scanResultTask.Result;
             
             // Output scan result
-            Log.Information("Writing output to '{OutputFileName}'.", OutputFileName);
+            Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
             var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
             var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
             writeTask.Wait();
@@ -137,8 +137,8 @@ public static class Program
                 services.Configure<CommandLineOptions>(hostContext.Configuration);
                 services.AddFireMothServices(hostContext.Configuration);
                 var commandLineOptions = hostContext.Configuration.Get<CommandLineOptions>();
-                OutputFileName = GetOutputFileName(commandLineOptions.OutputFile);
-                services.AddTransient(_ => new StreamWriter(OutputFileName));
+                _outputFileName = GetOutputFileName(commandLineOptions.OutputFile);
+                services.AddTransient(_ => new StreamWriter(_outputFileName));
             });
 
     private static string GetOutputFileName(string outputFile)
