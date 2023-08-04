@@ -3,21 +3,22 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.IO;
-using RiotClub.FireMoth.Services.Orchestration;
-
 namespace RiotClub.FireMoth.Console;
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Services.FileScanning;
+using RiotClub.FireMoth.Services.FileScanning;
+using RiotClub.FireMoth.Services.Orchestration;
+using RiotClub.FireMoth.Services.Output;
 using Serilog;
-using Services.Output;
 
 /// <summary>
 /// Application entry point.
@@ -26,6 +27,11 @@ public static class Program
 {
     private const int BootstrapLogRetainedFileCountLimit = 2;
     private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 32 MB
+    private const string DefaultFilePrefix = "FireMoth_";
+    private const string DefaultFileExtension = "csv";
+    private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
+
+    private static string OutputFileName;
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -38,7 +44,7 @@ public static class Program
     {
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .WriteTo.Console()
+            .WriteTo.Console() 
             .WriteTo.File(
                 "./bootstrap.log",
                 fileSizeLimitBytes: BootstrapLogFileSizeLimit,
@@ -68,7 +74,7 @@ public static class Program
             var scanResult = scanResultTask.Result;
             
             // Output scan result
-            Log.Information("Writing ");
+            Log.Information("Writing output to '{OutputFileName}'.", OutputFileName);
             var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
             var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
             writeTask.Wait();
@@ -130,5 +136,27 @@ public static class Program
             {
                 services.Configure<CommandLineOptions>(hostContext.Configuration);
                 services.AddFireMothServices(hostContext.Configuration);
+                var commandLineOptions = hostContext.Configuration.Get<CommandLineOptions>();
+                OutputFileName = GetOutputFileName(commandLineOptions.OutputFile);
+                services.AddTransient(_ => new StreamWriter(OutputFileName));
             });
+
+    private static string GetOutputFileName(string outputFile)
+    {
+        if (string.IsNullOrWhiteSpace(outputFile))
+            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                   + Path.DirectorySeparatorChar + DefaultFilePrefix
+                   + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
+                   + '.' + DefaultFileExtension;
+
+        var outputFileFullPath = Path.GetFullPath(outputFile);
+        
+        // May update to support appending to files
+        if (!File.Exists(outputFileFullPath))
+            return Path.GetFullPath(outputFileFullPath);
+
+        var fileExistsError = $"Output file '{outputFileFullPath}' already exists";
+        Log.Fatal(fileExistsError);
+        throw new IOException(fileExistsError);
+    }
 }
