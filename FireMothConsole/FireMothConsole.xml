@@ -46,6 +46,11 @@
             Indicates an error occurred after program initialization.
             </summary>
         </member>
+        <member name="T:RiotClub.FireMoth.Console.ServiceCollectionExtensions">
+            <summary>
+            Extensions to support service configuration.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
             <summary>
             Application entry point.

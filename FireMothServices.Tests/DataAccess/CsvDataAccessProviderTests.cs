@@ -14,7 +14,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
-using RiotClub.FireMoth.Services.DataAccess.Csv;
 using RiotClub.FireMoth.Services.Repository;
 using Xunit;
 
