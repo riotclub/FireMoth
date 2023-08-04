@@ -3,16 +3,16 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess.Csv;
+namespace RiotClub.FireMoth.Services.DataAccess.InMemory;
 
-using Microsoft.Extensions.Logging;
-using RiotClub.FireMoth.Services.Repository;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using RiotClub.FireMoth.Services.Repository;
 
 /// <summary>
 /// Implementation of a data access layer that persists data to memory.

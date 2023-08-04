@@ -11,19 +11,28 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RiotClub.FireMoth.Services.DataAccess;
-using RiotClub.FireMoth.Services.DataAccess.Csv;
+using RiotClub.FireMoth.Services.DataAccess.InMemory;
 using RiotClub.FireMoth.Services.DataAnalysis;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Repository;
 using Services.Output.Csv;
 
+/// <summary>
+/// Extensions to support service configuration.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     private const string DefaultFilePrefix = "FireMothData_";
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
+    /// <summary>
+    /// Adds services required to perform directory scanning via the FireMoth API.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which services are added.</param>
+    /// <param name="config">An <see cref="IConfiguration"/> containing program runtime configuration.</param>
+    /// <returns></returns>
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
