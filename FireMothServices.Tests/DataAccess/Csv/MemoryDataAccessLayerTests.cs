@@ -26,24 +26,20 @@ public class MemoryDataAccessLayerTests
      *  - If ILogger is null, an ArgumentNullException is thrown.
      *
      * GetAsync
-     *  - If object is disposed, an ObjectDisposedException is thrown.
      *  - Call without filter or orderBy parameters returns all FileFingerprints.
      *  - Call with filter returns filtered results.
      *  - Call with orderBy returns ordered results.
      *  - Call with both filter and orderBy parameters returns filtered and ordered results.
      *
      * AddAsync
-     *  - If object is disposed, an ObjectDisposedException is thrown.
      *  - If null FileFingerprint is provided, throw ArgumentNullException.
      *  - After call, provided FileFingerprint has been added to the data access layer.
      * 
      * AddManyAsync
-     *  - If object is disposed, an ObjectDisposedException is thrown.
      *  - If null IEnumerable is provided, throw ArgumentNullException.
      *  - After call, provided FileFingerprints have been added to the data access layer. 
      *
      * UpdateAsync
-     *  - If object is disposed, an ObjectDisposedException is thrown.
      *  - If null FileFingerprint is provided, throw ArgumentNullException.
      *  - After call when data access layer contains a FileFingerprint with a matching full path, matching value is
      *    updated.
@@ -51,7 +47,6 @@ public class MemoryDataAccessLayerTests
      *    made to the data access layer.
      *
      * DeleteAsync
-     *  - If object is disposed, an ObjectDisposedException is thrown.
      *  - If null FileFingerprint is provided, throw ArgumentNullException.
      *  - After call when data access layer contains an equal FileFingerprint, matching value is deleted.
      *  - After call when data access layer does not contain a FileFingerprint with a matching full path, no changes are
@@ -85,23 +80,6 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region GetAsync
-    /// <summary>
-    /// GetAsync: If object is disposed, an ObjectDisposedException is thrown
-    /// </summary>
-    [Fact]
-    public void GetAsync_ObjectDisposed_ThrowsObjectDisposedException()
-    {
-        // Arrange
-        var testObject = _mocker.CreateInstance<MemoryDataAccessLayer>();
-        testObject.Dispose();
-
-        // Act
-        Action getAsyncAction = () => testObject.GetAsync();
-
-        // Assert
-        getAsyncAction.Should().ThrowExactly<ObjectDisposedException>();
-    }
-    
     /// <summary>
     /// GetAsync: Call without filter or orderBy parameters returns all FileFingerprints
     /// </summary>
@@ -181,24 +159,6 @@ public class MemoryDataAccessLayerTests
 
 #region AddAsync
     /// <summary>
-    /// AddAsync: If object is disposed, an ObjectDisposedException is thrown.
-    /// </summary>
-    [Fact]
-    public void AddAsync_ObjectDisposed_ThrowsObjectDisposedException()
-    {
-        // Arrange
-        var testObject = _mocker.CreateInstance<MemoryDataAccessLayer>();
-        var testFileFingerprint = _fixture.Create<FileFingerprint>();
-        testObject.Dispose();
-
-        // Act
-        Action addAsyncAction = () => testObject.AddAsync(testFileFingerprint);
-
-        // Assert
-        addAsyncAction.Should().ThrowExactly<ObjectDisposedException>();
-    }
-    
-    /// <summary>
     /// AddAsync: If null FileFingerprint is provided, throw ArgumentNullException.
     /// </summary>
     [Fact]
@@ -236,23 +196,6 @@ public class MemoryDataAccessLayerTests
 #endregion
     
 #region AddManyAsync
-    /// <summary>
-    /// AddManyAsync: If object is disposed, an ObjectDisposedException is thrown. 
-    /// </summary>
-    [Fact]
-    public void AddManyAsync_ObjectDisposed_ThrowsObjectDisposedException()
-    {
-        // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
-        sut.Dispose();
-
-        // Act
-        Action addManyAsyncAction = () => sut.AddManyAsync(new List<IFileFingerprint>());
-
-        // Assert
-        addManyAsyncAction.Should().ThrowExactly<ObjectDisposedException>();
-    }
-
     /// <summary>
     /// AddManyAsync: If null IEnumerable is provided, throw ArgumentNullException.
     /// </summary>

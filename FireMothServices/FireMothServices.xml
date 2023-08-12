@@ -94,28 +94,25 @@
             <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was deleted, <c>false</c>
             if no match could be found.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.Dispose">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.Dispose(System.Boolean)">
-            <summary>
-            Releases unmanaged and, optionally, managed resources.
-            </summary>
-            <param name="disposing">If true, managed resources are freed.</param>
-        </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext.#ctor">
+        <member name="F:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.DbAppdataSubfolder">
             <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext"/> class.
+            Subfolder within system application data folder where the database file is located.
+            </summary>
+            <seealso cref="F:System.Environment.SpecialFolder.LocalApplicationData"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext"/> class.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc/>
             <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration"/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher">
@@ -299,6 +296,18 @@
             <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.
             </returns>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.Migrations.CreateDb">
+            <inheritdoc />
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Migrations.CreateDb.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Migrations.CreateDb.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Migrations.CreateDb.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator">
             <summary>
             Directory scanner implementation that reads the files in a directory and writes the file and hash to an
@@ -442,6 +451,11 @@
             Contains data that uniquely identifies a file and its data.
             </summary>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprint.#ctor">
+            <summary>
+            Private, parameterless constructor required by Entity Framework ORM.
+            </summary>
+        </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprint.#ctor(System.String,System.String,System.Int64,System.String)">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> class.
@@ -449,13 +463,12 @@
             <param name="fileName">The name of the file.</param>
             <param name="directoryName">The full path of the directory containing the file.</param>
             <param name="fileSize">The size of the file in bytes.</param>
-            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
-            specified file.</param>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.DirectoryName">
-            <inheritdoc/>
+            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the specified file.</param>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.FileName">
+            <inheritdoc/>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.DirectoryName">
             <inheritdoc/>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.FileSize">
@@ -463,6 +476,13 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.Base64Hash">
             <inheritdoc/>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.Id">
+            <summary>
+            Unique identifier for this <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>.
+            </summary>
+            <remarks>This value serves as the primary key for entities when using an ORM (Entity Framework) in the data
+            access layer.</remarks>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.FullPath">
             <inheritdoc/>

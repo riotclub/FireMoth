@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
@@ -17,11 +16,10 @@ using RiotClub.FireMoth.Services.Repository;
 /// <summary>
 /// Implementation of a data access layer that persists data to memory.
 /// </summary>
-public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDisposable
+public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
 {
     private readonly List<IFileFingerprint> _fileFingerprints;
     private readonly ILogger<MemoryDataAccessLayer> _logger;
-    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MemoryDataAccessLayer"/> class.
@@ -44,8 +42,6 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDispos
         Func<IFileFingerprint, bool>? filter = null,
         Func<IFileFingerprint, string>? orderBy = null)
     {
-        ThrowIfDisposed();
-            
         var result = _fileFingerprints.AsEnumerable();
 
         if (filter is not null)
@@ -66,7 +62,6 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDispos
     /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.</exception>
     public Task AddAsync(IFileFingerprint fileFingerprint)
     {
-        ThrowIfDisposed();
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
 
         _fileFingerprints.Add(fileFingerprint);
@@ -88,7 +83,6 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDispos
     /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.</exception>
     public Task AddManyAsync(IEnumerable<IFileFingerprint> fileFingerprints)
     {
-        ThrowIfDisposed();
         ThrowIfArgumentNull(fileFingerprints, nameof(fileFingerprints));
 
         var fileFingerprintList = fileFingerprints.ToList();
@@ -106,7 +100,6 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDispos
     /// if no match could be found.</returns>
     public Task<bool> UpdateAsync(IFileFingerprint fileFingerprint)
     {
-        ThrowIfDisposed();
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
 
         var match = _fileFingerprints.FirstOrDefault(fingerprint =>
@@ -129,49 +122,14 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDispos
     /// if no match could be found.</returns>
     public Task<bool> DeleteAsync(IFileFingerprint fileFingerprint)
     {
-        ThrowIfDisposed();
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
         
         return Task.FromResult(_fileFingerprints.Remove(fileFingerprint));
-    }
-
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Releases unmanaged and, optionally, managed resources.
-    /// </summary>
-    /// <param name="disposing">If true, managed resources are freed.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            _logger.LogDebug("Flushing CsvWriter buffer and disposing.");
-        }
-
-        _disposed = true;
     }
 
     private static void ThrowIfArgumentNull(object testArgument, string argumentName)
     {
         if (testArgument is null)
             throw new ArgumentNullException(argumentName);
-    }
-
-    private void ThrowIfDisposed([CallerMemberName] string methodName = "")
-    {
-        if (!_disposed) return;
-
-        _logger.LogCritical("Tried to call {MethodName} on disposed object.", methodName);
-        throw new ObjectDisposedException(GetType().FullName);
     }
 }
