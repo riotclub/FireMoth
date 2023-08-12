@@ -112,7 +112,8 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>, IDispos
         var match = _fileFingerprints.FirstOrDefault(fingerprint =>
             fingerprint.FullPath == fileFingerprint.FullPath);
             
-        if (match is null) return Task.FromResult(false);
+        if (match is null) 
+            return Task.FromResult(false);
 
         _fileFingerprints.Remove(match);
         _fileFingerprints.Add(fileFingerprint);
