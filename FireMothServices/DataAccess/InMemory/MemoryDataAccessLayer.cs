@@ -28,7 +28,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     public MemoryDataAccessLayer(ILogger<MemoryDataAccessLayer> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+
         _fileFingerprints = new List<IFileFingerprint>();
     }
 

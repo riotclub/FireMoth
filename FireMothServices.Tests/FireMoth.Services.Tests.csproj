@@ -37,8 +37,4 @@
     <ProjectReference Include="..\FireMothServices\FireMoth.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DataAccess\Sqlite\" />
-  </ItemGroup>
-
 </Project>

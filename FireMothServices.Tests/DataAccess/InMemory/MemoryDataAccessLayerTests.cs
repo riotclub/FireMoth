@@ -3,21 +3,20 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Tests.DataAccess.Csv;
+namespace RiotClub.FireMoth.Services.Tests.DataAccess.InMemory;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
-using CsvHelper;
 using FluentAssertions;
 using Moq.AutoMock;
-using Xunit;
 using RiotClub.FireMoth.Services.DataAccess;
+using RiotClub.FireMoth.Services.DataAccess.InMemory;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tests.Helpers;
-using RiotClub.FireMoth.Services.DataAccess.InMemory;
+using Xunit;
 
 public class MemoryDataAccessLayerTests
 {
@@ -54,7 +53,7 @@ public class MemoryDataAccessLayerTests
      */
     private readonly AutoMocker _mocker = new();
     private readonly Fixture _fixture = new();
-
+    
     public MemoryDataAccessLayerTests()
     {
         _fixture.Customizations.Add(new Base64HashSpecimenBuilder());
@@ -63,7 +62,7 @@ public class MemoryDataAccessLayerTests
     
 #region Ctor
     /// <summary>
-    /// Ctor: If ILogger is null, an ArgumentNullException is thrown
+    /// Ctor: If ILogger is null, an ArgumentNullException is thrown.
     /// </summary>
     [Fact]
     public void Ctor_ILoggerIsNull_ThrowsArgumentNullException()

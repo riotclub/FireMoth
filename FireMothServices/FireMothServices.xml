@@ -97,12 +97,6 @@
         <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
             <inheritdoc/>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.DbAppdataSubfolder">
-            <summary>
-            Subfolder within system application data folder where the database file is located.
-            </summary>
-            <seealso cref="F:System.Environment.SpecialFolder.LocalApplicationData"/>
-        </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext"/> class.
@@ -113,6 +107,26 @@
             <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration"/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+            <inheritdoc/>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer">
+            <summary>
+            Implementation of a data access layer that persists data to a SQLite database.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.IFileFingerprint,System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.AddAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.AddManyAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.UpdateAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.DeleteAsync(RiotClub.FireMoth.Services.Repository.IFileFingerprint)">
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher">

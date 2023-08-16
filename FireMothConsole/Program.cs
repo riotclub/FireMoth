@@ -58,26 +58,27 @@ public static class Program
             using var host = CreateHostBuilder(args).Build();
             await host.StartAsync();
 
-            var scanner = host.Services.GetRequiredService<IDirectoryScanOrchestrator>();
-            var commandLineOptions = host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
-            var scanOptions = new ScanOptions(
-                new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),
-                commandLineOptions.RecursiveScan);
-
+            ScanResult scanResult;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+            using (var scope = host.Services.CreateScope())
+            {
+                var scanner = scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+                var commandLineOptions = scope.ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
+                var scanOptions = new ScanOptions(
+                    new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),
+                    commandLineOptions.RecursiveScan);
             
-            // Perform scan
-            var scanResultTask = scanner.ScanDirectoryAsync(
-                scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
-            scanResultTask.Wait();
-            var scanResult = scanResultTask.Result;
-            
-            // Output scan result
-            Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
-            var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
-            var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
-            writeTask.Wait();
+                // Perform scan
+                scanResult = await scanner.ScanDirectoryAsync(
+                    scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
+                
+                // Output scan result
+                Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
+                var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
+                var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
+                writeTask.Wait();
+            }
             
             stopwatch.Stop();
             var timeSpan = stopwatch.Elapsed;

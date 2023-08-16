@@ -5,10 +5,12 @@
 
 namespace RiotClub.FireMoth.Console;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RiotClub.FireMoth.Services.DataAccess;
 using RiotClub.FireMoth.Services.DataAccess.InMemory;
+using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.DataAnalysis;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
@@ -35,7 +37,16 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDirectoryScanOrchestrator, DirectoryScanOrchestrator>();
         services.AddTransient<IFileScanOrchestrator, FileScanOrchestrator>();
         services.AddTransient<IFileHasher, SHA256FileHasher>();
-        services.AddTransient<IDataAccessLayer<IFileFingerprint>, MemoryDataAccessLayer>();
+        
+#region UseInMemoryDataAccessLayer
+        // services.AddTransient<IDataAccessLayer<IFileFingerprint>, MemoryDataAccessLayer>();
+#endregion
+
+#region UseSqliteDataAccessLayer
+        services.AddDbContext<FireMothContext>();
+        services.AddTransient<IDataAccessLayer<IFileFingerprint>, SqliteDataAccessLayer>();
+#endregion
+
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
             
