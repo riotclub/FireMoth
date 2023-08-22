@@ -6,17 +6,21 @@
 namespace RiotClub.FireMoth.Services.DataAccess.Sqlite;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
 
 /// <summary>
 /// Implementation of a data access layer that persists data to a SQLite database.
 /// </summary>
-public class SqliteDataAccessLayer : IDataAccessLayer<IFileFingerprint>
+public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
 {
     private readonly ILogger<SqliteDataAccessLayer> _logger;
     private readonly FireMothContext _fireMothContext;
@@ -31,43 +35,53 @@ public class SqliteDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     }
     
     /// <inheritdoc/>
-    public Task<IEnumerable<IFileFingerprint>> GetAsync(
-        Func<IFileFingerprint, bool>? filter = null,
-        Func<IFileFingerprint, string>? orderBy = null)
+    public Task<IEnumerable<FileFingerprint>> GetAsync(
+        Func<FileFingerprint, bool>? filter = null,
+        Func<FileFingerprint, string>? orderBy = null)
     {
-        _logger.LogInformation("SqliteDataAccessLayer: GET");
-
-        var result = new List<IFileFingerprint>();
+        IEnumerable<FileFingerprint> result = _fireMothContext.FileFingerprints;
         
-        return Task.FromResult(result.Where(filter));
+        if (filter is not null)
+            result = result.Where(filter);
+
+        if (orderBy is not null)
+            result = result.OrderBy(orderBy);
+
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc/>
-    public Task AddAsync(IFileFingerprint value)
+    public Task AddAsync(FileFingerprint fileFingerprint)
     {
-        _logger.LogInformation("SqliteDataAccessLayer: ADD");
+        Guard.IsNotNull(fileFingerprint);
+
+        var fullPath = Path.Combine(fileFingerprint.DirectoryName, fileFingerprint.FileName);
+        _logger.LogDebug(
+            "Writing fingerprint for file {FileName} with hash {HashString}.",
+            fullPath,
+            fileFingerprint.Base64Hash);
+
+        _fireMothContext.FileFingerprints.Add(fileFingerprint);
+        _fireMothContext.SaveChanges();
+        
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+    public Task AddManyAsync(IEnumerable<FileFingerprint> fileFingerprints)
+    {
+        Guard.IsNotNull(fileFingerprints);
+
+        var fileFingerprintList = fileFingerprints.ToList();
+        _logger.LogDebug("Writing {FileFingerprintCount} fingerprint(s).", fileFingerprintList.Count);
+        _fireMothContext.AddRange(fileFingerprintList);
 
         return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public Task AddManyAsync(IEnumerable<IFileFingerprint> values)
-    {
-        _logger.LogInformation("SqliteDataAccessLayer: ADDMANY");
-
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    public Task<bool> UpdateAsync(IFileFingerprint value)
-    {
-        _logger.LogInformation("SqliteDataAccessLayer: UPDATE");
-
-        return Task.FromResult(false);
-    }
-
-    /// <inheritdoc/>
-    public Task<bool> DeleteAsync(IFileFingerprint value)
+    public Task<bool> DeleteAsync(FileFingerprint value)
     {
         _logger.LogInformation("SqliteDataAccessLayer: DELETE");
 

@@ -23,8 +23,8 @@ public interface IDataAccessLayer<TValue>
     /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
     /// <returns>A collection of values matching the specified filter with the specified ordering.</returns>
     public Task<IEnumerable<TValue>> GetAsync(
-        Func<IFileFingerprint, bool>? filter = null,
-        Func<IFileFingerprint, string>? orderBy = null);
+        Func<TValue, bool>? filter = null,
+        Func<TValue, string>? orderBy = null);
 
     /// <summary>
     /// Adds a value to the data layer.
@@ -37,12 +37,6 @@ public interface IDataAccessLayer<TValue>
     /// </summary>
     /// <param name="values">An <see cref="IEnumerable{TValue}"/> collection to add to the data layer.</param>
     public Task AddManyAsync(IEnumerable<TValue> values); 
-        
-    /// <summary>
-    /// Updates a value in the repository.
-    /// </summary>
-    /// <param name="value">A value of type <typeparamref name="TValue"/> to update in the data layer.</param>
-    public Task<bool> UpdateAsync(TValue value);
 
     /// <summary>
     /// Deletes a value from the repository.

@@ -37,19 +37,19 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDirectoryScanOrchestrator, DirectoryScanOrchestrator>();
         services.AddTransient<IFileScanOrchestrator, FileScanOrchestrator>();
         services.AddTransient<IFileHasher, SHA256FileHasher>();
-        
+
 #region UseInMemoryDataAccessLayer
-        // services.AddTransient<IDataAccessLayer<IFileFingerprint>, MemoryDataAccessLayer>();
+        // services.AddScoped<IDataAccessLayer<FileFingerprint>, MemoryDataAccessLayer>();
 #endregion
 
 #region UseSqliteDataAccessLayer
         services.AddDbContext<FireMothContext>();
-        services.AddTransient<IDataAccessLayer<IFileFingerprint>, SqliteDataAccessLayer>();
+        services.AddTransient<IDataAccessLayer<FileFingerprint>, SqliteDataAccessLayer>();
 #endregion
 
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
-            
+
         return services;
     }
 }

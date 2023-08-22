@@ -38,18 +38,12 @@ public class MemoryDataAccessLayerTests
      *  - If null IEnumerable is provided, throw ArgumentNullException.
      *  - After call, provided FileFingerprints have been added to the data access layer. 
      *
-     * UpdateAsync
-     *  - If null FileFingerprint is provided, throw ArgumentNullException.
-     *  - After call when data access layer contains a FileFingerprint with a matching full path, matching value is
-     *    updated.
-     *  - After call when data access layer does not contain a FileFingerprint with a matching full path, no changes are
-     *    made to the data access layer.
-     *
      * DeleteAsync
      *  - If null FileFingerprint is provided, throw ArgumentNullException.
-     *  - After call when data access layer contains an equal FileFingerprint, matching value is deleted.
-     *  - After call when data access layer does not contain a FileFingerprint with a matching full path, no changes are
-     *    made to the data access layer.
+     *  - After call when data access layer contains a FileFingerprint that equals the provided value, matching value is
+     *    deleted.
+     *  - After call when data access layer does not contain a FileFingerprint that equals the provided value, no
+     *    changes are made to the data access layer.
      */
     private readonly AutoMocker _mocker = new();
     private readonly Fixture _fixture = new();
@@ -183,7 +177,7 @@ public class MemoryDataAccessLayerTests
         var testObject = _mocker.CreateInstance<MemoryDataAccessLayer>();
         await AddFileFingerprints(testObject);
         var testFileFingerprint = _fixture.Create<FileFingerprint>();
-        var expectedResult = new List<IFileFingerprint> { testFileFingerprint };
+        var expectedResult = new List<FileFingerprint> { testFileFingerprint };
 
         // Act
         await testObject.AddAsync(testFileFingerprint);
@@ -233,20 +227,8 @@ public class MemoryDataAccessLayerTests
     }
 #endregion
 
-#region UpdateAsync
-/*
-     *  - If object is disposed, an ObjectDisposedException is thrown.
-     *  - If null FileFingerprint is provided, throw ArgumentNullException.
-     *  - After call when data access layer contains a FileFingerprint with a matching full path, matching value is
-     *    updated.
-     *  - After call when data access layer does not contain a FileFingerprint with a matching full path, no changes are
-     *    made to the data access layer.
- */
-
-#endregion
-
-    private async Task<IEnumerable<IFileFingerprint>> AddFileFingerprints(
-        IDataAccessLayer<IFileFingerprint> dataAccessLayer)
+    private async Task<IEnumerable<FileFingerprint>> AddFileFingerprints(
+        IDataAccessLayer<FileFingerprint> dataAccessLayer)
     {
         var fileFingerprints = _fixture.CreateMany<FileFingerprint>(50);
         var fileFingerprintList = fileFingerprints.ToList();

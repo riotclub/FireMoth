@@ -16,9 +16,9 @@ using RiotClub.FireMoth.Services.Repository;
 /// <summary>
 /// Implementation of a data access layer that persists data to memory.
 /// </summary>
-public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
+public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
 {
-    private readonly List<IFileFingerprint> _fileFingerprints;
+    private readonly List<FileFingerprint> _fileFingerprints;
     private readonly ILogger<MemoryDataAccessLayer> _logger;
 
     /// <summary>
@@ -29,7 +29,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _fileFingerprints = new List<IFileFingerprint>();
+        _fileFingerprints = new List<FileFingerprint>();
     }
 
     /// <summary>
@@ -38,9 +38,9 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     /// <param name="filter">A lambda expression that specifies a filter condition.</param>
     /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
     /// <returns>IEnumerable collection of file fingerprints.</returns>
-    public Task<IEnumerable<IFileFingerprint>> GetAsync(
-        Func<IFileFingerprint, bool>? filter = null,
-        Func<IFileFingerprint, string>? orderBy = null)
+    public Task<IEnumerable<FileFingerprint>> GetAsync(
+        Func<FileFingerprint, bool>? filter = null,
+        Func<FileFingerprint, string>? orderBy = null)
     {
         var result = _fileFingerprints.AsEnumerable();
 
@@ -60,7 +60,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     /// <exception cref="ArgumentNullException">Thrown when provided <see cref="IFileFingerprint"/> reference is
     /// null.</exception>
     /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.</exception>
-    public Task AddAsync(IFileFingerprint fileFingerprint)
+    public Task AddAsync(FileFingerprint fileFingerprint)
     {
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
 
@@ -81,7 +81,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     /// <param name="fileFingerprints">An <see cref="IEnumerable{IFileFingerprint}"/> containing items to add.</param>
     /// <exception cref="ArgumentNullException">Thrown when provided collection is null.</exception>
     /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.</exception>
-    public Task AddManyAsync(IEnumerable<IFileFingerprint> fileFingerprints)
+    public Task AddManyAsync(IEnumerable<FileFingerprint> fileFingerprints)
     {
         ThrowIfArgumentNull(fileFingerprints, nameof(fileFingerprints));
 
@@ -93,34 +93,12 @@ public class MemoryDataAccessLayer : IDataAccessLayer<IFileFingerprint>
     }
 
     /// <summary>
-    /// Updates the provided <see cref="IFileFingerprint"/> in the data access layer.
-    /// </summary>
-    /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to update.</param>
-    /// <returns><c>true</c> if a file matching the provided <see cref="IFileFingerprint"/>'s was updated, <c>false</c>
-    /// if no match could be found.</returns>
-    public Task<bool> UpdateAsync(IFileFingerprint fileFingerprint)
-    {
-        ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
-
-        var match = _fileFingerprints.FirstOrDefault(fingerprint =>
-            fingerprint.FullPath == fileFingerprint.FullPath);
-            
-        if (match is null) 
-            return Task.FromResult(false);
-
-        _fileFingerprints.Remove(match);
-        _fileFingerprints.Add(fileFingerprint);
-            
-        return Task.FromResult(true);
-    }
-
-    /// <summary>
     /// Deletes the provided <see cref="IFileFingerprint"/> from the data access layer.
     /// </summary>
     /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to delete.</param>
     /// <returns><c>true</c> if a file matching the provided <see cref="IFileFingerprint"/>'s was deleted, <c>false</c>
     /// if no match could be found.</returns>
-    public Task<bool> DeleteAsync(IFileFingerprint fileFingerprint)
+    public Task<bool> DeleteAsync(FileFingerprint fileFingerprint)
     {
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
         

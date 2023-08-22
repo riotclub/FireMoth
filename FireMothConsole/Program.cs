@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
+using RiotClub.FireMoth.Services.Repository;
 using Serilog;
 
 /// <summary>
