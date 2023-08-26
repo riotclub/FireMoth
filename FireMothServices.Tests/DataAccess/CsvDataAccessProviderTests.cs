@@ -5,18 +5,6 @@
 
 namespace RiotClub.FireMoth.Services.Tests.FileScanning;
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Abstractions;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
-using RiotClub.FireMoth.Services.Repository;
-using Xunit;
-
 /*
  * Ctor
  *  * StreamWriter can't be null

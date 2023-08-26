@@ -6,14 +6,12 @@
 namespace RiotClub.FireMoth.Services.DataAccess.Sqlite;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
 

@@ -5,11 +5,9 @@
 
 namespace RiotClub.FireMoth.Console;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RiotClub.FireMoth.Services.DataAccess;
-using RiotClub.FireMoth.Services.DataAccess.InMemory;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.DataAnalysis;
 using RiotClub.FireMoth.Services.Orchestration;

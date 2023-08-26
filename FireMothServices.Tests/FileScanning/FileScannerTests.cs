@@ -5,23 +5,6 @@
 
 namespace RiotClub.FireMoth.Services.Tests.FileScanning;
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Moq;
-using RiotClub.FireMoth.Services.DataAccess;
-using RiotClub.FireMoth.Services.DataAnalysis;
-using RiotClub.FireMoth.Services.FileScanning;
-using RiotClub.FireMoth.Services.Output;
-using RiotClub.FireMoth.Services.Repository;
-using RiotClub.FireMoth.Services.Tests.Extensions;
-using Xunit;
-
 /*
  * Constructor:
  * * Null IDataAccessLayer throws exception
