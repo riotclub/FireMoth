@@ -8,7 +8,8 @@
             <summary>
             Defines the public interface for a class that implements data access and persistence operations.
             </summary>
-            <typeparam name="TValue">The type of domain objects this data access layer manipulates.</typeparam>
+            <typeparam name="TValue">The type of domain objects this data access layer manipulates.
+            </typeparam>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.GetAsync(System.Func{`0,System.Boolean},System.Func{`0,System.String})">
             <summary>
@@ -16,25 +17,29 @@
             </summary>
             <param name="filter">A lambda expression that specifies a filter condition.</param>
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
-            <returns>A collection of values matching the specified filter with the specified ordering.</returns>
+            <returns>A collection of values matching the specified filter with the specified ordering.
+            </returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.AddAsync(`0)">
             <summary>
             Adds a value to the data layer.
             </summary>
-            <param name="value">A value of type <typeparamref name="TValue"/> to add to the data layer.</param>
+            <param name="value">A value of type <typeparamref name="TValue"/> to add to the data layer.
+            </param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.AddManyAsync(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             Adds a collection of values to the data layer.
             </summary>
-            <param name="values">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to add to the data layer.</param>
+            <param name="values">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to add to the data
+            layer.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.DeleteAsync(`0)">
             <summary>
             Deletes a value from the repository.
             </summary>
-            <param name="value">A value of type <typeparamref name="TValue"/> to delete from the data layer.</param>
+            <param name="value">A value of type <typeparamref name="TValue"/> to delete from the data
+            layer.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer">
             <summary>
