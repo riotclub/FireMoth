@@ -97,4 +97,16 @@ public class SqliteDataAccessLayerTests
         ctorAction.Should().ThrowExactly<ArgumentNullException>();
     }
 #endregion
+
+#region GetAsync
+
+    // * GetAsync
+    // *  - Call without filter or orderBy parameters returns all FileFingerprints.
+   
+    // *  - Call with filter returns filtered results.
+    // *  - Call with orderBy returns ordered results.
+    // *  - Call with both filter and orderBy parameters returns filtered and ordered results.
+
+#endregion
+
 }

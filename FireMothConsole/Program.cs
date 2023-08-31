@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
@@ -58,6 +59,12 @@ public static class Program
             using var host = CreateHostBuilder(args).Build();
             await host.StartAsync();
 
+            using (var scope = host.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<FireMothContext>();
+                await dbContext.Database.EnsureCreatedAsync();
+            }
+            
             ScanResult scanResult;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -152,7 +159,6 @@ public static class Program
 
         var outputFileFullPath = Path.GetFullPath(outputFile);
         
-        // May update to support appending to files
         if (!File.Exists(outputFileFullPath))
             return Path.GetFullPath(outputFileFullPath);
 

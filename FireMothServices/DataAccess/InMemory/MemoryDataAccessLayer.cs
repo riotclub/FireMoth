@@ -7,7 +7,6 @@ namespace RiotClub.FireMoth.Services.DataAccess.InMemory;
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -57,20 +56,14 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
     /// Adds the provided <see cref="IFileFingerprint"/> to the data access layer.
     /// </summary>
     /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to add.</param>
-    /// <exception cref="ArgumentNullException">Thrown when provided <see cref="IFileFingerprint"/> reference is
-    /// null.</exception>
-    /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when provided <see cref="IFileFingerprint"/>
+    /// reference is null.</exception>
     public Task AddAsync(FileFingerprint fileFingerprint)
     {
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
-
-        _fileFingerprints.Add(fileFingerprint);
-
-        var fullPath = Path.Combine(fileFingerprint.DirectoryName, fileFingerprint.FileName);
         _logger.LogDebug(
-            "Writing fingerprint for file {FileName} with hash {HashString}.",
-            fullPath,
-            fileFingerprint.Base64Hash);
+            "MemoryDataAccessLayer: Writing fingerprint {FileFingerprint}.", fileFingerprint);
+        _fileFingerprints.Add(fileFingerprint);
 
         return Task.CompletedTask;
     }
@@ -78,16 +71,17 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
     /// <summary>
     /// Adds the provided collection of <see cref="IFileFingerprint"/>s to the data access layer.
     /// </summary>
-    /// <param name="fileFingerprints">An <see cref="IEnumerable{IFileFingerprint}"/> containing items to add.</param>
+    /// <param name="fileFingerprints">An <see cref="IEnumerable{IFileFingerprint}"/> containing
+    /// items to add.</param>
     /// <exception cref="ArgumentNullException">Thrown when provided collection is null.</exception>
-    /// <exception cref="ObjectDisposedException">Thrown when object is in a disposed state.</exception>
     public Task AddManyAsync(IEnumerable<FileFingerprint> fileFingerprints)
     {
         ThrowIfArgumentNull(fileFingerprints, nameof(fileFingerprints));
-
         var fileFingerprintList = fileFingerprints.ToList();
+        _logger.LogDebug(
+            "MemoryDataAccessLayer: Writing {FileFingerprintCount} fingerprint(s).",
+            fileFingerprintList.Count);
         _fileFingerprints.AddRange(fileFingerprintList);
-        _logger.LogDebug("Writing {FileFingerprintCount} fingerprint(s).", fileFingerprintList.Count);
 
         return Task.CompletedTask;
     }
@@ -96,11 +90,13 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
     /// Deletes the provided <see cref="IFileFingerprint"/> from the data access layer.
     /// </summary>
     /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to delete.</param>
-    /// <returns><c>true</c> if a file matching the provided <see cref="IFileFingerprint"/>'s was deleted, <c>false</c>
-    /// if no match could be found.</returns>
+    /// <returns><c>true</c> if a file matching the provided <see cref="IFileFingerprint"/>'s was
+    /// deleted, <c>false</c> if no match could be found.</returns>
     public Task<bool> DeleteAsync(FileFingerprint fileFingerprint)
     {
         ThrowIfArgumentNull(fileFingerprint, nameof(fileFingerprint));
+        _logger.LogDebug(
+            "MemoryDataAccessLayer: Deleting fingerprint {FileFingerprint}", fileFingerprint);
         
         return Task.FromResult(_fileFingerprints.Remove(fileFingerprint));
     }
