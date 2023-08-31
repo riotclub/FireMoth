@@ -42,7 +42,7 @@ public interface IDataAccessLayer<TValue>
     public Task AddManyAsync(IEnumerable<TValue> values); 
 
     /// <summary>
-    /// Deletes a value from the repository.
+    /// Deletes a value from the data layer.
     /// </summary>
     /// <param name="value">A value of type <typeparamref name="TValue"/> to delete from the data
     /// layer.</param>

@@ -15,29 +15,15 @@ public class FireMothContext : DbContext
 {
     public DbSet<FileFingerprint> FileFingerprints { get; set; }
 
-    private const string DbAppdataSubfolder = "FireMoth";
-    private const string DbFileName = "FireMoth_FileFingerprints.db";
-    private string DbFullPath { get; }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="FireMothContext"/> class.
     /// </summary>
-    public FireMothContext()
+    public FireMothContext(DbContextOptions<FireMothContext> options) : base(options)
     {
-        const Environment.SpecialFolder folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Path.Combine(Environment.GetFolderPath(folder), DbAppdataSubfolder);
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
-        DbFullPath = Path.Join(path, DbFileName);
     }
 
     /// <inheritdoc/>
     /// <seealso cref="FileFingerprintTypeConfiguration"/>
     protected override void OnModelCreating(ModelBuilder builder) =>
         new FileFingerprintTypeConfiguration().Configure(builder.Entity<FileFingerprint>());
-
-    // TODO: Move DB connection string to configuration 
-    /// <inheritdoc/>
-    protected override void OnConfiguring(DbContextOptionsBuilder options) =>
-        options.UseSqlite($"Data Source={DbFullPath}");
 }

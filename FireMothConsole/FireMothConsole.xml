@@ -61,8 +61,10 @@
             <summary>
             Adds services required to perform directory scanning via the FireMoth API.
             </summary>
-            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to which services are added.</param>
-            <param name="config">An <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> containing program runtime configuration.</param>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to which services are added.
+            </param>
+            <param name="config">An <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> containing program runtime
+            configuration.</param>
             <returns></returns>
         </member>
         <member name="T:RiotClub.FireMoth.Console.Program">

@@ -36,7 +36,7 @@
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1.DeleteAsync(`0)">
             <summary>
-            Deletes a value from the repository.
+            Deletes a value from the data layer.
             </summary>
             <param name="value">A value of type <typeparamref name="TValue"/> to delete from the data
             layer.</param>
@@ -65,30 +65,29 @@
             Adds the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to the data access layer.
             </summary>
             <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to add.</param>
-            <exception cref="T:System.ArgumentNullException">Thrown when provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> reference is
-            null.</exception>
-            <exception cref="T:System.ObjectDisposedException">Thrown when object is in a disposed state.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown when provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>
+            reference is null.</exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.AddManyAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
             <summary>
             Adds the provided collection of <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s to the data access layer.
             </summary>
-            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing items to add.</param>
+            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing
+            items to add.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when provided collection is null.</exception>
-            <exception cref="T:System.ObjectDisposedException">Thrown when object is in a disposed state.</exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
             <summary>
             Deletes the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> from the data access layer.
             </summary>
             <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to delete.</param>
-            <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was deleted, <c>false</c>
-            if no match could be found.</returns>
+            <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was
+            deleted, <c>false</c> if no match could be found.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.#ctor">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext"/> class.
             </summary>
@@ -97,13 +96,18 @@
             <inheritdoc/>
             <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration"/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
-            <inheritdoc/>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer">
             <summary>
             Implementation of a data access layer that persists data to a SQLite database.
             </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.#ctor(Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer},RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer"/> class.
+            </summary>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger"/> used to log information.</param>
+            <param name="context">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext"/> instance representing the database
+            connection.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.String})">
             <inheritdoc/>
