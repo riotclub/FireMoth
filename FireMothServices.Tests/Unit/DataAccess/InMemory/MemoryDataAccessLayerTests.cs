@@ -15,7 +15,7 @@ using Moq.AutoMock;
 using RiotClub.FireMoth.Services.DataAccess;
 using RiotClub.FireMoth.Services.DataAccess.InMemory;
 using RiotClub.FireMoth.Services.Repository;
-using RiotClub.FireMoth.Services.Tests.Helpers;
+using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
 using Xunit;
 
 /// <summary>
@@ -78,7 +78,7 @@ public class MemoryDataAccessLayerTests
     /// GetAsync: Call without filter or orderBy parameters returns all FileFingerprints
     /// </summary>
     [Fact]
-    public async void GetAsync_NoFilterOrOrderByParameters_ReturnsAllFileFingerprints()
+    public async void GetAsync_WithoutFilterOrOrderBy_ReturnsAllFileFingerprints()
     {
         // Arrange
         var testObject = _mocker.CreateInstance<MemoryDataAccessLayer>();

@@ -84,7 +84,7 @@
             Ctor: If ILogger is null, an ArgumentNullException is thrown.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NoFilterOrOrderByParameters_ReturnsAllFileFingerprints">
+        <member name="M:RiotClub.FireMoth.Services.Tests.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_WithoutFilterOrOrderBy_ReturnsAllFileFingerprints">
             <summary>
             GetAsync: Call without filter or orderBy parameters returns all FileFingerprints
             </summary>
@@ -150,16 +150,6 @@
             <summary>
             DeleteAsync: When data access layer does not contain a matching FileFingerprint, false is
             returned.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_ILoggerIsNull_ThrowsArgumentNullException">
-            <summary>
-            Ctor: If ILogger is null, an ArgumentNullException is thrown.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_FireMothContextIsNull_ThrowsArgumentNullException">
-            <summary>
-            Ctor: If FireMothContext is null, an ArgumentNullException is thrown.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Extensions.MockExtensions.VerifyLogCalled``1(Moq.Mock{Microsoft.Extensions.Logging.ILogger{``0}},System.String,Microsoft.Extensions.Logging.LogLevel)">

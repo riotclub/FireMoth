@@ -34,7 +34,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FireMoth.Tests.Common\FireMoth.Tests.Common.csproj" />
     <ProjectReference Include="..\FireMothServices\FireMoth.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="Integration\" />
+    <Folder Include="Unit\" />
   </ItemGroup>
 
 </Project>

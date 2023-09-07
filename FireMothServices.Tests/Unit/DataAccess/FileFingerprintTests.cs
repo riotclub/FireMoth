@@ -59,8 +59,6 @@ using Xunit;
 [ExcludeFromCodeCoverage]
 public class FileFingerprintTests
 {
-    private readonly string testBase64Hash = "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=";
-
     // Ctor: base64Hash string can't be null or empty
     [Fact]
     public void Ctor_NullString_ThrowsArgumentNullException()
