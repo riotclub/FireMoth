@@ -469,7 +469,8 @@
             <param name="fileName">The name of the file.</param>
             <param name="directoryName">The full path of the directory containing the file.</param>
             <param name="fileSize">The size of the file in bytes.</param>
-            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the specified file.</param>
+            <param name="base64Hash">A <see cref="T:System.String"/> containing a valid base 64 hash for the
+            specified file.</param>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.FileName">
             <inheritdoc/>
@@ -482,13 +483,6 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.Base64Hash">
             <inheritdoc/>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.Id">
-            <summary>
-            Unique identifier for this <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>.
-            </summary>
-            <remarks>This value serves as the primary key for entities when using an ORM (Entity Framework) in the data
-            access layer.</remarks>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Repository.FileFingerprint.FullPath">
             <inheritdoc/>

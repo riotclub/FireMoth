@@ -70,11 +70,14 @@ public static class Program
             stopwatch.Start();
             using (var scope = host.Services.CreateScope())
             {
-                var scanner = scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
-                var commandLineOptions = scope.ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
+                var scanner = scope
+                    .ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+                var commandLineOptions = scope
+                    .ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
+                var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
+                    commandLineOptions.ScanDirectory);
                 var scanOptions = new ScanOptions(
-                    new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),
-                    commandLineOptions.RecursiveScan);
+                    scanDirectoryInfo, commandLineOptions.RecursiveScan);
             
                 // Perform scan
                 scanResult = await scanner.ScanDirectoryAsync(
@@ -95,7 +98,10 @@ public static class Program
         }
         catch (Exception exception)
         {
-            Log.Fatal(exception, "FireMoth.Console could not complete: {ExceptionMessage}.", exception.Message);
+            Log.Fatal(
+                exception,
+                "FireMoth.Console could not complete: {ExceptionMessage}.",
+                exception.Message);
         }
         finally
         {
@@ -106,10 +112,12 @@ public static class Program
 
     private static void LogScanResult(ScanResult scanResult)
     {
-        Log.Information("Scan complete. Scanned {ScannedFilesCount} file(s).", scanResult.ScannedFiles.Count);
+        Log.Information(
+            "Scan complete. Scanned {ScannedFilesCount} file(s).", scanResult.ScannedFiles.Count);
         if (scanResult.SkippedFiles.Count == 0) return;
 
-        Log.Information("{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
+        Log.Information(
+            "{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
         foreach (var file in scanResult.SkippedFiles)
         {
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);

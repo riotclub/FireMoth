@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite;
+namespace RiotClub.FireMoth.Services.DataAccess.Sqlite;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,6 +14,10 @@ internal class FileFingerprintTypeConfiguration : IEntityTypeConfiguration<FileF
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<FileFingerprint> builder)
     {
+        builder.Property<int>("Id")
+               .ValueGeneratedOnAdd();
+        builder.HasKey("Id");
+        
         builder.Property("FileName")
                .HasColumnType("varchar(256)");
         builder.Property("DirectoryName")

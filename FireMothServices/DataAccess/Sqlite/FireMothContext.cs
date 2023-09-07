@@ -8,12 +8,11 @@ namespace RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using System;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
-using RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite;
 using RiotClub.FireMoth.Services.Repository;
 
 public class FireMothContext : DbContext
 {
-    public DbSet<FileFingerprint> FileFingerprints { get; set; }
+    public virtual DbSet<FileFingerprint> FileFingerprints { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FireMothContext"/> class.
