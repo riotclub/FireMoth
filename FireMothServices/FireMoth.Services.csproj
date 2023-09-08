@@ -23,9 +23,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="12.2.19">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
