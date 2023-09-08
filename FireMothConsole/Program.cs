@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
+using RiotClub.FireMoth.Services.Repository;
 using Serilog;
 
 /// <summary>
@@ -85,10 +87,24 @@ public static class Program
                     scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
                 
                 // Output scan result
-                Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
-                var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
-                var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
-                writeTask.Wait();
+                if (!commandLineOptions.DuplicatesOnly)
+                {
+                    Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
+                    var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
+                    await resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
+                }
+                else
+                {
+                    Log.Information(
+                        "Writing output (duplicates only) to '{OutputFileName}'.", _outputFileName);
+                    var fingerprintRepository = scope.ServiceProvider
+                        .GetRequiredService<IFileFingerprintRepository>();
+                    var duplicates = await fingerprintRepository
+                        .GetFileFingerprintsWithDuplicateHashesAsync();
+
+                    var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
+                    await resultWriter.WriteFileFingerprintsAsync(duplicates);
+                }
             }
             
             stopwatch.Stop();
@@ -128,14 +144,6 @@ public static class Program
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .UseConsoleLifetime()
-            .ConfigureHostConfiguration(configuration =>
-            {
-                // Perform any configuration needed when building the host here.
-            })
-            .ConfigureAppConfiguration((hostContext, configuration) =>
-            {
-                // Perform app configuration here (after the host is built).
-            })
             .UseSerilog((context, services, configuration) =>
             {
                 configuration
@@ -161,10 +169,12 @@ public static class Program
     private static string GetOutputFileName(string outputFile)
     {
         if (string.IsNullOrWhiteSpace(outputFile))
+        {
             return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
                    + Path.DirectorySeparatorChar + DefaultFilePrefix
                    + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
                    + '.' + DefaultFileExtension;
+        }
 
         var outputFileFullPath = Path.GetFullPath(outputFile);
         
