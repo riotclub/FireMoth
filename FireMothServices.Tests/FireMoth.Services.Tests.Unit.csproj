@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <AssemblyName>FireMoth.Services.Tests</AssemblyName>
     <RootNamespace>RiotClub.FireMoth.Services.Tests</RootNamespace>
+    <PackageId>FireMoth.Services.Tests.Unit</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -40,8 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="Integration\" />
     <Folder Include="Unit\" />
   </ItemGroup>
 

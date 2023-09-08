@@ -316,7 +316,8 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator">
             <summary>
-            Directory scanner implementation that reads the files in a directory and writes the file and hash to an
+            Directory scanner implementation that reads the files in a directory and writes the file and
+            hash to an
             <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
             </summary>
         </member>
@@ -324,10 +325,10 @@
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator"/> class.
             </summary>
-            <param name="fileScanOrchestrator">An <see cref="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator"/> that manages scanning of files.
-            </param>
-            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output will be written.
-            </param>
+            <param name="fileScanOrchestrator">An <see cref="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator"/> that manages
+            scanning of files.</param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output
+            will be written.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.ScanDirectoryAsync(System.String,System.Boolean)">
             <inheritdoc/>
@@ -537,6 +538,9 @@
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.String})">
             <inheritdoc/>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetFileFingerprintsWithDuplicateHashesAsync">
+            <inheritdoc/>
+        </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
             <inheritdoc/>
         </member>
@@ -594,6 +598,14 @@
             <param name="filter">A lambda expression that specifies a filter condition.</param>
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>IEnumerable collection of file fingerprints.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.GetFileFingerprintsWithDuplicateHashesAsync">
+            <summary>
+            Retrieves a collection of file fingerprints that have hash values that match other file
+            fingerprints in the repository.
+            </summary>
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the file fingerprints.
+            </returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
             <summary>

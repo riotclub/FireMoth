@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Console.Tests", "F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Services", "FireMothServices\FireMoth.Services.csproj", "{AE104B2C-0186-4415-9421-E0CA2022CE76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Services.Tests", "FireMothServices.Tests\FireMoth.Services.Tests.csproj", "{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Services.Tests.Unit", "FireMothServices.Tests\FireMoth.Services.Tests.Unit.csproj", "{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3C0CF8FC-0954-477C-A2E9-5C278EC1D005}"
 EndProject
