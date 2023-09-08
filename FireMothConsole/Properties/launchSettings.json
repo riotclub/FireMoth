@@ -1,0 +1,11 @@
+﻿{
+    "profiles": {
+        "FireMothConsole": {
+            "commandName": "Project",
+            "commandLineArgs": "--ScanDirectory \"D:\\FireMoth Test Data\" --RecursiveScan false --OutputFilter all --OutputFile CustomOutputTest.csv",
+            "environmentVariables": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        }
+    }
+}
