@@ -4,7 +4,6 @@
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
 
-using static System.Formats.Asn1.AsnWriter;
 using System.Diagnostics.CodeAnalysis;
 
 [module: SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Ignoring this for early development builds.", Scope = "module")]

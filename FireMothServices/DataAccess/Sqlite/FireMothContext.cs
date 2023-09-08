@@ -3,34 +3,26 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite;
+namespace RiotClub.FireMoth.Services.DataAccess.Sqlite;
 
 using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using RiotClub.FireMoth.Services.Repository;
 
-internal class FireMothContext : DbContext
+public class FireMothContext : DbContext
 {
+    public virtual DbSet<FileFingerprint> FileFingerprints { get; set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FireMothContext"/> class.
     /// </summary>
-    public FireMothContext()
+    public FireMothContext(DbContextOptions<FireMothContext> options) : base(options)
     {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
-        this.DbPath = System.IO.Path.Join(path, "FireMoth.db");
     }
-
-    public DbSet<FileFingerprint>? FileFingerprints { get; set; }
-
-    public string DbPath { get; }
 
     /// <inheritdoc/>
     /// <seealso cref="FileFingerprintTypeConfiguration"/>
     protected override void OnModelCreating(ModelBuilder builder) =>
         new FileFingerprintTypeConfiguration().Configure(builder.Entity<FileFingerprint>());
-
-    /// <inheritdoc/>
-    protected override void OnConfiguring(DbContextOptionsBuilder options) =>
-        options.UseSqlite($"Data Source={this.DbPath}");
 }

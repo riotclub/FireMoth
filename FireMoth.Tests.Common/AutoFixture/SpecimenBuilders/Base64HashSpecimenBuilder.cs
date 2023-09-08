@@ -3,25 +3,21 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Tests.Helpers;
+namespace RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
 
 using System;
 using System.Reflection;
-using AutoFixture.Kernel;
+using global::AutoFixture.Kernel;
 
 public class Base64HashSpecimenBuilder : ISpecimenBuilder
 {
     public object Create(object request, ISpecimenContext context)
     {
-        var pi = request as ParameterInfo;
-        if (pi == null)
-        {
+        if (request is not ParameterInfo pi)
             return new NoSpecimen();
-        }
+        
         if (pi.ParameterType != typeof(string) || pi.Name != "base64Hash")
-        {
             return new NoSpecimen();
-        }
 
         var rand = new Random();
         var bytes = new byte[32];

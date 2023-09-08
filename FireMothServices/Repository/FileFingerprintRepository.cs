@@ -15,7 +15,7 @@ using System.Collections.Generic;
 /// </summary>
 public class FileFingerprintRepository : IFileFingerprintRepository
 {
-    private readonly IDataAccessLayer<IFileFingerprint> _dataAccessLayer;
+    private readonly IDataAccessLayer<FileFingerprint> _dataAccessLayer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprintRepository"/> class.
@@ -23,26 +23,22 @@ public class FileFingerprintRepository : IFileFingerprintRepository
     /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer{IFileFingerprint}"/> implementation used to
     /// persist data.</param>
     /// <exception cref="ArgumentNullException">If any of the provided services are <c>null</c>.</exception>
-    public FileFingerprintRepository(IDataAccessLayer<IFileFingerprint> dataAccessLayer)
+    public FileFingerprintRepository(IDataAccessLayer<FileFingerprint> dataAccessLayer)
     {
         _dataAccessLayer = dataAccessLayer ?? throw new ArgumentNullException(nameof(dataAccessLayer));
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<IFileFingerprint>> GetAsync(
-        Func<IFileFingerprint, bool>? filter = null,
-        Func<IFileFingerprint, string>? orderBy = null) =>
+    public async Task<IEnumerable<FileFingerprint>> GetAsync(
+        Func<FileFingerprint, bool>? filter = null,
+        Func<FileFingerprint, string>? orderBy = null) =>
         await _dataAccessLayer.GetAsync(filter, orderBy);
 
     /// <inheritdoc/>
-    public async Task<bool> DeleteAsync(IFileFingerprint fileFingerprint) =>
+    public async Task<bool> DeleteAsync(FileFingerprint fileFingerprint) =>
         await _dataAccessLayer.DeleteAsync(fileFingerprint);
 
     /// <inheritdoc/>
-    public async Task AddAsync(IFileFingerprint fileFingerprint) =>
+    public async Task AddAsync(FileFingerprint fileFingerprint) =>
         await _dataAccessLayer.AddAsync(fileFingerprint);
-
-    /// <inheritdoc/>
-    public async Task<bool> UpdateAsync(IFileFingerprint fileFingerprint) =>
-        await _dataAccessLayer.UpdateAsync(fileFingerprint);
 }

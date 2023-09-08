@@ -14,6 +14,12 @@ using Extensions;
 public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
 {
     /// <summary>
+    /// Private, parameterless constructor required by Entity Framework ORM.
+    /// </summary>
+    private FileFingerprint()
+    { }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
     /// </summary>
     /// <param name="fileName">The name of the file.</param>
@@ -21,11 +27,10 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     /// <param name="fileSize">The size of the file in bytes.</param>
     /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the
     /// specified file.</param>
-    public FileFingerprint(
-        string fileName, string directoryName, long fileSize, string base64Hash)
+    public FileFingerprint(string fileName, string directoryName, long fileSize, string base64Hash)
     {
-        DirectoryName = directoryName
-                        ?? throw new ArgumentNullException(nameof(directoryName));
+        DirectoryName = directoryName ?? throw new ArgumentNullException(nameof(directoryName));
+        // _fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
         FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
         FileSize = fileSize;
 
@@ -34,10 +39,10 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     }
 
     /// <inheritdoc/>
-    public string DirectoryName { get; }
+    public string FileName { get; }
 
     /// <inheritdoc/>
-    public string FileName { get; }
+    public string DirectoryName { get; }
 
     /// <inheritdoc/>
     public long FileSize { get; }
@@ -60,19 +65,13 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     public static bool operator ==(FileFingerprint? left, FileFingerprint? right)
     {
         if (ReferenceEquals(left, right))
-        {
             return true;
-        }
 
         if (left is null && right is null)
-        {
             return true;
-        }
 
         if (left is null || right is null)
-        {
             return false;
-        }
 
         return left.Equals(right);
     }
@@ -101,34 +100,27 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
         && Base64Hash == fingerprint.Base64Hash;
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine(
-        FileName, DirectoryName, FileSize, Base64Hash);
+    public override int GetHashCode() =>
+        HashCode.Combine(FileName, DirectoryName, FileSize, Base64Hash);
 
     /// <inheritdoc/>
     public override string ToString()
     {
-        return
-            "File:" + System.IO.Path.Combine(DirectoryName, FileName)
-                    + ",FileSize:" + FileSize
-                    + ",Hash:" + Base64Hash;
+        return "File:" + System.IO.Path.Combine(DirectoryName, FileName) 
+               + ",FileSize:" + FileSize
+               + ",Hash:" + Base64Hash;
     }
 
     private static void ThrowIfHashInvalid(string base64Hash)
     {
         if (base64Hash == null)
-        {
             throw new ArgumentNullException(nameof(base64Hash));
-        }
 
         if (base64Hash.IsEmptyOrWhiteSpace())
-        {
             throw new ArgumentException("Hash string cannot be empty.");
-        }
 
         if (!base64Hash.IsBase64String())
-        {
             throw new ArgumentException(
                 "Hash string is not a valid base 64 string.", nameof(base64Hash));
-        }
     }
 }

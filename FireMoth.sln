@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireMoth.Services.Tests", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3C0CF8FC-0954-477C-A2E9-5C278EC1D005}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FireMoth.Services.Tests.Integration", "FireMoth.Services.Tests.Integration\FireMoth.Services.Tests.Integration.csproj", "{EC25259F-A45A-42D4-8854-3C5106A44D9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FireMoth.Tests.Common", "FireMoth.Tests.Common\FireMoth.Tests.Common.csproj", "{39C8C7BA-E7BB-4196-AFC4-96969F643548}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,14 @@ Global
 		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC25259F-A45A-42D4-8854-3C5106A44D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC25259F-A45A-42D4-8854-3C5106A44D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC25259F-A45A-42D4-8854-3C5106A44D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC25259F-A45A-42D4-8854-3C5106A44D9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39C8C7BA-E7BB-4196-AFC4-96969F643548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39C8C7BA-E7BB-4196-AFC4-96969F643548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39C8C7BA-E7BB-4196-AFC4-96969F643548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39C8C7BA-E7BB-4196-AFC4-96969F643548}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,6 +54,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DCEF8C2F-B64A-4D46-8969-320A4E143A61} = {3C0CF8FC-0954-477C-A2E9-5C278EC1D005}
 		{EA0420BD-2965-4A9A-9A3F-CB5CD2122CB8} = {3C0CF8FC-0954-477C-A2E9-5C278EC1D005}
+		{EC25259F-A45A-42D4-8854-3C5106A44D9E} = {3C0CF8FC-0954-477C-A2E9-5C278EC1D005}
+		{39C8C7BA-E7BB-4196-AFC4-96969F643548} = {3C0CF8FC-0954-477C-A2E9-5C278EC1D005}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8C143A4-3940-43DA-A0DE-B1C757892A8A}

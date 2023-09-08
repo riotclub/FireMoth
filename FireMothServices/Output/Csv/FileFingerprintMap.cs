@@ -19,16 +19,16 @@ internal class FileFingerprintMap : ClassMap<IFileFingerprint>
     /// </summary>
     public FileFingerprintMap()
     {
-        this.Map(fingerprint => fingerprint.FileName)
-            .Name("Name")
+        Map(fingerprint => fingerprint.FileName)
+            .Name("FileName")
             .Index(0);
-        this.Map(fingerprint => fingerprint.DirectoryName)
+        Map(fingerprint => fingerprint.DirectoryName)
             .Name("DirectoryName")
             .Index(1);
-        this.Map(fingerprint => fingerprint.FileSize)
-            .Name("Length")
+        Map(fingerprint => fingerprint.FileSize)
+            .Name("FileSize")
             .Index(2);
-        this.Map(fingerprint => fingerprint.Base64Hash)
+        Map(fingerprint => fingerprint.Base64Hash)
             .Name("Base64Hash")
             .Index(3);
     }

@@ -6,9 +6,7 @@
 namespace RiotClub.FireMoth.Services.Tests.FileScanning;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO.Abstractions.TestingHelpers;
 using RiotClub.FireMoth.Services.DataAnalysis;
 using RiotClub.FireMoth.Services.Repository;
 using Xunit;
@@ -61,21 +59,6 @@ using Xunit;
 [ExcludeFromCodeCoverage]
 public class FileFingerprintTests
 {
-    private readonly MockFileSystem mockFileSystem;
-    private readonly MockFileInfo mockFileInfo;
-    private readonly string testBase64Hash = "ByA2dbkxG5oPUX/flw2vMRZDvHmdzSQL0jKAWlrsMVY=";
-
-    public FileFingerprintTests()
-    {
-        this.mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
-        {
-            { @"c:\test\SomeFile.txt", new MockFileData("000") },
-            { @"c:\test\AnotherFile.dat", new MockFileData("000") },
-        });
-
-        this.mockFileInfo = new MockFileInfo(this.mockFileSystem, @"c:\test\SomeFile.txt");
-    }
-
     // Ctor: base64Hash string can't be null or empty
     [Fact]
     public void Ctor_NullString_ThrowsArgumentNullException()

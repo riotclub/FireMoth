@@ -15,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using RiotClub.FireMoth.Console.Extensions;
+using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
@@ -31,7 +33,7 @@ public static class Program
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-    private static string OutputFileName;
+    private static string _outputFileName;
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -58,26 +60,36 @@ public static class Program
             using var host = CreateHostBuilder(args).Build();
             await host.StartAsync();
 
-            var scanner = host.Services.GetRequiredService<IDirectoryScanOrchestrator>();
-            var commandLineOptions = host.Services.GetRequiredService<IOptions<CommandLineOptions>>().Value;
-            var scanOptions = new ScanOptions(
-                new FileSystem().DirectoryInfo.FromDirectoryName(commandLineOptions.ScanDirectory),
-                commandLineOptions.RecursiveScan);
-
+            using (var scope = host.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<FireMothContext>();
+                await dbContext.Database.EnsureCreatedAsync();
+            }
+            
+            ScanResult scanResult;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+            using (var scope = host.Services.CreateScope())
+            {
+                var scanner = scope
+                    .ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+                var commandLineOptions = scope
+                    .ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
+                var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
+                    commandLineOptions.ScanDirectory);
+                var scanOptions = new ScanOptions(
+                    scanDirectoryInfo, commandLineOptions.RecursiveScan);
             
-            // Perform scan
-            var scanResultTask = scanner.ScanDirectoryAsync(
-                scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
-            scanResultTask.Wait();
-            var scanResult = scanResultTask.Result;
-            
-            // Output scan result
-            Log.Information("Writing output to '{OutputFileName}'.", OutputFileName);
-            var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
-            var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
-            writeTask.Wait();
+                // Perform scan
+                scanResult = await scanner.ScanDirectoryAsync(
+                    scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
+                
+                // Output scan result
+                Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
+                var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
+                var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
+                writeTask.Wait();
+            }
             
             stopwatch.Stop();
             var timeSpan = stopwatch.Elapsed;
@@ -87,7 +99,10 @@ public static class Program
         }
         catch (Exception exception)
         {
-            Log.Fatal(exception, "FireMoth.Console could not complete: {ExceptionMessage}.", exception.Message);
+            Log.Fatal(
+                exception,
+                "FireMoth.Console could not complete: {ExceptionMessage}.",
+                exception.Message);
         }
         finally
         {
@@ -98,10 +113,12 @@ public static class Program
 
     private static void LogScanResult(ScanResult scanResult)
     {
-        Log.Information("Scan complete. Scanned {ScannedFilesCount} file(s).", scanResult.ScannedFiles.Count);
+        Log.Information(
+            "Scan complete. Scanned {ScannedFilesCount} file(s).", scanResult.ScannedFiles.Count);
         if (scanResult.SkippedFiles.Count == 0) return;
 
-        Log.Information("{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
+        Log.Information(
+            "{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
         foreach (var file in scanResult.SkippedFiles)
         {
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
@@ -137,8 +154,8 @@ public static class Program
                 services.Configure<CommandLineOptions>(hostContext.Configuration);
                 services.AddFireMothServices(hostContext.Configuration);
                 var commandLineOptions = hostContext.Configuration.Get<CommandLineOptions>();
-                OutputFileName = GetOutputFileName(commandLineOptions.OutputFile);
-                services.AddTransient(_ => new StreamWriter(OutputFileName));
+                _outputFileName = GetOutputFileName(commandLineOptions.OutputFile);
+                services.AddTransient(_ => new StreamWriter(_outputFileName));
             });
 
     private static string GetOutputFileName(string outputFile)
@@ -151,7 +168,6 @@ public static class Program
 
         var outputFileFullPath = Path.GetFullPath(outputFile);
         
-        // May update to support appending to files
         if (!File.Exists(outputFileFullPath))
             return Path.GetFullPath(outputFileFullPath);
 
