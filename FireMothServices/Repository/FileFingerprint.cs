@@ -39,21 +39,16 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     }
 
     /// <inheritdoc/>
-    // public string FileName { get => _fileName; }
-    // private string _fileName;
     public string FileName { get; }
 
     /// <inheritdoc/>
     public string DirectoryName { get; }
-    //private string _directoryName;
 
     /// <inheritdoc/>
     public long FileSize { get; }
-    //private long _fileSize;
 
     /// <inheritdoc/>
     public string Base64Hash { get; }
-    //private string _base64Hash;
 
     /// <inheritdoc/>
     public string FullPath => System.IO.Path.Combine(DirectoryName, FileName);
