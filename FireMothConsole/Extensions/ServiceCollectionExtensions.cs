@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Console;
+namespace RiotClub.FireMoth.Console.Extensions;
 
 using System;
 using System.IO;
@@ -64,29 +64,31 @@ public static class ServiceCollectionExtensions
 
     private static string GetSqliteConnectionString(IConfiguration sqliteConfigSection)
     {
-        // Get required values from configuration
-        var dbDirectory = sqliteConfigSection.GetRequiredSection("DbDirectory").Value;
-        var dbFileName = sqliteConfigSection.GetRequiredSection("DbFileName").Value;
+        var useAppData = sqliteConfigSection.GetValue("UseAppDataDirectory", false);
+        var dbDirectory = sqliteConfigSection.GetValue<string>("DbDirectory");
+        var dbFileName = sqliteConfigSection.GetValue<string>("DbFileName");
         
-        // If necessary, do %APPDATA% replacement in directory retrieved from config
-        if (dbDirectory!.Contains("%APPDATA%"))
+        string dbFullPath;
+        if (useAppData)
         {
             const Environment.SpecialFolder appDataFolder = 
                 Environment.SpecialFolder.LocalApplicationData;
-            dbDirectory =
-                dbDirectory.Replace("%APPDATA%", Environment.GetFolderPath(appDataFolder));
+            dbFullPath = Environment.GetFolderPath(appDataFolder);
         }
+        else
+        {
+            dbFullPath = Environment.CurrentDirectory;
+        }
+
+        dbFullPath = dbFullPath + Path.DirectorySeparatorChar + dbDirectory;
+        if (!Directory.Exists(dbFullPath))
+            Directory.CreateDirectory(dbFullPath);
         
-        // Verify directory exists, create if necessary
-        if (!Directory.Exists(dbDirectory))
-            Directory.CreateDirectory(dbDirectory);
-        
-        // Build and return Sqlite connection string
         var sqliteConnectionStringBuilder = new SqliteConnectionStringBuilder
         {
-            DataSource = Path.Join(dbDirectory, dbFileName)
+            DataSource = Path.Join(dbFullPath, dbFileName)
         };
-
+        
         return sqliteConnectionStringBuilder.ConnectionString;
     }
 }

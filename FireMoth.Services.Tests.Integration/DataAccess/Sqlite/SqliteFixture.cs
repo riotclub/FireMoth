@@ -8,6 +8,7 @@ namespace FireMoth.Services.Tests.Integration.DataAccess.Sqlite;
 using AutoFixture;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
@@ -17,8 +18,7 @@ public class SqliteFixture : IDisposable
     private readonly Fixture _autoFixture = new();
     public FireMothContext DbContext { get; }
 
-    private const string TestDbDirectory = @"C:\Users\Jason\";
-    private const string TestDbFileName = "firemoth_integration_test_db.sqlite";
+    private const string TestDbFileName = "FireMoth_Integration_Testing.sqlite";
 
     public List<FileFingerprint> TestFileFingerprints { get; } = new();
 
@@ -26,15 +26,11 @@ public class SqliteFixture : IDisposable
     {
         _autoFixture.Customizations.Add(new Base64HashSpecimenBuilder());
         _autoFixture.Customizations.Add(new FileNameSpecimenBuilder());
-        
-        if (!Directory.Exists(TestDbDirectory))
-            Directory.CreateDirectory(TestDbDirectory);
-        var connectionStringBuilder = new SqliteConnectionStringBuilder
-        {
-            DataSource = Path.Join(TestDbDirectory, TestDbFileName)
-        };
+
+        var sqliteConnectionString = GetSqliteConnectionString();
+
         var dbContextOptions = new DbContextOptionsBuilder<FireMothContext>()
-            .UseSqlite(connectionStringBuilder.ConnectionString)
+            .UseSqlite(sqliteConnectionString)
             .Options;
 
         DbContext = new FireMothContext(dbContextOptions);
@@ -42,6 +38,18 @@ public class SqliteFixture : IDisposable
         DbContext.Database.EnsureCreated();
         
         GenerateTestData();
+    }
+
+    private static string GetSqliteConnectionString()
+    {
+        var tempDirectory = Path.GetTempPath();
+
+        var sqliteConnectionStringBuilder = new SqliteConnectionStringBuilder
+        {
+            DataSource = Path.Join(tempDirectory, TestDbFileName)
+        };
+        
+        return sqliteConnectionStringBuilder.ConnectionString;
     }
 
     private void GenerateTestData()

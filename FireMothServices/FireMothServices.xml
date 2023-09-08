@@ -84,7 +84,7 @@
             <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was
             deleted, <c>false</c> if no match could be found.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
+        <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
             <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext})">
@@ -94,7 +94,7 @@
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc/>
-            <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.EntityFrameworkSqlite.FileFingerprintTypeConfiguration"/>
+            <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FileFingerprintTypeConfiguration"/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer">
             <summary>
