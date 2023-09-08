@@ -230,7 +230,7 @@ public class SqliteDataAccessLayerTests : IClassFixture<SqliteFixture>, IDisposa
     
     /// <summary>
     /// AddManyAsync: After call, provided FileFingerprints have been added to the data access
-    /// layer.
+    ///               layer.
     /// </summary>
     [Fact]
     public async void AddManyAsync_WithValidIEnumerable_AddsFileFingerprintsToDataAccessLayer()
@@ -251,13 +251,6 @@ public class SqliteDataAccessLayerTests : IClassFixture<SqliteFixture>, IDisposa
 #endregion
 
 #region DeleteAsync
-    // DeleteAsync
-    // - 
-    // - When data access layer contains a matching FileFingerprint, true is returned.
-    // - When data access layer does not contain a matching FileFingerprint, no changes are made to
-    //   the data access layer.
-    // - When data access layer does not contain a matching FileFingerprint, false is returned.
-
     /// <summary>
     /// DeleteAsync: If null FileFingerprint is provided, throw ArgumentNullException.
     /// </summary>
@@ -276,26 +269,82 @@ public class SqliteDataAccessLayerTests : IClassFixture<SqliteFixture>, IDisposa
 
     /// <summary>
     /// DeleteAsync: When data access layer contains a matching FileFingerprint, matching value is
-    /// deleted.
+    ///              deleted.
     /// </summary>
-    // [Fact]
-    // public async void DeleteAsync_WithMatchingFileFingerprint_MatchingValueIsDeleted()
-    // {
-    //     // Arrange
-    //     var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
-    //     var fp = _sqliteFixture.TestFileFingerprints.First(fp => fp.FileName == "TestFileA.dat");
-    //     var fingerprintToDelete =
-    //         new FileFingerprint(99999, "TestFileZZT", fp.DirectoryName, fp.FileSize, fp.Base64Hash);
-    //     var expected = _sqliteFixture.TestFileFingerprints.ToList();
-    //     // expected.Remove(fingerprintToDelete);
-    //
-    //     // Act
-    //     await sut.DeleteAsync(fingerprintToDelete);
-    //     var result = await sut.GetAsync();
-    //
-    //     // Assert
-    //     result.Should().Equal(expected);
-    // }
+    [Fact]
+    public async void DeleteAsync_WithMatchingFileFingerprint_MatchingValueIsDeleted()
+    {
+        // Arrange
+        var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
+        var fingerprintToDelete = _sqliteFixture.DbContext.FileFingerprints
+            .First(fp => fp.FileName == "TestFileA.dat");
+        var expected = _sqliteFixture.TestFileFingerprints.ToList();
+        expected.Remove(fingerprintToDelete);
     
+        // Act
+        await sut.DeleteAsync(fingerprintToDelete);
+        var result = await sut.GetAsync();
+    
+        // Assert
+        result.Should().Equal(expected);
+    }
+    
+    /// <summary>
+    /// DeleteAsync: When data access layer contains a matching FileFingerprint, true is returned.
+    /// </summary>
+    [Fact]
+    public async void DeleteAsync_WithMatchingFileFingerprint_ReturnsTrue()
+    {
+        // Arrange
+        var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
+        var fingerprintToDelete = _sqliteFixture.DbContext.FileFingerprints
+            .First(fp => fp.FileName == "TestFileA.dat");
+    
+        // Act
+        var result = await sut.DeleteAsync(fingerprintToDelete);
+    
+        // Assert
+        result.Should().BeTrue();
+    }
+    
+    /// <summary>
+    /// DeleteAsync: When data access layer does not contain a matching FileFingerprint, no changes
+    ///              are made to the data access layer. 
+    /// </summary>
+    [Fact]
+    public async void DeleteAsync_WithoutMatchingFileFingerprint_NoChangesMade()
+    {
+        // Arrange
+        var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
+        var fingerprintToDelete = new FileFingerprint(
+            "File", "NotFound", 0, "kCHjHcukmK55NvgizMPfN4Icwk9xEpcpqrm6SiC1nkw=");
+        var expected = _sqliteFixture.TestFileFingerprints.ToList();
+
+        // Act
+        await sut.DeleteAsync(fingerprintToDelete);
+        var result = await sut.GetAsync();
+
+        // Assert
+        result.Should().Equal(expected);
+    }
+    
+    // DeleteAsync: When data access layer does not contain a matching FileFingerprint, false is
+    //              returned.
+    [Fact]
+    public async void DeleteAsync_WithoutMatchingFileFingerprint_ReturnsFalse()
+    {
+        // Arrange
+        var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
+        var fingerprintToDelete = new FileFingerprint(
+            "File", "NotFound", 0, "kCHjHcukmK55NvgizMPfN4Icwk9xEpcpqrm6SiC1nkw=");
+        var expected = _sqliteFixture.TestFileFingerprints.ToList();
+
+        // Act
+        await sut.DeleteAsync(fingerprintToDelete);
+        var result = await sut.GetAsync();
+
+        // Assert
+        result.Should().Equal(expected);
+    }
 #endregion
 }

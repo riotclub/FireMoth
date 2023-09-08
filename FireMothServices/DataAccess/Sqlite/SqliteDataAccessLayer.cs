@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
 
@@ -85,9 +86,20 @@ public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
         Guard.IsNotNull(fileFingerprint);
         _logger.LogDebug(
             "SqliteDataAccessLayer: Deleting fingerprint {FileFingerprint}", fileFingerprint);
-        var entityEntry = _fireMothContext.Remove(fileFingerprint);
+        
+        // Memberwise comparison is done here to prevent PK comparison (e.g., fp => fp.Equals(...))
+        var fingerprintToDelete = await _fireMothContext.FileFingerprints
+            .FirstOrDefaultAsync(fp =>
+                fp.FileName == fileFingerprint.FileName
+                && fp.DirectoryName == fileFingerprint.DirectoryName
+                && fp.FileSize == fileFingerprint.FileSize
+                && fp.Base64Hash == fileFingerprint.Base64Hash);
+        if (fingerprintToDelete is null)
+            return false;
+        
+        _fireMothContext.Remove(fingerprintToDelete);
         await _fireMothContext.SaveChangesAsync();
-
-        return entityEntry != null;
+        
+        return true;
     }
 }

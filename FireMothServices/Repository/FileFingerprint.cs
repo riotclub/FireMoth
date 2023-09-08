@@ -18,65 +18,43 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     /// </summary>
     private FileFingerprint()
     { }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
     /// </summary>
     /// <param name="fileName">The name of the file.</param>
     /// <param name="directoryName">The full path of the directory containing the file.</param>
     /// <param name="fileSize">The size of the file in bytes.</param>
-    /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the specified file.</param>
-    public FileFingerprint(
-        string fileName, string directoryName, long fileSize, string base64Hash)
+    /// <param name="base64Hash">A <see cref="string"/> containing a valid base 64 hash for the
+    /// specified file.</param>
+    public FileFingerprint(string fileName, string directoryName, long fileSize, string base64Hash)
     {
-        _directoryName = directoryName ?? throw new ArgumentNullException(nameof(directoryName));
-        _fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
-        _fileSize = fileSize;
+        DirectoryName = directoryName ?? throw new ArgumentNullException(nameof(directoryName));
+        // _fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+        FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+        FileSize = fileSize;
 
         ThrowIfHashInvalid(base64Hash);
-        _base64Hash = base64Hash;
+        Base64Hash = base64Hash;
     }
 
     /// <inheritdoc/>
-    public string FileName
-    {
-        get => _fileName;
-    }
-    
-    private string _fileName;
+    // public string FileName { get => _fileName; }
+    // private string _fileName;
+    public string FileName { get; }
 
     /// <inheritdoc/>
-    public string DirectoryName
-    {
-        get => _directoryName;
-    }
-    
-    private string _directoryName;
+    public string DirectoryName { get; }
+    //private string _directoryName;
 
     /// <inheritdoc/>
-    public long FileSize
-    {
-        get => _fileSize;
-    }
-    
-    private long _fileSize;
-    
+    public long FileSize { get; }
+    //private long _fileSize;
 
     /// <inheritdoc/>
-    public string Base64Hash
-    {
-        get => _base64Hash;
-    }
+    public string Base64Hash { get; }
+    //private string _base64Hash;
 
-    private string _base64Hash; 
-
-    /// <summary>
-    /// Unique identifier for this <see cref="FileFingerprint"/>.
-    /// </summary>
-    /// <remarks>This value serves as the primary key for entities when using an ORM (Entity Framework) in the data
-    /// access layer.</remarks>
-    public int Id { get; private set; }
-    
     /// <inheritdoc/>
     public string FullPath => System.IO.Path.Combine(DirectoryName, FileName);
 
@@ -127,7 +105,8 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
         && Base64Hash == fingerprint.Base64Hash;
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine(FileName, DirectoryName, FileSize, Base64Hash);
+    public override int GetHashCode() =>
+        HashCode.Combine(FileName, DirectoryName, FileSize, Base64Hash);
 
     /// <inheritdoc/>
     public override string ToString()
@@ -146,6 +125,7 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
             throw new ArgumentException("Hash string cannot be empty.");
 
         if (!base64Hash.IsBase64String())
-            throw new ArgumentException("Hash string is not a valid base 64 string.", nameof(base64Hash));
+            throw new ArgumentException(
+                "Hash string is not a valid base 64 string.", nameof(base64Hash));
     }
 }
