@@ -105,7 +105,7 @@ public static class Program
                     Log.Information(
                         "Writing output (duplicates only) to '{OutputFileName}'.", _outputFileName);
                     var duplicateFingerprints = 
-                        await fingerprintRepository.GetFileFingerprintsWithDuplicateHashesAsync();
+                        await fingerprintRepository.GetRecordsWithDuplicateHashesAsync();
                     fingerprintsToOutput = duplicateFingerprints.ToList();
                 }
                 var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();

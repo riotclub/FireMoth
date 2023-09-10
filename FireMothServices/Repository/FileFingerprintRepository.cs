@@ -36,7 +36,7 @@ public class FileFingerprintRepository : IFileFingerprintRepository
         await _dataAccessLayer.GetAsync(filter, orderBy);
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<FileFingerprint>> GetFileFingerprintsWithDuplicateHashesAsync()
+    public async Task<IEnumerable<FileFingerprint>> GetRecordsWithDuplicateHashesAsync()
     {
         var allFingerprints = await _dataAccessLayer.GetAsync();
         return allFingerprints

@@ -39,7 +39,7 @@ public interface IFileFingerprintRepository
     /// </summary>
     /// <returns>An <see cref="IEnumerable{FileFingerprint}"/> containing the file fingerprints.
     /// </returns>
-    public Task<IEnumerable<FileFingerprint>> GetFileFingerprintsWithDuplicateHashesAsync();
+    public Task<IEnumerable<FileFingerprint>> GetRecordsWithDuplicateHashesAsync();
     
     /// <summary>
     /// Deletes a file fingerprint from the repository.
