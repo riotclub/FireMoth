@@ -50,6 +50,10 @@ public class FileFingerprintRepository : IFileFingerprintRepository
         await _dataAccessLayer.DeleteAsync(fileFingerprint);
 
     /// <inheritdoc/>
+    public async Task<int> DeleteAllAsync() =>
+        await _dataAccessLayer.DeleteAllAsync();
+
+    /// <inheritdoc/>
     public async Task AddAsync(FileFingerprint fileFingerprint) =>
         await _dataAccessLayer.AddAsync(fileFingerprint);
 }

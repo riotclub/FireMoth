@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Console;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -79,32 +80,36 @@ public static class Program
                     .ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
                 var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
                     commandLineOptions.ScanDirectory);
+                var fingerprintRepository =
+                    scope.ServiceProvider.GetRequiredService<IFileFingerprintRepository>();
                 var scanOptions = new ScanOptions(
                     scanDirectoryInfo, commandLineOptions.RecursiveScan);
-            
+
+                var result = await fingerprintRepository.DeleteAllAsync();
+                Log.Debug(
+                    "Cleared {ExistingEntryCount} existing entries from SQLite database.", result);
+                
                 // Perform scan
                 scanResult = await scanner.ScanDirectoryAsync(
                     scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
                 
                 // Output scan result
+                IEnumerable<FileFingerprint> fingerprintsToOutput;
                 if (!commandLineOptions.DuplicatesOnly)
                 {
                     Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
-                    var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
-                    await resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
+                    fingerprintsToOutput = scanResult.ScannedFiles;
                 }
                 else
                 {
                     Log.Information(
                         "Writing output (duplicates only) to '{OutputFileName}'.", _outputFileName);
-                    var fingerprintRepository = scope.ServiceProvider
-                        .GetRequiredService<IFileFingerprintRepository>();
-                    var duplicates = await fingerprintRepository
-                        .GetFileFingerprintsWithDuplicateHashesAsync();
-
-                    var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
-                    await resultWriter.WriteFileFingerprintsAsync(duplicates);
+                    var duplicateFingerprints = 
+                        await fingerprintRepository.GetFileFingerprintsWithDuplicateHashesAsync();
+                    fingerprintsToOutput = duplicateFingerprints.ToList();
                 }
+                var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
+                await resultWriter.WriteFileFingerprintsAsync(fingerprintsToOutput);
             }
             
             stopwatch.Stop();

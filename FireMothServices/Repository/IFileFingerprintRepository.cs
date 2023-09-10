@@ -46,4 +46,9 @@ public interface IFileFingerprintRepository
     /// </summary>
     /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to delete.</param>
     public Task<bool> DeleteAsync(FileFingerprint fileFingerprint);
+
+    /// <summary>
+    /// Deletes all file fingerprints from the repository.
+    /// </summary>
+    public Task<int> DeleteAllAsync();
 }
