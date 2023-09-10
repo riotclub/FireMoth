@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using DataAccess;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// A repository that provides access to <see cref="IFileFingerprint"/>s.
@@ -35,8 +36,22 @@ public class FileFingerprintRepository : IFileFingerprintRepository
         await _dataAccessLayer.GetAsync(filter, orderBy);
 
     /// <inheritdoc/>
+    public async Task<IEnumerable<FileFingerprint>> GetRecordsWithDuplicateHashesAsync()
+    {
+        var allFingerprints = await _dataAccessLayer.GetAsync();
+        return allFingerprints
+            .GroupBy(fp => fp.Base64Hash)
+            .Where(group => group.Count() > 1)
+            .SelectMany(duplicateGroup => duplicateGroup.ToList());
+    }
+
+    /// <inheritdoc/>
     public async Task<bool> DeleteAsync(FileFingerprint fileFingerprint) =>
         await _dataAccessLayer.DeleteAsync(fileFingerprint);
+
+    /// <inheritdoc/>
+    public async Task<int> DeleteAllAsync() =>
+        await _dataAccessLayer.DeleteAllAsync();
 
     /// <inheritdoc/>
     public async Task AddAsync(FileFingerprint fileFingerprint) =>

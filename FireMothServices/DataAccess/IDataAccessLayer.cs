@@ -47,4 +47,10 @@ public interface IDataAccessLayer<TValue>
     /// <param name="value">A value of type <typeparamref name="TValue"/> to delete from the data
     /// layer.</param>
     public Task<bool> DeleteAsync(TValue value);
+    
+    /// <summary>
+    /// Deletes all values from the data layer.
+    /// </summary>
+    /// <returns>The number of rows that were deleted.</returns>
+    public Task<int> DeleteAllAsync();    
 }

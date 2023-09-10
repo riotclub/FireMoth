@@ -6,10 +6,12 @@
 namespace RiotClub.FireMoth.Console;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,7 @@ using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
+using RiotClub.FireMoth.Services.Repository;
 using Serilog;
 
 /// <summary>
@@ -60,42 +63,24 @@ public static class Program
             using var host = CreateHostBuilder(args).Build();
             await host.StartAsync();
 
-            using (var scope = host.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<FireMothContext>();
-                await dbContext.Database.EnsureCreatedAsync();
-            }
-            
             ScanResult scanResult;
             var stopwatch = new Stopwatch();
-            stopwatch.Start();
+
             using (var scope = host.Services.CreateScope())
             {
-                var scanner = scope
-                    .ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+                stopwatch.Start();
+                await InitializeDatabase(scope);
                 var commandLineOptions = scope
                     .ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
-                var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
-                    commandLineOptions.ScanDirectory);
-                var scanOptions = new ScanOptions(
-                    scanDirectoryInfo, commandLineOptions.RecursiveScan);
-            
-                // Perform scan
-                scanResult = await scanner.ScanDirectoryAsync(
-                    scanOptions.ScanDirectory.FullName, commandLineOptions.RecursiveScan);
-                
-                // Output scan result
-                Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
-                var resultWriter = host.Services.GetRequiredService<IFileFingerprintWriter>();
-                var writeTask = resultWriter.WriteFileFingerprintsAsync(scanResult.ScannedFiles);
-                writeTask.Wait();
+                scanResult = await ScanDirectory(scope, commandLineOptions);
+                await OutputScanResult(scope, scanResult, commandLineOptions);
+                stopwatch.Stop();
             }
             
-            stopwatch.Stop();
             var timeSpan = stopwatch.Elapsed;
+            Log.Information("Total scan time: {ScanTime}.", timeSpan);
 
             LogScanResult(scanResult);
-            Log.Information("Total scan time: {ScanTime}.", timeSpan);
         }
         catch (Exception exception)
         {
@@ -111,31 +96,66 @@ public static class Program
         }
     }
 
+    private static async Task OutputScanResult(
+        IServiceScope scope, ScanResult result, CommandLineOptions options)
+    {
+        IEnumerable<FileFingerprint> fingerprintsToOutput;
+        if (!options.DuplicatesOnly)
+        {
+            Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
+            fingerprintsToOutput = result.ScannedFiles;
+        }
+        else
+        {
+            Log.Information(
+                "Writing output (duplicates only) to '{OutputFileName}'.", _outputFileName);
+            var fingerprintRepository =
+                scope.ServiceProvider.GetRequiredService<IFileFingerprintRepository>();
+            var duplicateFingerprints = 
+                await fingerprintRepository.GetRecordsWithDuplicateHashesAsync();
+            fingerprintsToOutput = duplicateFingerprints.ToList();
+        }
+        var resultWriter = scope.ServiceProvider.GetRequiredService<IFileFingerprintWriter>();
+        await resultWriter.WriteFileFingerprintsAsync(fingerprintsToOutput);
+    }
+    
+    private static async Task<ScanResult> ScanDirectory(
+        IServiceScope scope, CommandLineOptions options)
+    {
+        var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
+            options.ScanDirectory);
+        var scanOptions = new ScanOptions(scanDirectoryInfo, options.RecursiveScan);
+        var scanner = scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+        return await scanner.ScanDirectoryAsync(
+            scanOptions.ScanDirectory.FullName, options.RecursiveScan);
+    }
+    
+    private static async Task InitializeDatabase(IServiceScope scope)
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<FireMothContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+        var fingerprintRepository =
+            scope.ServiceProvider.GetRequiredService<IFileFingerprintRepository>();
+        var result = await fingerprintRepository.DeleteAllAsync();
+        Log.Debug("Deleted {ExistingEntryCount} existing entries from SQLite database.", result);
+    }
+    
     private static void LogScanResult(ScanResult scanResult)
     {
         Log.Information(
             "Scan complete. Scanned {ScannedFilesCount} file(s).", scanResult.ScannedFiles.Count);
-        if (scanResult.SkippedFiles.Count == 0) return;
+        if (scanResult.SkippedFiles.Count == 0)
+            return;
 
         Log.Information(
             "{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
         foreach (var file in scanResult.SkippedFiles)
-        {
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
-        }
     }
 
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .UseConsoleLifetime()
-            .ConfigureHostConfiguration(configuration =>
-            {
-                // Perform any configuration needed when building the host here.
-            })
-            .ConfigureAppConfiguration((hostContext, configuration) =>
-            {
-                // Perform app configuration here (after the host is built).
-            })
             .UseSerilog((context, services, configuration) =>
             {
                 configuration
@@ -161,10 +181,12 @@ public static class Program
     private static string GetOutputFileName(string outputFile)
     {
         if (string.IsNullOrWhiteSpace(outputFile))
+        {
             return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
                    + Path.DirectorySeparatorChar + DefaultFilePrefix
                    + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
                    + '.' + DefaultFileExtension;
+        }
 
         var outputFileFullPath = Path.GetFullPath(outputFile);
         

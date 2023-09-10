@@ -34,8 +34,21 @@ public interface IFileFingerprintRepository
         Func<FileFingerprint, string>? orderBy = null);
 
     /// <summary>
+    /// Retrieves a collection of file fingerprints that have hash values that match other file
+    /// fingerprints in the repository.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{FileFingerprint}"/> containing the file fingerprints.
+    /// </returns>
+    public Task<IEnumerable<FileFingerprint>> GetRecordsWithDuplicateHashesAsync();
+    
+    /// <summary>
     /// Deletes a file fingerprint from the repository.
     /// </summary>
     /// <param name="fileFingerprint">The <see cref="IFileFingerprint"/> to delete.</param>
     public Task<bool> DeleteAsync(FileFingerprint fileFingerprint);
+
+    /// <summary>
+    /// Deletes all file fingerprints from the repository.
+    /// </summary>
+    public Task<int> DeleteAllAsync();
 }

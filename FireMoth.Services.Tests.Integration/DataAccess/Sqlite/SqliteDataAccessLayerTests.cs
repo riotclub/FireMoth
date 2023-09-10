@@ -42,6 +42,10 @@ using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
 ///     - When data access layer does not contain a matching FileFingerprint, no changes are made to
 ///       the data access layer.
 ///     - When data access layer does not contain a matching FileFingerprint, false is returned.
+///
+/// DeleteAllAsync
+///     - After call, returns count of the total number of FileFingerprints deleted.
+///     - After call, all FileFingerprints are removed from the data access layer.
 /// </summary>
 public class SqliteDataAccessLayerTests : IClassFixture<SqliteFixture>, IDisposable
 {
@@ -345,6 +349,42 @@ public class SqliteDataAccessLayerTests : IClassFixture<SqliteFixture>, IDisposa
 
         // Assert
         result.Should().Equal(expected);
+    }
+#endregion
+
+#region DeleteAllAsync
+    /// <summary>
+    /// DeleteAllAsync: After call, returns count of the total number of FileFingerprints deleted.
+    /// </summary>
+    [Fact]
+    public async void DeleteAllAsync_AfterCall_ReturnsDeletedRecordCount()
+    {
+        // Arrange
+        var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
+        var expected = (await sut.GetAsync()).ToList().Count;
+            
+        // Act
+        var result = await sut.DeleteAllAsync();
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    /// <summary>
+    /// DeleteAllAsync: After call, all FileFingerprints are removed from the data access layer.
+    /// </summary>
+    [Fact]
+    public async void DeleteAllAsync_AfterCall_AllFileFingerprintsRemoved()
+    {
+        // Arrange
+        var sut = new SqliteDataAccessLayer(_nullLogger, _sqliteFixture.DbContext);
+        
+        // Act
+        await sut.DeleteAllAsync();
+        var result = await sut.GetAsync();
+
+        // Assert
+        result.Should().BeEmpty();
     }
 #endregion
 }

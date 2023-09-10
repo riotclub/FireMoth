@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Tests.DataAccess.InMemory;
+namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory;
 
 using System;
 using System.Collections.Generic;

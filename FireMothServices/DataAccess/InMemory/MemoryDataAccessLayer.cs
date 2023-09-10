@@ -17,7 +17,7 @@ using RiotClub.FireMoth.Services.Repository;
 /// </summary>
 public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
 {
-    private readonly List<FileFingerprint> _fileFingerprints;
+    private List<FileFingerprint> _fileFingerprints;
     private readonly ILogger<MemoryDataAccessLayer> _logger;
 
     /// <summary>
@@ -99,6 +99,17 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
             "MemoryDataAccessLayer: Deleting fingerprint {FileFingerprint}", fileFingerprint);
         
         return Task.FromResult(_fileFingerprints.Remove(fileFingerprint));
+    }
+
+    /// <summary>
+    /// Deletes all <see cref="FileFingerprint"/>s from the data access layer.
+    /// </summary>
+    public Task<int> DeleteAllAsync()
+    {
+        var recordCount = _fileFingerprints.Count;
+        _fileFingerprints = new List<FileFingerprint>();
+
+        return Task.FromResult(recordCount);
     }
 
     private static void ThrowIfArgumentNull(object testArgument, string argumentName)

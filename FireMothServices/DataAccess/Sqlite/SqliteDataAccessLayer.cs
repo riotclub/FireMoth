@@ -102,4 +102,10 @@ public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
         
         return true;
     }
+
+    /// <inheritdoc/>
+    public async Task<int> DeleteAllAsync()
+    {
+        return await _fireMothContext.FileFingerprints.ExecuteDeleteAsync();
+    }
 }

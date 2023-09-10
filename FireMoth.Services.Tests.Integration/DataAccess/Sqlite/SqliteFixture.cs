@@ -77,7 +77,7 @@ public class SqliteFixture : IDisposable
     
     public void DeleteTestData()
     {
-        DbContext.Database.ExecuteSqlRaw("DELETE FROM FileFingerprints");
+        DbContext.FileFingerprints.ExecuteDelete();
     }
     
     public void Dispose()
