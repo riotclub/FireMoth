@@ -87,7 +87,7 @@ public static class Program
 
                 var result = await fingerprintRepository.DeleteAllAsync();
                 Log.Debug(
-                    "Cleared {ExistingEntryCount} existing entries from SQLite database.", result);
+                    "Deleted {ExistingEntryCount} existing entries from SQLite database.", result);
                 
                 // Perform scan
                 scanResult = await scanner.ScanDirectoryAsync(
