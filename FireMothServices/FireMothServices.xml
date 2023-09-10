@@ -536,7 +536,7 @@
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.String})">
             <inheritdoc/>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetFileFingerprintsWithDuplicateHashesAsync">
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetRecordsWithDuplicateHashesAsync">
             <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
@@ -600,7 +600,7 @@
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>IEnumerable collection of file fingerprints.</returns>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.GetFileFingerprintsWithDuplicateHashesAsync">
+        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.GetRecordsWithDuplicateHashesAsync">
             <summary>
             Retrieves a collection of file fingerprints that have hash values that match other file
             fingerprints in the repository.
