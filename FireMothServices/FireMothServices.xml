@@ -377,16 +377,19 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator">
             <summary>
-            Defines the interface for a class that implements a directory scanner that reads the files in the specified
-            directory and writes the file's unique fingerprint data to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
+            Defines the interface for a class that implements a directory scanner that reads the files in
+            the specified directory and writes the file's unique fingerprint data to an
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator.ScanDirectoryAsync(System.String,System.Boolean)">
             <summary>
             Scans the files in the provided directory.
             </summary>
-            <param name="scanDirectory">A <see cref="T:System.String"/> containing the path to the directory to scan.</param>
-            <param name="recursive">If <c>true</c>, recursively scans subdirectories in the provided directory.</param>
+            <param name="scanDirectory">A <see cref="T:System.String"/> containing the path to the directory to
+            scan.</param>
+            <param name="recursive">If <c>true</c>, recursively scans subdirectories in the provided
+            directory.</param>
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the result of the directory scan.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator">
@@ -449,7 +452,8 @@
             <summary>
             Writes the provided collection of file fingerprints.
             </summary>
-            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to write.</param>
+            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to
+            write.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.FileFingerprint">
             <summary>
@@ -539,6 +543,9 @@
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetRecordsWithDuplicateHashesAsync">
             <inheritdoc/>
         </member>
+        <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync">
+            <inheritdoc/>
+        </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
             <inheritdoc/>
         </member>
@@ -605,7 +612,18 @@
             Retrieves a collection of file fingerprints that have hash values that match other file
             fingerprints in the repository.
             </summary>
-            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the file fingerprints.
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection containing file
+            fingerprints with duplicate hash values.
+            </returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync">
+            <summary>
+            Retrieves a collection of file fingerprints that have hash values that match other file
+            fingerprints in the repository.
+            </summary>
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection of
+            <see cref="T:System.Linq.IGrouping`2"/>; for each grouping, the key contains the hash that
+            all <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>s of the grouping share.
             </returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
@@ -618,6 +636,49 @@
             <summary>
             Deletes all file fingerprints from the repository.
             </summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler.RunTaskAsync">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod">
+            <summary>
+            Specifies the method for handling duplicates at the end of the scanning process.
+            </summary>
+        </member>
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod.NoAction">
+            <summary>
+            Specifies that nothing should be done to duplicate files after scanning.
+            </summary>
+        </member>
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod.Delete">
+            <summary>
+            Specifies that duplicate files are deleted after scanning. 
+            </summary>
+        </member>
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod.Move">
+            <summary>
+            Specifies that duplicate files should be moved to a separate directory after scanning.
+            </summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.ITaskHandler">
+            <summary>
+            Defines the public interface for a class that runs a task.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.ITaskHandler.RunTaskAsync">
+            <summary>
+            Performs the task for this task handler.
+            </summary>
+            <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a result that indicates whether the task
+            completed successfully or failed.</returns>
         </member>
     </members>
 </doc>

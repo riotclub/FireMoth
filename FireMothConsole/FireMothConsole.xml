@@ -26,10 +26,16 @@
             program output will be written.
             </summary>
         </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicatesOnly">
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.OutputDuplicatesOnly">
             <summary>
             Gets or sets a value indicating whether the output should include only files that have
             duplicate hash values.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicatesAction">
+            <summary>
+            Gets or sets a value indicating the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod"/> to be used for
+            duplicate files after scanning.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Console.ExitState">
