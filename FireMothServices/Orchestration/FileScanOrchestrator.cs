@@ -41,7 +41,7 @@ public class FileScanOrchestrator : IFileScanOrchestrator
         ILogger<FileScanOrchestrator> logger)
     {
         _fileFingerprintRepository = fileFingerprintRepository
-                                     ?? throw new ArgumentNullException(nameof(fileFingerprintRepository));
+            ?? throw new ArgumentNullException(nameof(fileFingerprintRepository));
         _fileHasher = fileHasher ?? throw new ArgumentNullException(nameof(fileHasher));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -86,10 +86,15 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                 // TODO: Convert to async implementation
                 var hashString = GetBase64HashFromStream(fileStream);
 
-                _logger.LogDebug("Adding fingerprint for file '{FileName}' to data access provider", fileInfo.Name);
+                _logger.LogDebug(
+                    "Adding fingerprint for file '{FileName}' to data access provider",
+                    fileInfo.Name);
                 
                 var fingerprint = new FileFingerprint(
-                    fileInfo.Name, fileInfo.DirectoryName ?? string.Empty, fileInfo.Length, hashString);
+                    fileInfo.Name,
+                    fileInfo.DirectoryName ?? string.Empty,
+                    fileInfo.Length,
+                    hashString);
                 await _fileFingerprintRepository.AddAsync(fingerprint);
                 scanResult.ScannedFiles.Add(fingerprint);
             }

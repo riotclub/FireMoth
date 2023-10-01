@@ -38,11 +38,16 @@ public class FileFingerprintRepository : IFileFingerprintRepository
     /// <inheritdoc/>
     public async Task<IEnumerable<FileFingerprint>> GetRecordsWithDuplicateHashesAsync()
     {
+        return (await GetGroupingsWithDuplicateHashesAsync())
+            .SelectMany(duplicateGroup => duplicateGroup);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<IGrouping<string, FileFingerprint>>> GetGroupingsWithDuplicateHashesAsync()
+    {
         var allFingerprints = await _dataAccessLayer.GetAsync();
-        return allFingerprints
-            .GroupBy(fp => fp.Base64Hash)
-            .Where(group => group.Count() > 1)
-            .SelectMany(duplicateGroup => duplicateGroup.ToList());
+        return allFingerprints.GroupBy(fp => fp.Base64Hash)
+                              .Where(group => group.Count() > 1);
     }
 
     /// <inheritdoc/>

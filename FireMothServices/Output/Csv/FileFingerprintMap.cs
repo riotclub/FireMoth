@@ -12,7 +12,8 @@ using RiotClub.FireMoth.Services.Repository;
 /// A mapping between an <see cref="IFileFingerprint"/> and CSV headers.
 /// </summary>
 /// <seealso cref="ClassMap"/>
-internal class FileFingerprintMap : ClassMap<IFileFingerprint>
+// ReSharper disable once ClassNeverInstantiated.Global
+internal sealed class FileFingerprintMap : ClassMap<IFileFingerprint>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprintMap"/> class.
