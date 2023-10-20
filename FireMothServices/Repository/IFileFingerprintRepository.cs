@@ -9,6 +9,7 @@ namespace RiotClub.FireMoth.Services.Repository;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Defines the public interface for a class that implements a repository of
@@ -37,9 +38,20 @@ public interface IFileFingerprintRepository
     /// Retrieves a collection of file fingerprints that have hash values that match other file
     /// fingerprints in the repository.
     /// </summary>
-    /// <returns>An <see cref="IEnumerable{FileFingerprint}"/> containing the file fingerprints.
+    /// <returns>An <see cref="IEnumerable{FileFingerprint}"/> collection containing file
+    /// fingerprints with duplicate hash values.
     /// </returns>
     public Task<IEnumerable<FileFingerprint>> GetRecordsWithDuplicateHashesAsync();
+    
+    /// <summary>
+    /// Retrieves a collection of file fingerprints that have hash values that match other file
+    /// fingerprints in the repository.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{T}"/> collection of
+    /// <see cref="IGrouping{TKey,TElement}"/>; for each grouping, the key contains the hash that
+    /// all <see cref="FileFingerprint"/>s of the grouping share.
+    /// </returns>
+    public Task<IEnumerable<IGrouping<string, FileFingerprint>>> GetGroupingsWithDuplicateHashesAsync();
     
     /// <summary>
     /// Deletes a file fingerprint from the repository.

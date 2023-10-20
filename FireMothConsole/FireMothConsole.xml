@@ -32,30 +32,10 @@
             duplicate hash values.
             </summary>
         </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicatesAction">
+        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicateFileHandlingOptions">
             <summary>
-            Gets or sets a value indicating the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod"/> to be used for
+            Gets or sets a value indicating the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod"/> to be used for
             duplicate files after scanning.
-            </summary>
-        </member>
-        <member name="T:RiotClub.FireMoth.Console.ExitState">
-            <summary>
-            Specifies the cause of program termination.
-            </summary>
-        </member>
-        <member name="F:RiotClub.FireMoth.Console.ExitState.Normal">
-            <summary>
-            Inidicates nominal program shutdown.
-            </summary>
-        </member>
-        <member name="F:RiotClub.FireMoth.Console.ExitState.StartupError">
-            <summary>
-            Inidicates an error occurred during program initialization.
-            </summary>
-        </member>
-        <member name="F:RiotClub.FireMoth.Console.ExitState.RuntimeError">
-            <summary>
-            Indicates an error occurred after program initialization.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Console.Extensions.ServiceCollectionExtensions">

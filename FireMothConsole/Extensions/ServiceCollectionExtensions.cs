@@ -18,6 +18,7 @@ using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Output.Csv;
 using RiotClub.FireMoth.Services.Repository;
+using RiotClub.FireMoth.Services.Tasks;
 
 /// <summary>
 /// Extensions to support service configuration.
@@ -56,6 +57,18 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataAccessLayer<FileFingerprint>, SqliteDataAccessLayer>();
 #endregion
 
+        /*
+
+         */
+        //services.Configure<DuplicateFileHandlingOptions>(config.GetSe)
+        var duplicateHandlingMethod = config.GetValue<DuplicateFileHandlingMethod>("DuplicatesAction");
+        if (duplicateHandlingMethod
+            is DuplicateFileHandlingMethod.Delete or DuplicateFileHandlingMethod.Move)
+        {
+            services.AddTransient<ITaskHandler, DuplicateFileHandler>();
+            services.AddTransient<ITaskHandler, NullHandler>();
+        }
+        
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
 

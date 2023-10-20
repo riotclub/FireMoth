@@ -648,24 +648,47 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod">
+        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod">
             <summary>
             Specifies the method for handling duplicates at the end of the scanning process.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod.NoAction">
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.NoAction">
             <summary>
             Specifies that nothing should be done to duplicate files after scanning.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod.Delete">
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Delete">
             <summary>
             Specifies that duplicate files are deleted after scanning. 
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateHandlingMethod.Move">
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Move">
             <summary>
             Specifies that duplicate files should be moved to a separate directory after scanning.
+            </summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions">
+            <summary>
+            Contains options pertaining to how duplicate files are handled by
+            <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler"/>s.
+            </summary>
+        </member>
+        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandling">
+            <summary>
+            Property used to bind this options class to its associated configuration options.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod">
+            <summary>
+            A <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> used to indicate how duplicate files should be
+            handled.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.MoveDuplicateFilesToDir">
+            <summary>
+            The full path where duplicate files will be moved to when
+            <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> is <see cref="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Move"/>.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.ITaskHandler">

@@ -36,9 +36,11 @@ public class CommandLineOptions
     public bool OutputDuplicatesOnly { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating the <see cref="DuplicateHandlingMethod"/> to be used for
+    /// Gets or sets a value indicating the <see cref="DuplicateFileHandlingMethod"/> to be used for
     /// duplicate files after scanning.
     /// </summary>
-    public DuplicateHandlingMethod DuplicatesAction { get; set; } =
-        DuplicateHandlingMethod.NoAction;
+    // public DuplicateFileHandlingMethod DuplicateFilesAction { get; set; } =
+    //     DuplicateFileHandlingMethod.NoAction;
+    
+    public DuplicateFileHandlingOptions DuplicateFileHandlingOptions { get; set; }
 }

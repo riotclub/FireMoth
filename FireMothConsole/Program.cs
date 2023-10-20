@@ -13,6 +13,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +24,7 @@ using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Repository;
+using RiotClub.FireMoth.Services.Tasks;
 using Serilog;
 
 /// <summary>
@@ -47,6 +49,23 @@ public static class Program
     /// <seealso cref="CommandLineOptions"/>
     public static async Task Main(string[] args)
     {
+        /*
+        var scanDirectoryOption = new Option<DirectoryInfo>(
+            name: "--directory",
+            description: "The directory to scan.");
+        scanDirectoryOption.AddAlias("-d");
+        var rootCommand = new RootCommand("FireMoth.Console file scanning command-line tool.");
+        rootCommand.AddOption(scanDirectoryOption);
+        
+        rootCommand.SetHandler(async (directory) =>
+            {
+                await CreateHostAndRun(directory, args);
+            },
+            scanDirectoryOption);
+
+        return await rootCommand.InvokeAsync(args);
+        */
+
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console() 
@@ -56,7 +75,7 @@ public static class Program
                 rollOnFileSizeLimit: true,
                 retainedFileCountLimit: BootstrapLogRetainedFileCountLimit)
             .CreateBootstrapLogger();
-
+        
         try
         {
             Log.Information("FireMoth.Console starting up...");
@@ -69,11 +88,12 @@ public static class Program
             using (var scope = host.Services.CreateScope())
             {
                 stopwatch.Start();
-                await InitializeDatabase(scope);
+                await InitializeDatabaseAsync(scope);
                 var commandLineOptions = scope
                     .ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
-                scanResult = await ScanDirectory(scope, commandLineOptions);
+                scanResult = await ScanDirectoryAsync(scope, commandLineOptions);
                 await OutputScanResult(scope, scanResult, commandLineOptions);
+                await HandleFileOpsAsync(scope, commandLineOptions);
                 stopwatch.Stop();
             }
             
@@ -93,14 +113,14 @@ public static class Program
         {
             Log.Information("Shutting down");
             Log.CloseAndFlush();
-        }
+        }        
     }
 
     private static async Task OutputScanResult(
         IServiceScope scope, ScanResult result, CommandLineOptions options)
     {
         IEnumerable<FileFingerprint> fingerprintsToOutput;
-        if (!options.DuplicatesOnly)
+        if (!options.OutputDuplicatesOnly)
         {
             Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
             fingerprintsToOutput = result.ScannedFiles;
@@ -115,11 +135,22 @@ public static class Program
                 await fingerprintRepository.GetRecordsWithDuplicateHashesAsync();
             fingerprintsToOutput = duplicateFingerprints.ToList();
         }
+        
         var resultWriter = scope.ServiceProvider.GetRequiredService<IFileFingerprintWriter>();
         await resultWriter.WriteFileFingerprintsAsync(fingerprintsToOutput);
     }
+
+    private static async Task HandleFileOpsAsync(IServiceScope scope, CommandLineOptions options)
+    {
+        var taskHandlers = scope.ServiceProvider.GetServices<ITaskHandler>();
+        foreach (var taskHandler in taskHandlers)
+        {
+            Log.Debug("Running task handler of type '{TaskHandlerType}'.", taskHandler.GetType());
+            await taskHandler.RunTaskAsync();
+        }
+    }
     
-    private static async Task<ScanResult> ScanDirectory(
+    private static async Task<ScanResult> ScanDirectoryAsync(
         IServiceScope scope, CommandLineOptions options)
     {
         var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
@@ -130,7 +161,7 @@ public static class Program
             scanOptions.ScanDirectory.FullName, options.RecursiveScan);
     }
     
-    private static async Task InitializeDatabase(IServiceScope scope)
+    private static async Task InitializeDatabaseAsync(IServiceScope scope)
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<FireMothContext>();
         await dbContext.Database.EnsureCreatedAsync();
