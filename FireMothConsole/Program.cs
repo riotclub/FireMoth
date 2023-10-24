@@ -7,6 +7,11 @@ namespace RiotClub.FireMoth.Console;
 
 using System;
 using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Hosting;
+using System.CommandLine.NamingConventionBinder;
+using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -33,13 +38,49 @@ using Serilog;
 public static class Program
 {
     private const int BootstrapLogRetainedFileCountLimit = 2;
-    private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 32 MB
+    private const uint BootstrapLogFileSizeLimit = 1024 * 1024 * 32; // 32 MB
     private const string DefaultFilePrefix = "FireMoth_";
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
     private static string _outputFileName;
 
+    private static Parser BuildCommandLineParser(string[] args) =>
+        new CommandLineBuilder(
+            new RootCommand
+            {
+                Handler = CommandHandler.Create<IHost>(RunAsync)
+            })
+            .UseDefaults()
+            .UseHost(host =>
+            {
+                host.ConfigureDefaults(args)
+                    .UseConsoleLifetime()
+                    .UseSerilog((context, services, configuration) =>
+                    {
+                        configuration
+                            .ReadFrom.Configuration(context.Configuration)
+                            .ReadFrom.Services(services)
+                            .WriteTo.Console();
+
+                        var seqHost = context.Configuration["SeqHost"];
+                        if (seqHost is not null)
+                        {
+                            configuration.WriteTo.Seq(seqHost);
+                        }
+                    })
+                    .ConfigureServices((hostContext, services) =>
+                    {
+                        services.Configure<CommandLineOptions>(hostContext.Configuration);
+                        services.AddFireMothServices(hostContext.Configuration);
+                        var commandLineOptions =
+                            hostContext.Configuration.Get<CommandLineOptions>();
+                        _outputFileName = GetOutputFileName(commandLineOptions.OutputFile);
+                        services.AddTransient(_ => new StreamWriter(_outputFileName));
+                    });
+            })
+            .Build();
+    
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
     /// configuration, and invokes the directory scanning process.
@@ -47,25 +88,8 @@ public static class Program
     /// <param name="args">Command-line arguments.</param>
     /// <returns>An <c>int</c> return code indicating invocation result.</returns>
     /// <seealso cref="CommandLineOptions"/>
-    public static async Task Main(string[] args)
+    public static int Main(string[] args)
     {
-        /*
-        var scanDirectoryOption = new Option<DirectoryInfo>(
-            name: "--directory",
-            description: "The directory to scan.");
-        scanDirectoryOption.AddAlias("-d");
-        var rootCommand = new RootCommand("FireMoth.Console file scanning command-line tool.");
-        rootCommand.AddOption(scanDirectoryOption);
-        
-        rootCommand.SetHandler(async (directory) =>
-            {
-                await CreateHostAndRun(directory, args);
-            },
-            scanDirectoryOption);
-
-        return await rootCommand.InvokeAsync(args);
-        */
-
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console() 
@@ -75,11 +99,17 @@ public static class Program
                 rollOnFileSizeLimit: true,
                 retainedFileCountLimit: BootstrapLogRetainedFileCountLimit)
             .CreateBootstrapLogger();
-        
+
+        var parser = BuildCommandLineParser(args);
+        return parser.InvokeAsync(args).Result;
+    }
+
+    private static async Task RunAsync(IHost host)
+    {
         try
         {
             Log.Information("FireMoth.Console starting up...");
-            using var host = CreateHostBuilder(args).Build();
+            
             await host.StartAsync();
 
             ScanResult scanResult;
@@ -113,7 +143,7 @@ public static class Program
         {
             Log.Information("Shutting down");
             Log.CloseAndFlush();
-        }        
+        }          
     }
 
     private static async Task OutputScanResult(
