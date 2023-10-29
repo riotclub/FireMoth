@@ -190,22 +190,6 @@
             <param name="value">The string to check.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.FileScanning.IScanOptions">
-            <summary>
-            Defines the public interface for a class that specifies options used during a file scan.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.IScanOptions.ScanDirectory">
-            <summary>
-            Gets the directory to be scanned.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.IScanOptions.RecursiveScan">
-            <summary>
-            Gets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Services.FileScanning.IScanOptions.ScanDirectory"/> will be
-            recursively scanned.
-            </summary>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanError">
             <summary>
             Represents an error that occured during a file scan.
@@ -265,26 +249,6 @@
         <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.GetHashCode">
             <inheritdoc/>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanOptions">
-            <summary>
-            Specifies options that are used when performing a file scan.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanOptions.#ctor(System.IO.Abstractions.IDirectoryInfo,System.Boolean)">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanOptions"/> class for the provided
-            directory.
-            </summary>
-            <param name="scanDirectory">The directory to scan.</param>
-            <param name="recursiveScan">A flag indicating whether the scan will recursively scan
-            subdirectories of <paramref name="scanDirectory"/>.</param>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanOptions.ScanDirectory">
-            <inheritdoc/>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.ScanOptions.RecursiveScan">
-            <inheritdoc/>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanResult">
             <summary>
             Specifies the result of a file scan operation.
@@ -316,6 +280,22 @@
             <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.
             </returns>
         </member>
+        <member name="T:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions">
+            <summary>
+            Specifies options that are used when performing a directory scan.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions.Directory">
+            <summary>
+            Gets or sets the directory to be scanned.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions.Recursive">
+            <summary>
+            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions.Directory"/> will
+            be recursively scanned.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.Migrations.CreateDb">
             <inheritdoc />
         </member>
@@ -331,20 +311,21 @@
         <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator">
             <summary>
             Directory scanner implementation that reads the files in a directory and writes the file and
-            hash to an
-            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
+            hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator"/> class.
             </summary>
             <param name="fileScanOrchestrator">An <see cref="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator"/> that manages
             scanning of files.</param>
+            <param name="directoryScanOptions">An <see cref="T:Microsoft.Extensions.Options.IOptions`1"/>
+            containing the configured options for this directory scan orchestrator.</param>
             <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output
             will be written.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.ScanDirectoryAsync(System.String,System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.ScanDirectoryAsync">
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator">
@@ -378,18 +359,14 @@
         <member name="T:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator">
             <summary>
             Defines the interface for a class that implements a directory scanner that reads the files in
-            the specified directory and writes the file's unique fingerprint data to an
+            the configured directory and writes the file's unique fingerprint data to an
             <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator.ScanDirectoryAsync(System.String,System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.IDirectoryScanOrchestrator.ScanDirectoryAsync">
             <summary>
-            Scans the files in the provided directory.
+            Scans the files in the configured.
             </summary>
-            <param name="scanDirectory">A <see cref="T:System.String"/> containing the path to the directory to
-            scan.</param>
-            <param name="recursive">If <c>true</c>, recursively scans subdirectories in the provided
-            directory.</param>
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the result of the directory scan.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator">

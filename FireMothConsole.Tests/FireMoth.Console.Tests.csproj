@@ -8,6 +8,8 @@
     <AssemblyName>FireMoth.Console.Tests</AssemblyName>
 
     <RootNamespace>RiotClub.FireMoth.Console.Tests</RootNamespace>
+
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

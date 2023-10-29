@@ -6,6 +6,7 @@
     <RootNamespace>RiotClub.FireMoth.Console</RootNamespace>
     <AssemblyName>FireMoth.Console</AssemblyName>
     <UserSecretsId>f5efb3e3-b04f-4c81-9310-be0daee8df01</UserSecretsId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
