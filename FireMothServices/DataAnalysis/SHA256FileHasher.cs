@@ -14,26 +14,26 @@ using System.Security.Cryptography;
 /// </summary>
 public class SHA256FileHasher : IFileHasher, IDisposable
 {
-    private readonly HashAlgorithm hashAlgorithm;
+    private readonly HashAlgorithm _hashAlgorithm;
 
-    private bool disposed = false;
+    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SHA256FileHasher"/> class.
     /// </summary>
     public SHA256FileHasher()
     {
-        this.hashAlgorithm = SHA256.Create();
+        _hashAlgorithm = SHA256.Create();
     }
 
     /// <inheritdoc/>
     public byte[] ComputeHashFromStream(Stream inputStream) =>
-        this.hashAlgorithm.ComputeHash(inputStream);
+        _hashAlgorithm.ComputeHash(inputStream);
 
     /// <inheritdoc/>
     public void Dispose()
     {
-        this.Dispose(true);
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 
@@ -43,16 +43,16 @@ public class SHA256FileHasher : IFileHasher, IDisposable
     /// <param name="disposing">If true, managed resources are freed.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (this.disposed)
+        if (_disposed)
         {
             return;
         }
 
         if (disposing)
         {
-            this.hashAlgorithm.Dispose();
+            _hashAlgorithm.Dispose();
         }
 
-        this.disposed = true;
+        _disposed = true;
     }
 }
