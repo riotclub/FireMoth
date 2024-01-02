@@ -280,22 +280,6 @@
             <returns>A new <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> containing the sum of the two operands.
             </returns>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions">
-            <summary>
-            Specifies options that are used when performing a directory scan.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions.Directory">
-            <summary>
-            Gets or sets the directory to be scanned.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions.Recursive">
-            <summary>
-            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions.Directory"/> will
-            be recursively scanned.
-            </summary>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.Migrations.CreateDb">
             <inheritdoc />
         </member>
@@ -308,13 +292,29 @@
         <member name="M:RiotClub.FireMoth.Services.Migrations.CreateDb.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions">
+            <summary>
+            Specifies options that are used when performing a directory scan.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions.Directory">
+            <summary>
+            Gets or sets the directory to be scanned.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions.Recursive">
+            <summary>
+            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions.Directory"/> will
+            be recursively scanned.
+            </summary>
+        </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator">
             <summary>
             Directory scanner implementation that reads the files in a directory and writes the file and
             hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.FileScanning.DirectoryScanOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator"/> class.
             </summary>
@@ -382,6 +382,26 @@
             </summary>
             <param name="files">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the full paths of the files to scan.</param>
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the scanning operation.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Output.ConsoleProgressBar">
+            <summary>
+            Provides a method to display a progress bar in a console window.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.ConsoleProgressBar.WriteProgressBar(System.Single,System.Boolean)">
+            <summary>
+            Writes a progress bar to console standard output.
+            </summary>
+            <param name="progress">A <see cref="T:System.Single"/> with the amount of progress to display.</param>
+            <param name="resetCursorLocation">If <c>true</c>, resets the cursor to its original location after displaying
+            the progress bar.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Output.ConsoleProgressBar.TrySetCursorVisibility(System.Boolean)">
+            <summary>
+            Attempts to set console cursor visibility to the provided value.
+            </summary>
+            <param name="visible"><c>true</c> to set the cursor visible; false otherwise.</param>
+            <returns><c>true</c> if on Windows platform; false otherwise.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter">
             <summary>

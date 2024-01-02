@@ -83,9 +83,7 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                     fileInfo.Name,
                     _fileHasher.GetType().FullName);
                 
-                // TODO: Convert to async implementation
                 var hashString = GetBase64HashFromStream(fileStream);
-
                 _logger.LogDebug(
                     "Adding fingerprint for file '{FileName}' to data access provider",
                     fileInfo.Name);
@@ -103,29 +101,18 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                 scanResult.SkippedFiles.Add(
                     fileInfo.FullName,
                     $"Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.");
-                HandleError(
-                    fileInfo.FullName,
+                _logger.LogError(
                     ex,
-                    scanResult,
-                    $"Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.",
                     "Could not add record for file '{FileName}': {ExceptionMessage}; skipping file.",
                     fileInfo.FullName,
                     ex.Message);
+                scanResult.Errors.Add(
+                    new ScanError(
+                        fileInfo.FullName,
+                        "Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.",
+                        ex));
             }
         }
-    }
-
-    private void HandleError(
-        string path,
-        Exception exception,
-        ScanResult scanResult,
-        string scanResultMessage,
-        string logMessageTemplate,
-        params object?[] logMessageArguments)
-    {
-        _logger.LogError(exception, logMessageTemplate, logMessageArguments);
-
-        scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
     }
 
     private string GetBase64HashFromStream(Stream stream)

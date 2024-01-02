@@ -30,10 +30,8 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     public FileFingerprint(string fileName, string directoryName, long fileSize, string base64Hash)
     {
         DirectoryName = directoryName ?? throw new ArgumentNullException(nameof(directoryName));
-        // _fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
         FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
         FileSize = fileSize;
-
         ThrowIfHashInvalid(base64Hash);
         Base64Hash = base64Hash;
     }
@@ -93,11 +91,11 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
 
     /// <inheritdoc/>
     public bool Equals(FileFingerprint? other) =>
-        other is FileFingerprint fingerprint
-        && FileName == fingerprint.FileName
-        && DirectoryName == fingerprint.DirectoryName
-        && FileSize == fingerprint.FileSize
-        && Base64Hash == fingerprint.Base64Hash;
+        other is not null
+        && FileName == other.FileName
+        && DirectoryName == other.DirectoryName
+        && FileSize == other.FileSize
+        && Base64Hash == other.Base64Hash;
 
     /// <inheritdoc/>
     public override int GetHashCode() =>

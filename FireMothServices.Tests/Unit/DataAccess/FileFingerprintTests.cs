@@ -7,8 +7,8 @@ namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using RiotClub.FireMoth.Services.DataAnalysis;
-using RiotClub.FireMoth.Services.Repository;
+using DataAnalysis;
+using Repository;
 using Xunit;
 
 /// <summary>
@@ -87,7 +87,7 @@ public class FileFingerprintTests
     {
         // Arrange, Act, Assert
         Assert.Throws<ArgumentException>(() =>
-            new FileFingerprint(string.Empty, string.Empty, 0, "asdf!!!000"));
+            new FileFingerprint(string.Empty, string.Empty, 0, "carrot!!!000"));
     }
 
     // Equals: Semantically equal FileFingerprint returns true
@@ -128,6 +128,7 @@ public class FileFingerprintTests
         var testComparator = new SHA256FileHasher();
 
         // Act, Assert
+        // ReSharper disable once SuspiciousTypeConversion.Global ("suspicious" comparison is the point of this test)
         Assert.False(testObject.Equals(testComparator));
     }
 

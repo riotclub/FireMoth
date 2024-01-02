@@ -70,8 +70,10 @@ public static class Program
         var scanDirectoryOption = new Option<string>(
             // ReSharper disable once StringLiteralTypo
             aliases: new[] { "--directory", "-d" },
-            description: "The directory to scan");
-        scanDirectoryOption.IsRequired = true;
+            description: "The directory to scan")
+        {
+            IsRequired = true
+        };
 
         var recursiveScanOption = new Option<bool>(
             aliases: new[] { "--recursive", "-r" },
