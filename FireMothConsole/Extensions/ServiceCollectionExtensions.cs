@@ -6,6 +6,10 @@
 namespace RiotClub.FireMoth.Console.Extensions;
 
 using System;
+using System.CommandLine;
+using System.CommandLine.Binding;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 using System.IO;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +22,7 @@ using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Output.Csv;
 using RiotClub.FireMoth.Services.Repository;
+using RiotClub.FireMoth.Services.Tasks;
 
 /// <summary>
 /// Extensions to support service configuration.
@@ -35,6 +40,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
+        // Build service provider here so we can resolve command line parse result
+        var provider = services.BuildServiceProvider();
+        var parseResult = provider.GetRequiredService<ParseResult>();
+        var commandLineOptions = parseResult.CommandResult.Children;
+        
         //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
         //    ? OutputDuplicateFileFingerprintsOption.Duplicates
         //    : OutputDuplicateFileFingerprintsOption.All;
@@ -56,6 +66,15 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataAccessLayer<FileFingerprint>, SqliteDataAccessLayer>();
 #endregion
 
+        //services.Configure<DuplicateFileHandlingOptions>(config.GetSe)
+        var duplicateHandlingMethod = config.GetValue<DuplicateFileHandlingMethod>("DuplicatesAction");
+        if (duplicateHandlingMethod
+            is DuplicateFileHandlingMethod.Delete or DuplicateFileHandlingMethod.Move)
+        {
+            services.AddTransient<ITaskHandler, DuplicateFileHandler>();
+            services.AddTransient<ITaskHandler, NullHandler>();
+        }
+        
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
 

@@ -2,7 +2,7 @@
     "profiles": {
         "FireMothConsole": {
             "commandName": "Project",
-            "commandLineArgs": "--ScanDirectory \"C:\\Users\\Jason\\AppData\\Local\\DOSBox\\capture\" --RecursiveScan true --DuplicatesOnly true",
+            "commandLineArgs": "-d \"C:\\Users\\Jason\\Downloads\"",
             "environmentVariables": {
                 "DOTNET_ENVIRONMENT": "Development"
             }

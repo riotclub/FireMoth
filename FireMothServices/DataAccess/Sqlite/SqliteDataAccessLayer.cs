@@ -87,7 +87,11 @@ public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
         _logger.LogDebug(
             "SqliteDataAccessLayer: Deleting fingerprint {FileFingerprint}", fileFingerprint);
         
-        // Memberwise comparison is done here to prevent PK comparison (e.g., fp => fp.Equals(...))
+        // TODO: Figure out a better way to do this. Ideally, we'd do a simple Equals comparison
+        //       (i.e., fp => fp.Equals(...)) to keep the code DRY and prevent future maintenance
+        //       issues. However, EntityFramework translates the Equals call to a primary key
+        //       comparison. Because of this, we're doing a memberwise comparison here as a
+        //       workaround.
         var fingerprintToDelete = await _fireMothContext.FileFingerprints
             .FirstOrDefaultAsync(fp =>
                 fp.FileName == fileFingerprint.FileName

@@ -41,7 +41,7 @@ public class FileScanOrchestrator : IFileScanOrchestrator
         ILogger<FileScanOrchestrator> logger)
     {
         _fileFingerprintRepository = fileFingerprintRepository
-                                     ?? throw new ArgumentNullException(nameof(fileFingerprintRepository));
+            ?? throw new ArgumentNullException(nameof(fileFingerprintRepository));
         _fileHasher = fileHasher ?? throw new ArgumentNullException(nameof(fileHasher));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -83,13 +83,16 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                     fileInfo.Name,
                     _fileHasher.GetType().FullName);
                 
-                // TODO: Convert to async implementation
                 var hashString = GetBase64HashFromStream(fileStream);
-
-                _logger.LogDebug("Adding fingerprint for file '{FileName}' to data access provider", fileInfo.Name);
+                _logger.LogDebug(
+                    "Adding fingerprint for file '{FileName}' to data access provider",
+                    fileInfo.Name);
                 
                 var fingerprint = new FileFingerprint(
-                    fileInfo.Name, fileInfo.DirectoryName ?? string.Empty, fileInfo.Length, hashString);
+                    fileInfo.Name,
+                    fileInfo.DirectoryName ?? string.Empty,
+                    fileInfo.Length,
+                    hashString);
                 await _fileFingerprintRepository.AddAsync(fingerprint);
                 scanResult.ScannedFiles.Add(fingerprint);
             }
@@ -98,29 +101,18 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                 scanResult.SkippedFiles.Add(
                     fileInfo.FullName,
                     $"Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.");
-                HandleError(
-                    fileInfo.FullName,
+                _logger.LogError(
                     ex,
-                    scanResult,
-                    $"Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.",
                     "Could not add record for file '{FileName}': {ExceptionMessage}; skipping file.",
                     fileInfo.FullName,
                     ex.Message);
+                scanResult.Errors.Add(
+                    new ScanError(
+                        fileInfo.FullName,
+                        "Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.",
+                        ex));
             }
         }
-    }
-
-    private void HandleError(
-        string path,
-        Exception exception,
-        ScanResult scanResult,
-        string scanResultMessage,
-        string logMessageTemplate,
-        params object?[] logMessageArguments)
-    {
-        _logger.LogError(exception, logMessageTemplate, logMessageArguments);
-
-        scanResult.Errors.Add(new ScanError(path, scanResultMessage, exception));
     }
 
     private string GetBase64HashFromStream(Stream stream)

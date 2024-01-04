@@ -13,7 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
 using Microsoft.Extensions.Logging;
-using Repository;
+using RiotClub.FireMoth.Services.Output;
+using RiotClub.FireMoth.Services.Repository;
 
 /// <summary>
 /// Writes <see cref="IFileFingerprint"/> data in CSV format.

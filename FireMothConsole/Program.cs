@@ -7,22 +7,26 @@ namespace RiotClub.FireMoth.Console;
 
 using System;
 using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Hosting;
+using System.CommandLine.NamingConventionBinder;
+using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Console.Extensions;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Repository;
+using RiotClub.FireMoth.Services.Tasks;
 using Serilog;
 
 /// <summary>
@@ -31,7 +35,7 @@ using Serilog;
 public static class Program
 {
     private const int BootstrapLogRetainedFileCountLimit = 2;
-    private const uint BootstrapLogFileSizeLimit = 1 << 25;     // 32 MB
+    private const uint BootstrapLogFileSizeLimit = 1024 * 1024 * 32; // 32 MB
     private const string DefaultFilePrefix = "FireMoth_";
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
@@ -45,7 +49,7 @@ public static class Program
     /// <param name="args">Command-line arguments.</param>
     /// <returns>An <c>int</c> return code indicating invocation result.</returns>
     /// <seealso cref="CommandLineOptions"/>
-    public static async Task Main(string[] args)
+    public static int Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
@@ -57,23 +61,103 @@ public static class Program
                 retainedFileCountLimit: BootstrapLogRetainedFileCountLimit)
             .CreateBootstrapLogger();
 
+        var parser = BuildCommandLineParser(args);
+        return parser.InvokeAsync(args).Result;
+    }    
+    
+    private static Parser BuildCommandLineParser(string[] args)
+    {
+        var scanDirectoryOption = new Option<string>(
+            // ReSharper disable once StringLiteralTypo
+            aliases: new[] { "--directory", "-d" },
+            description: "The directory to scan")
+        {
+            IsRequired = true
+        };
+
+        var recursiveScanOption = new Option<bool>(
+            aliases: new[] { "--recursive", "-r" },
+            description: "Recursively scan subdirectories of the scan directory");
+
+        // var outputFileOption = new Option<FileInfo?>(
+        //     name: "--output",
+        //     description: "File to write output to.");
+        //
+        // var outputDuplicatesOnlyOption = new Option<bool?>(
+        //     // ReSharper disable once StringLiteralTypo
+        //     name: "--output-duplicates-only",
+        //     description: "Only include files with duplicate hash values in output.",
+        //     getDefaultValue: () => false);
+
+        var rootCommand =
+            new RootCommand(description: "FireMoth file analysis and deduplication program.");
+        rootCommand.AddOption(scanDirectoryOption);
+        rootCommand.AddOption(recursiveScanOption);
+        // recursiveScanOption,
+        // outputFileOption,
+        // outputDuplicatesOnlyOption
+        rootCommand.Handler = CommandHandler.Create<IHost, ParseResult, string, bool>(
+            async (host, parseResult, directory, recursive) =>
+            {
+                Log.Debug(
+                    "Command line parse result: {ParsedCommandLine}",
+                    parseResult);
+                await RunAsync(host);
+            });
+        
+        var builder = new CommandLineBuilder(rootCommand)
+            .UseDefaults()
+            .UseHost(host =>
+            {
+                host.ConfigureDefaults(args)
+                    .ConfigureAppConfiguration((context, builder) =>
+                    {
+                        builder.AddCommandLineConfiguration(
+                            context.GetInvocationContext().ParseResult);
+                    })
+                    .UseConsoleLifetime()
+                    .UseSerilog((context, services, configuration) =>
+                    {
+                        configuration
+                            .ReadFrom.Configuration(context.Configuration)
+                            .ReadFrom.Services(services)
+                            .WriteTo.Console();
+
+                        var seqHost = context.Configuration["SeqHost"];
+                        if (seqHost is not null)
+                        {
+                            configuration.WriteTo.Seq(seqHost);
+                        }
+                    })
+                    .ConfigureServices((hostContext, services) =>
+                    {
+                        services.Configure<DirectoryScanOptions>(
+                            hostContext.Configuration.GetSection("CommandLine"));
+                        services.AddFireMothServices(hostContext.Configuration);
+                        // TODO: Replace string.Empty with command-line argument
+                        _outputFileName = GetOutputFileName(string.Empty);
+                        services.AddTransient(_ => new StreamWriter(_outputFileName));
+                    });
+            });
+        
+        return builder.Build();
+    }
+    
+    private static async Task RunAsync(IHost host)
+    {
         try
         {
-            Log.Information("FireMoth.Console starting up...");
-            using var host = CreateHostBuilder(args).Build();
-            await host.StartAsync();
-
+            Log.Information("FireMoth.Console starting up.");
             ScanResult scanResult;
             var stopwatch = new Stopwatch();
 
             using (var scope = host.Services.CreateScope())
             {
                 stopwatch.Start();
-                await InitializeDatabase(scope);
-                var commandLineOptions = scope
-                    .ServiceProvider.GetRequiredService<IOptions<CommandLineOptions>>().Value;
-                scanResult = await ScanDirectory(scope, commandLineOptions);
-                await OutputScanResult(scope, scanResult, commandLineOptions);
+                await InitializeDatabaseAsync(scope);
+                scanResult = await ScanDirectoryAsync(scope);
+                await OutputScanResult(scope, scanResult);
+                await HandleFileOpsAsync(scope);
                 stopwatch.Stop();
             }
             
@@ -93,14 +177,14 @@ public static class Program
         {
             Log.Information("Shutting down");
             Log.CloseAndFlush();
-        }
+        }          
     }
 
-    private static async Task OutputScanResult(
-        IServiceScope scope, ScanResult result, CommandLineOptions options)
+    private static async Task OutputScanResult(IServiceScope scope, ScanResult result)
     {
         IEnumerable<FileFingerprint> fingerprintsToOutput;
-        if (!options.DuplicatesOnly)
+        // TODO: reimplement OutputDuplicatesOnly option using new command line options
+        if (/* !options.OutputDuplicatesOnly */ result is not null)
         {
             Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
             fingerprintsToOutput = result.ScannedFiles;
@@ -115,22 +199,28 @@ public static class Program
                 await fingerprintRepository.GetRecordsWithDuplicateHashesAsync();
             fingerprintsToOutput = duplicateFingerprints.ToList();
         }
+        
         var resultWriter = scope.ServiceProvider.GetRequiredService<IFileFingerprintWriter>();
         await resultWriter.WriteFileFingerprintsAsync(fingerprintsToOutput);
     }
-    
-    private static async Task<ScanResult> ScanDirectory(
-        IServiceScope scope, CommandLineOptions options)
+
+    private static async Task HandleFileOpsAsync(IServiceScope scope)
     {
-        var scanDirectoryInfo = new FileSystem().DirectoryInfo.FromDirectoryName(
-            options.ScanDirectory);
-        var scanOptions = new ScanOptions(scanDirectoryInfo, options.RecursiveScan);
-        var scanner = scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
-        return await scanner.ScanDirectoryAsync(
-            scanOptions.ScanDirectory.FullName, options.RecursiveScan);
+        var taskHandlers = scope.ServiceProvider.GetServices<ITaskHandler>();
+        foreach (var taskHandler in taskHandlers)
+        {
+            Log.Debug("Running task handler of type '{TaskHandlerType}'.", taskHandler.GetType());
+            await taskHandler.RunTaskAsync();
+        }
     }
     
-    private static async Task InitializeDatabase(IServiceScope scope)
+    private static async Task<ScanResult> ScanDirectoryAsync(IServiceScope scope)
+    {
+        var scanner = scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+        return await scanner.ScanDirectoryAsync();
+    }
+    
+    private static async Task InitializeDatabaseAsync(IServiceScope scope)
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<FireMothContext>();
         await dbContext.Database.EnsureCreatedAsync();
@@ -152,31 +242,6 @@ public static class Program
         foreach (var file in scanResult.SkippedFiles)
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
     }
-
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .UseConsoleLifetime()
-            .UseSerilog((context, services, configuration) =>
-            {
-                configuration
-                    .ReadFrom.Configuration(context.Configuration)
-                    .ReadFrom.Services(services)
-                    .WriteTo.Console();
-
-                var seqHost = context.Configuration["SeqHost"];
-                if (seqHost is not null)
-                {
-                    configuration.WriteTo.Seq(seqHost);
-                }
-            })
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.Configure<CommandLineOptions>(hostContext.Configuration);
-                services.AddFireMothServices(hostContext.Configuration);
-                var commandLineOptions = hostContext.Configuration.Get<CommandLineOptions>();
-                _outputFileName = GetOutputFileName(commandLineOptions.OutputFile);
-                services.AddTransient(_ => new StreamWriter(_outputFileName));
-            });
 
     private static string GetOutputFileName(string outputFile)
     {
