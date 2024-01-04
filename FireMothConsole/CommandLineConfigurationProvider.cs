@@ -21,7 +21,7 @@ internal class CommandLineConfigurationProvider : ConfigurationProvider
     public override void Load() =>
         Data = MapConfigurationFromParseResult(_parseResult);
 
-    private static IDictionary<string, string?> MapConfigurationFromParseResult(
+    private static Dictionary<string, string?> MapConfigurationFromParseResult(
         ParseResult parseResult)
     {
         var optionResults =
