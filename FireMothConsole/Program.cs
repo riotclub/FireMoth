@@ -40,7 +40,8 @@ public static class Program
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-    private static string _outputFileName;
+    private static string? _outputFileName;
+    private static bool? _outputDuplicatesOnly;
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -48,7 +49,6 @@ public static class Program
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>An <c>int</c> return code indicating invocation result.</returns>
-    /// <seealso cref="CommandLineOptions"/>
     public static int Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -68,36 +68,34 @@ public static class Program
     private static Parser BuildCommandLineParser(string[] args)
     {
         var scanDirectoryOption = new Option<string>(
-            // ReSharper disable once StringLiteralTypo
-            aliases: new[] { "--directory", "-d" },
+            aliases: ["--directory", "-d"],
             description: "The directory to scan")
         {
             IsRequired = true
         };
 
         var recursiveScanOption = new Option<bool>(
-            aliases: new[] { "--recursive", "-r" },
-            description: "Recursively scan subdirectories of the scan directory");
+            aliases: ["--recursive", "-r"],
+            description: "Recursively scan subdirectories",
+            getDefaultValue: () => false);
 
-        // var outputFileOption = new Option<FileInfo?>(
-        //     name: "--output",
-        //     description: "File to write output to.");
-        //
-        // var outputDuplicatesOnlyOption = new Option<bool?>(
-        //     // ReSharper disable once StringLiteralTypo
-        //     name: "--output-duplicates-only",
-        //     description: "Only include files with duplicate hash values in output.",
-        //     getDefaultValue: () => false);
+        var outputFileOption = new Option<FileInfo?>(
+            aliases: ["--output", "-o"],
+            description: "File to write output to");
+        
+        var outputDuplicatesOnlyOption = new Option<bool?>(
+            aliases: ["--output-duplicates-only", "-u"],
+            description: "Only include files with duplicate hash values in output.",
+            getDefaultValue: () => false);
 
         var rootCommand =
             new RootCommand(description: "FireMoth file analysis and deduplication program.");
         rootCommand.AddOption(scanDirectoryOption);
         rootCommand.AddOption(recursiveScanOption);
-        // recursiveScanOption,
-        // outputFileOption,
-        // outputDuplicatesOnlyOption
-        rootCommand.Handler = CommandHandler.Create<IHost, ParseResult, string, bool>(
-            async (host, parseResult, directory, recursive) =>
+        rootCommand.AddOption(outputFileOption);
+        rootCommand.AddOption(outputDuplicatesOnlyOption);
+        rootCommand.Handler = CommandHandler.Create<IHost, ParseResult, string, bool, string, bool>(
+            async (host, parseResult, directory, recursive, output, duplicatesOnly) =>
             {
                 Log.Debug(
                     "Command line parse result: {ParsedCommandLine}",
@@ -134,8 +132,10 @@ public static class Program
                         services.Configure<DirectoryScanOptions>(
                             hostContext.Configuration.GetSection("CommandLine"));
                         services.AddFireMothServices(hostContext.Configuration);
-                        // TODO: Replace string.Empty with command-line argument
-                        _outputFileName = GetOutputFileName(string.Empty);
+                        _outputFileName = GetOutputFileName(
+                            hostContext.Configuration.GetValue<string>("CommandLine:output"));
+                        _outputDuplicatesOnly = hostContext.Configuration.GetValue<bool>(
+                                "CommandLine:output-duplicates-only");
                         services.AddTransient(_ => new StreamWriter(_outputFileName));
                     });
             });
@@ -183,8 +183,7 @@ public static class Program
     private static async Task OutputScanResult(IServiceScope scope, ScanResult result)
     {
         IEnumerable<FileFingerprint> fingerprintsToOutput;
-        // TODO: reimplement OutputDuplicatesOnly option using new command line options
-        if (/* !options.OutputDuplicatesOnly */ result is not null)
+        if (_outputDuplicatesOnly is null or false)
         {
             Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
             fingerprintsToOutput = result.ScannedFiles;
@@ -243,7 +242,7 @@ public static class Program
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
     }
 
-    private static string GetOutputFileName(string outputFile)
+    private static string GetOutputFileName(string? outputFile)
     {
         if (string.IsNullOrWhiteSpace(outputFile))
         {

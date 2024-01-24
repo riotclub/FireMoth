@@ -65,7 +65,6 @@
             </summary>
             <param name="args">Command-line arguments.</param>
             <returns>An <c>int</c> return code indicating invocation result.</returns>
-            <seealso cref="T:RiotClub.FireMoth.Console.CommandLineOptions"/>
         </member>
     </members>
 </doc>
