@@ -4,40 +4,6 @@
         <name>FireMoth.Console</name>
     </assembly>
     <members>
-        <member name="T:RiotClub.FireMoth.Console.CommandLineOptions">
-            <summary>
-            Defines options available when invoking the application via command line.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.ScanDirectory">
-            <summary>
-            Gets or sets the ScanDirectory option, indicating the input directory to scan.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.RecursiveScan">
-            <summary>
-            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Console.CommandLineOptions.ScanDirectory"/>
-            will be recursively scanned in addition to its file contents.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.OutputFile">
-            <summary>
-            Gets or sets the OutputFile option, indicating the full path of the file to which any
-            program output will be written.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.OutputDuplicatesOnly">
-            <summary>
-            Gets or sets a value indicating whether the output should include only files that have
-            duplicate hash values.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Console.CommandLineOptions.DuplicateFileHandlingOptions">
-            <summary>
-            Gets or sets a value indicating the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod"/> to be used for
-            duplicate files after scanning.
-            </summary>
-        </member>
         <member name="T:RiotClub.FireMoth.Console.Extensions.ServiceCollectionExtensions">
             <summary>
             Extensions to support service configuration.

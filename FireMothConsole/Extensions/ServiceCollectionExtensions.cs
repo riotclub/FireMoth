@@ -40,11 +40,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
-        // Build service provider here so we can resolve command line parse result
-        var provider = services.BuildServiceProvider();
-        var parseResult = provider.GetRequiredService<ParseResult>();
-        var commandLineOptions = parseResult.CommandResult.Children;
-        
         //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
         //    ? OutputDuplicateFileFingerprintsOption.Duplicates
         //    : OutputDuplicateFileFingerprintsOption.All;
@@ -67,7 +62,8 @@ public static class ServiceCollectionExtensions
 #endregion
 
         //services.Configure<DuplicateFileHandlingOptions>(config.GetSe)
-        var duplicateHandlingMethod = config.GetValue<DuplicateFileHandlingMethod>("DuplicatesAction");
+        var duplicateHandlingMethod = config.GetValue<DuplicateFileHandlingMethod>(
+            "DuplicatesAction");
         if (duplicateHandlingMethod
             is DuplicateFileHandlingMethod.Delete or DuplicateFileHandlingMethod.Move)
         {

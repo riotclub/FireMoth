@@ -408,17 +408,18 @@
             Writes <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> data in CSV format.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter},System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,CsvHelper.IFactory,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter},System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> class. 
             </summary>
-            <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.</param>
+            <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.
+            </param>
             <param name="logger">The logger.</param>
-            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be closed when the
-            <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> is disposed.</param>
+            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be
+            closed when the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> is disposed.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.Dispose">
             <inheritdoc/>

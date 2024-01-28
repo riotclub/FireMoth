@@ -28,15 +28,18 @@ public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="CsvFileFingerprintWriter"/> class. 
     /// </summary>
-    /// <param name="outputWriter">The <see cref="TextWriter"/> object to which data is written.</param>
+    /// <param name="outputWriter">The <see cref="TextWriter"/> object to which data is written.
+    /// </param>
     /// <param name="logger">The logger.</param>
-    /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not be closed when the
-    /// <see cref="CsvFileFingerprintWriter"/> is disposed.</param>
+    /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not be
+    /// closed when the <see cref="CsvFileFingerprintWriter"/> is disposed.</param>
     public CsvFileFingerprintWriter(
         StreamWriter outputWriter,
+        IFactory csvWriterFactory,
         ILogger<CsvFileFingerprintWriter> logger,
         bool leaveOpen = false)
     {
+        csvWriterFactory.CreateWriter(outputWriter, CultureInfo.InvariantCulture);
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (outputWriter == null)
         {
@@ -49,7 +52,7 @@ public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
         _csvWriter.NextRecord();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public async Task WriteFileFingerprintsAsync(IEnumerable<IFileFingerprint> fileFingerprints)
     {
         if (_disposed)
@@ -59,7 +62,8 @@ public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
         }
 
         var fileFingerprintList = fileFingerprints.ToList();
-        _logger.LogDebug("Writing {FileFingerprintCount} fingerprints to stream...", fileFingerprintList.Count);
+        _logger.LogDebug(
+            "Writing {FileFingerprintCount} fingerprints to stream.", fileFingerprintList.Count);
         await _csvWriter.WriteRecordsAsync(fileFingerprintList);
     }
 
