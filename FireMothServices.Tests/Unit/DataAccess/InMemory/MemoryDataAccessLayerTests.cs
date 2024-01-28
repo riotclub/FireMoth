@@ -139,8 +139,8 @@ public class MemoryDataAccessLayerTests
         var testObject = _mocker.CreateInstance<MemoryDataAccessLayer>();
         var fingerprints = await AddFileFingerprintsAsync(testObject);
         bool FilterFunction(IFileFingerprint fingerprint) => fingerprint.FileName.Contains('X');        
-        string OrderByFunction(IFileFingerprint fingerprint) => fingerprint.FileName;
         var filteredResult = fingerprints.Where(FilterFunction);
+        string OrderByFunction(IFileFingerprint fingerprint) => fingerprint.FileName;
         var expectedResult = filteredResult.OrderBy(OrderByFunction);
         
         // Act

@@ -2,7 +2,7 @@
     "profiles": {
         "FireMothConsole": {
             "commandName": "Project",
-            "commandLineArgs": "-d \"C:\\Users\\Jason\\Downloads\"",
+            "commandLineArgs": "-r -d \"D:\\FireMoth Test Data\"",
             "environmentVariables": {
                 "DOTNET_ENVIRONMENT": "Development"
             }

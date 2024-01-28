@@ -26,9 +26,9 @@ public class ScanError : IEquatable<ScanError>
             throw new ArgumentNullException(nameof(message));
         }
 
-        this.Path = path;
-        this.Message = message;
-        this.Exception = exception;
+        Path = path;
+        Message = message;
+        Exception = exception;
     }
 
     /// <summary>
@@ -98,13 +98,13 @@ public class ScanError : IEquatable<ScanError>
     public bool Equals(ScanError? other)
     {
         return other != null
-               && this.Path == other.Path
-               && this.Message == other.Message;
+               && Path == other.Path
+               && Message == other.Message;
     }
 
     /// <inheritdoc/>
     public override int GetHashCode()
     {
-        return HashCode.Combine(this.Path, this.Message);
+        return HashCode.Combine(Path, Message);
     }
 }
