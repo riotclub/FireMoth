@@ -6,11 +6,8 @@
 namespace RiotClub.FireMoth.Console.Extensions;
 
 using System;
-using System.CommandLine;
-using System.CommandLine.Binding;
-using System.CommandLine.Invocation;
-using System.CommandLine.Parsing;
 using System.IO;
+using CsvHelper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,9 +37,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
-        //var outputOption = config.GetSection("CommandLineOptions").DuplicatesOnly
-        //    ? OutputDuplicateFileFingerprintsOption.Duplicates
-        //    : OutputDuplicateFileFingerprintsOption.All;
         services.AddTransient<IDirectoryScanOrchestrator, DirectoryScanOrchestrator>();
         services.AddTransient<IFileScanOrchestrator, FileScanOrchestrator>();
         services.AddTransient<IFileHasher, SHA256FileHasher>();
@@ -73,6 +67,7 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
+        services.AddTransient<IFactory, Factory>();     // CSVHelper factory
 
         return services;
     }
