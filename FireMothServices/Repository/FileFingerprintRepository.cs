@@ -21,12 +21,14 @@ public class FileFingerprintRepository : IFileFingerprintRepository
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprintRepository"/> class.
     /// </summary>
-    /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer{IFileFingerprint}"/> implementation used to
-    /// persist data.</param>
-    /// <exception cref="ArgumentNullException">If any of the provided services are <c>null</c>.</exception>
+    /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer{IFileFingerprint}"/>
+    /// implementation used to persist data.</param>
+    /// <exception cref="ArgumentNullException">If any of the provided services are <c>null</c>.
+    /// </exception>
     public FileFingerprintRepository(IDataAccessLayer<FileFingerprint> dataAccessLayer)
     {
-        _dataAccessLayer = dataAccessLayer ?? throw new ArgumentNullException(nameof(dataAccessLayer));
+        _dataAccessLayer = dataAccessLayer 
+                           ?? throw new ArgumentNullException(nameof(dataAccessLayer));
     }
 
     /// <inheritdoc/>
@@ -43,7 +45,8 @@ public class FileFingerprintRepository : IFileFingerprintRepository
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<IGrouping<string, FileFingerprint>>> GetGroupingsWithDuplicateHashesAsync()
+    public async Task<IEnumerable<IGrouping<string, FileFingerprint>>> 
+        GetGroupingsWithDuplicateHashesAsync()
     {
         var allFingerprints = await _dataAccessLayer.GetAsync();
         return allFingerprints.GroupBy(fp => fp.Base64Hash)
