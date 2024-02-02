@@ -129,14 +129,14 @@ public static class Program
                     })
                     .ConfigureServices((hostContext, services) =>
                     {
-                        services.Configure<DirectoryScanOptions>(
-                            hostContext.Configuration.GetSection("CommandLine"));
-                        services.AddFireMothServices(hostContext.Configuration);
                         _outputFileName = GetOutputFileName(
                             hostContext.Configuration.GetValue<string>("CommandLine:output"));
                         _outputDuplicatesOnly = hostContext.Configuration.GetValue<bool>(
-                                "CommandLine:output-duplicates-only");
-                        services.AddTransient(_ => new StreamWriter(_outputFileName));
+                            "CommandLine:output-duplicates-only");
+                        services.AddFireMothServices(hostContext.Configuration)
+                                .AddTransient(_ => new StreamWriter(_outputFileName));
+                        services.Configure<DirectoryScanOptions>(
+                            hostContext.Configuration.GetSection("CommandLine"));
                     });
             });
         

@@ -137,9 +137,9 @@ EqualsObject
       returns true.
       
 EqualsScanError
-    - If object is null, returns false.
-    - If object does not contain equal property values, returns false.
-    - If object contains equal property values, returns true.
+    - If ScanError is null, returns false.
+    - If ScanError does not contain equal property values, returns false.
+    - If ScanError contains equal property values, returns true.
     
 GetHashCode
     - Objects with different property values return different hash codes.
@@ -231,27 +231,95 @@ ScanFilesAsync
 Ctor
     - If StreamWriter is null, ArgumentNullException is thrown.
     - If ILogger is null, ArgumentNullException is thrown.
+    - If IFactory is null, ArgumentNullException is thrown.
+    - After creation, IFactory.CreateWriter has been called.
     
 WriteFileFingerprintsAsync
     - If IEnumerable<FileFingerprint> is null, ArgumentNullException is thrown.
+    - If empty IEnumerable<FileFingerprints> is provided, method returns with no
+      calls made to the 
     - If object is disposed, ObjectDisposedException is thrown.
-    - 
 
 ------------------------------------------------------------------------------------
 /Output/Csv/FileFingerprintMap
 ------------------------------------------------------------------------------------
+Ctor
+    - After call, ClassMap has been registered to associated CsvWriter.
 
 ------------------------------------------------------------------------------------
 /Output/ConsoleProgressBar
 ------------------------------------------------------------------------------------
+[Not very testable. Refactor someday if we keep using it.]
 
 ------------------------------------------------------------------------------------
 /Repository/FileFingerprint
 ------------------------------------------------------------------------------------
+Ctor
+    - Null fileName throws ArgumentNullException
+    - Null directoryName throws ArgumentNullException
+    - Null base64Hash throws ArgumentNullException
+    - Invalid base64Hash throws ArgumentNullException
+    
+GetFileName
+    - Returns the FileName property
+
+GetDirectoryName
+    - Returns the DirectoryName property
+
+GetFileSize
+    - Returns the FileSize property
+    
+GetBase64Hash
+    - Returns the Base64Hash property
+    
+GetFullPath
+    - Returns the properly formed full path
+    
+OperatorEquality
+    - If left and right operand refer to the same object, returns true.
+    - If left and right operands are both null, returns true.
+    - If left operand is null and right operand is non-null, returns false.
+    - If left operand is non-null and right operand is null, returns false.
+    - If left and right operands contain equal property values, returns true.
+    
+OperatorInequality
+    - If left and right operand refer to the same object, returns false.
+    - If left and right operands are both null, returns false.
+    - If left operand is null and right operand is non-null, returns true.
+    - If left operand is non-null and right operand is null, returns true.
+    - If left and right operands contain equal property values, returns false.
+    
+EqualsObject
+    - If object is null, returns false.
+    - If object is not an instance of FileFingerprint, returns false.
+    - If object is an instance of FileFingerprint but does not contain equal property
+      values, returns false.
+    - If object is an instance of FileFingerprint and contains equal property values,
+      returns true.
+      
+EqualsFileFingerprint
+    - If FileFingerprint is null, returns false.
+    - If FileFingerprint does not contain equal property values, returns false.
+    - If FileFingerprint contains equal property values, returns true.
+
+GetHashCode
+    - Objects with different property values return different hash codes.
+    - Objects with equal property values return the same hash code.    
 
 ------------------------------------------------------------------------------------
 /Repository/FileFingerprintRepository
 ------------------------------------------------------------------------------------
+Ctor
+    - Null IDataAccessLayer<FileFingerprint> throws ArgumentNullException
+    
+GetAsync
+    - Null filter and null orderBy returns unfiltered, non-ordered results.
+    - Null filter and valid orderBy returns unfiltered, ordered results.
+    - Valid filter and null orderBy returns filtered, non-ordered results.
+    - Valid filter and valid orderBy returns filtered, ordered results.
+    
+GetRecordsWithDuplicateHashesAsync 
+    - Returns correct results after invocation.
 
 ------------------------------------------------------------------------------------
 /Tasks/DuplicateFileHandler

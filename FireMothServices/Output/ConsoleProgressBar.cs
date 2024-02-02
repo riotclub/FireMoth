@@ -14,8 +14,9 @@ public static class ConsoleProgressBar
     /// Writes a progress bar to console standard output.
     /// </summary>
     /// <param name="progress">A <see cref="float"/> with the amount of progress to display.</param>
-    /// <param name="resetCursorLocation">If <c>true</c>, resets the cursor to its original location after displaying
-    /// the progress bar.</param>
+    /// <param name="resetCursorLocation">If <c>true</c>, attempts to reset the cursor to its
+    /// original location after displaying the progress bar. This functionality is not supported in
+    /// all environments.</param>
     public static void WriteProgressBar(float progress, bool resetCursorLocation = true)
     {
         Console.Write($"[{progress * 100,3:F0}% ");

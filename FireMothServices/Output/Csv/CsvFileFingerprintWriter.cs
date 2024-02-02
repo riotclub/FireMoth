@@ -21,21 +21,25 @@ using RiotClub.FireMoth.Services.Repository;
 /// </summary>
 public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
 {
-    private readonly CsvWriter _csvWriter;
+    private readonly IWriter _csvWriter;
     private readonly ILogger<CsvFileFingerprintWriter> _logger;
     private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CsvFileFingerprintWriter"/> class. 
     /// </summary>
-    /// <param name="outputWriter">The <see cref="TextWriter"/> object to which data is written.</param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not be closed when the
-    /// <see cref="CsvFileFingerprintWriter"/> is disposed.</param>
+    /// <param name="outputWriter">The <see cref="StreamWriter"/> object to which data is written.
+    /// </param>
+    /// <param name="csvWriterFactory"> The <see cref="IFactory"/> object used to create a
+    /// <see cref="CsvWriter"/> instance for writing CSV output.</param>
+    /// <param name="logger">The <see cref="ILogger{CsvFileFingerprintWriter}"/> to which log output
+    /// is written.</param>
+    /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not be
+    /// closed when the <see cref="CsvFileFingerprintWriter"/> is disposed.</param>
     public CsvFileFingerprintWriter(
         StreamWriter outputWriter,
-        ILogger<CsvFileFingerprintWriter> logger,
-        bool leaveOpen = false)
+        IFactory csvWriterFactory,
+        ILogger<CsvFileFingerprintWriter> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (outputWriter == null)
@@ -43,13 +47,13 @@ public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
             throw new ArgumentNullException(nameof(outputWriter));
         }
 
-        _csvWriter = new CsvWriter(outputWriter, CultureInfo.InvariantCulture, leaveOpen);
+        _csvWriter = csvWriterFactory.CreateWriter(outputWriter, CultureInfo.InvariantCulture);
         _csvWriter.Context.RegisterClassMap<FileFingerprintMap>();
         _csvWriter.WriteHeader<IFileFingerprint>();
         _csvWriter.NextRecord();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public async Task WriteFileFingerprintsAsync(IEnumerable<IFileFingerprint> fileFingerprints)
     {
         if (_disposed)
@@ -59,7 +63,8 @@ public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
         }
 
         var fileFingerprintList = fileFingerprints.ToList();
-        _logger.LogDebug("Writing {FileFingerprintCount} fingerprints to stream...", fileFingerprintList.Count);
+        _logger.LogDebug(
+            "Writing {FileFingerprintCount} fingerprints to stream.", fileFingerprintList.Count);
         await _csvWriter.WriteRecordsAsync(fileFingerprintList);
     }
 

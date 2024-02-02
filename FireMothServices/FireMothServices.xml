@@ -393,8 +393,9 @@
             Writes a progress bar to console standard output.
             </summary>
             <param name="progress">A <see cref="T:System.Single"/> with the amount of progress to display.</param>
-            <param name="resetCursorLocation">If <c>true</c>, resets the cursor to its original location after displaying
-            the progress bar.</param>
+            <param name="resetCursorLocation">If <c>true</c>, attempts to reset the cursor to its
+            original location after displaying the progress bar. This functionality is not supported in
+            all environments.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Output.ConsoleProgressBar.TrySetCursorVisibility(System.Boolean)">
             <summary>
@@ -408,17 +409,21 @@
             Writes <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> data in CSV format.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter},System.Boolean)">
+        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,CsvHelper.IFactory,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> class. 
             </summary>
-            <param name="outputWriter">The <see cref="T:System.IO.TextWriter"/> object to which data is written.</param>
-            <param name="logger">The logger.</param>
-            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be closed when the
-            <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> is disposed.</param>
+            <param name="outputWriter">The <see cref="T:System.IO.StreamWriter"/> object to which data is written.
+            </param>
+            <param name="csvWriterFactory"> The <see cref="T:CsvHelper.IFactory"/> object used to create a
+            <see cref="T:CsvHelper.CsvWriter"/> instance for writing CSV output.</param>
+            <param name="logger">The <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which log output
+            is written.</param>
+            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be
+            closed when the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> is disposed.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.Dispose">
             <inheritdoc/>
@@ -530,9 +535,10 @@
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository"/> class.
             </summary>
-            <param name="dataAccessLayer">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/> implementation used to
-            persist data.</param>
-            <exception cref="T:System.ArgumentNullException">If any of the provided services are <c>null</c>.</exception>
+            <param name="dataAccessLayer">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>
+            implementation used to persist data.</param>
+            <exception cref="T:System.ArgumentNullException">If any of the provided services are <c>null</c>.
+            </exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.String})">
             <inheritdoc/>

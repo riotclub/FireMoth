@@ -10,3 +10,4 @@ using System.Diagnostics.CodeAnalysis;
 [module: SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Style preference.", Scope = "module")]
 [module: SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "Conflicts with SA1000KeywordsMustBeSpacedCorrectly", Scope = "module")]
 [assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:Field names should not begin with underscore", Justification = "<Pending>", Scope = "module")]
+[assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:Field names should not begin with underscore", Justification = "<Pending>", Scope = "member", Target = "~F:RiotClub.FireMoth.Services.FileScanning.OnDemandScanOrchestrator._dataAccessLayer")]
