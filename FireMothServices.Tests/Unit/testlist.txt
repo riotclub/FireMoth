@@ -324,7 +324,30 @@ GetRecordsWithDuplicateHashesAsync
 ------------------------------------------------------------------------------------
 /Tasks/DuplicateFileHandler
 ------------------------------------------------------------------------------------
+Ctor
+    - Null IFileFingerprintRepository throws ArgumentNullException
+    - Null IOptions<DuplicateFileHandlingOptions> throws ArgumentNullException
+    - Null ILogger<DuplicateFileHandler> throws ArgumentNullException
+
+RunAsync
+    - If invoked with option DuplicateFileHandlingOptions.Delete, duplicate files
+      in the repository are deleted.
+    - If invoked with option DuplicateFileHandlingOptions.Move, duplicate files
+      in the repository are moved to the directory specified in options.
+    - If invoked with option DuplicateFileHandlingOptions.NoAction, no files are
+      deleted or moved.
 
 ------------------------------------------------------------------------------------
 /Tasks/DuplicateFileHandlingOptions
 ------------------------------------------------------------------------------------
+GetDuplicateFileHandlingMethod
+    - Returns the DuplicateFileHandlingMethod
+
+SetDuplicateFileHandlingMethod
+    - Sets the DuplicateFileHandlingMethod
+    
+GetMoveDuplicateFilesToDirectory
+    - Returns the MoveDuplicateFilesToDirectory
+    
+SetMoveDuplicateFilesToDirectory
+    - Sets the MoveDuplicateFilesToDirectory
