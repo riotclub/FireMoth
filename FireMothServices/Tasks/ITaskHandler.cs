@@ -15,7 +15,7 @@ public interface ITaskHandler
     /// <summary>
     /// Performs the task for this task handler.
     /// </summary>
-    /// <returns>An asynchronous <see cref="Task"/> with a result that indicates whether the task
-    /// completed successfully or failed.</returns>
+    /// <returns>An asynchronous <see cref="Task"/> with a <see cref="bool"/> result indicating
+    /// whether the task completed successfully (<c>true</c>) or failed (<c>false</c>).</returns>
     public Task<bool> RunTaskAsync();
 }

@@ -4,6 +4,23 @@
         <name>FireMoth.Console</name>
     </assembly>
     <members>
+        <member name="T:RiotClub.FireMoth.Console.CommandLineConfigurationProvider">
+            <summary>
+            Handles configuration of command line parameters, converting kebab-cased parameters to
+            PascalCase so they can be bound to options classes via
+            <see cref="M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"/> 
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.CommandLineConfigurationProvider.#ctor(System.CommandLine.Parsing.ParseResult)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.CommandLineConfigurationProvider"/> class.
+            </summary>
+            <param name="parseResult">A <see cref="T:System.CommandLine.Parsing.ParseResult"/> containing command line parse results.
+            </param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.CommandLineConfigurationProvider.Load">
+            <inheritdoc/>
+        </member>
         <member name="T:RiotClub.FireMoth.Console.Extensions.ServiceCollectionExtensions">
             <summary>
             Extensions to support service configuration.

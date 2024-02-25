@@ -642,14 +642,29 @@
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler">
             <summary>
-            
+            A task handler that performs operations on files containing duplicate hash values.
             </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler})">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler"/> class.
+            </summary>
+            <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> used to
+            retrieve duplicate records for handling and modify or delete records after handling.
+            </param>
+            <param name="duplicateFileHandlingOptions">An
+            <see cref="T:Microsoft.Extensions.Options.IOptions`1"/> containing configured options for this
+            task handler.</param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output
+            will be written.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler.RunTaskAsync">
             <summary>
-            
+            Runs the duplicate file handler task by either deleting or moving files with duplicate
+            hashes in the <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> depending on the provided
+            <see cref="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler._duplicateFileHandlingOptions"/>.
             </summary>
-            <returns></returns>
+            <returns><c>true</c></returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod">
             <summary>
@@ -677,18 +692,19 @@
             <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler"/>s.
             </summary>
         </member>
-        <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandling">
-            <summary>
-            Property used to bind this options class to its associated configuration options.
-            </summary>
-        </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod">
             <summary>
             A <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> used to indicate how duplicate files should be
             handled.
             </summary>
         </member>
-        <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.MoveDuplicateFilesToDir">
+        <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.Interactive">
+            <summary>
+            A flag indicating whether or not duplicate file deletion or moving should be user-
+            interactive or not.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory">
             <summary>
             The full path where duplicate files will be moved to when
             <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> is <see cref="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Move"/>.
@@ -703,8 +719,8 @@
             <summary>
             Performs the task for this task handler.
             </summary>
-            <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a result that indicates whether the task
-            completed successfully or failed.</returns>
+            <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a <see cref="T:System.Boolean"/>result indicating
+            whether the task completed successfully (<c>true</c>) or failed (<c>false</c>).</returns>
         </member>
     </members>
 </doc>
