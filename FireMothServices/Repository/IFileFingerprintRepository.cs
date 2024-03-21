@@ -51,7 +51,8 @@ public interface IFileFingerprintRepository
     /// <see cref="IGrouping{TKey,TElement}"/>; for each grouping, the key contains the hash that
     /// all <see cref="FileFingerprint"/>s of the grouping share.
     /// </returns>
-    public Task<IEnumerable<IGrouping<string, FileFingerprint>>> GetGroupingsWithDuplicateHashesAsync();
+    public Task<IEnumerable<IGrouping<string, FileFingerprint>>>
+        GetGroupingsWithDuplicateHashesAsync();
     
     /// <summary>
     /// Deletes a file fingerprint from the repository.

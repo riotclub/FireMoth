@@ -13,13 +13,13 @@ using System.CommandLine.Hosting;
 using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Console.Extensions;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
@@ -36,12 +36,8 @@ public static class Program
 {
     private const int BootstrapLogRetainedFileCountLimit = 2;
     private const uint BootstrapLogFileSizeLimit = 1024 * 1024 * 32; // 32 MB
-    private const string DefaultFilePrefix = "FireMoth_";
-    private const string DefaultFileExtension = "csv";
-    private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
 
-    private static string? _outputFileName;
-    private static bool? _outputDuplicatesOnly;
+    internal static DateTime ProgramStartDateTime;
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -60,33 +56,99 @@ public static class Program
                 rollOnFileSizeLimit: true,
                 retainedFileCountLimit: BootstrapLogRetainedFileCountLimit)
             .CreateBootstrapLogger();
-
+        ProgramStartDateTime = DateTime.Now;
         var parser = BuildCommandLineParser(args);
         return parser.InvokeAsync(args).Result;
     }    
     
     private static Parser BuildCommandLineParser(string[] args)
     {
+        // TODO: Per documentation, System.CommandLine should accept Option<DirectoryInfo> here, but
+        // when attempting to bind the argument with that type, it always ends up null. Figure out
+        // why and correct.
         var scanDirectoryOption = new Option<string>(
             aliases: ["--directory", "-d"],
             description: "The directory to scan")
         {
             IsRequired = true
         };
+        scanDirectoryOption.AddValidator(result =>
+        {
+            var scanDirectory = result.GetValueForOption(scanDirectoryOption);
+            if (string.IsNullOrWhiteSpace(scanDirectory) || !Directory.Exists(scanDirectory))
+            {
+                Log.Fatal("Scan directory '{ScanDirectory}' does not exist.", scanDirectory);
+                result.ErrorMessage = $"Scan directory '{scanDirectory}' does not exist.";
+            }
+        });
 
         var recursiveScanOption = new Option<bool>(
             aliases: ["--recursive", "-r"],
             description: "Recursively scan subdirectories",
             getDefaultValue: () => false);
 
-        var outputFileOption = new Option<FileInfo?>(
-            aliases: ["--output", "-o"],
+        var outputFileOption = new Option<string?>(
+            aliases: ["--output-file", "-o"],
             description: "File to write output to");
+        outputFileOption.AddValidator(result =>
+        {
+            var outputOptionValue = result.GetValueForOption(outputFileOption);
+            if (string.IsNullOrWhiteSpace(outputOptionValue))
+                return;
+
+            var outputFilePath = Path.GetFullPath(outputOptionValue);
+            string? errorText = null;
+            if (Directory.Exists(outputFilePath))
+            {
+                errorText = "Specified output path is an existing directory";
+            } 
+            else if (File.Exists(outputFilePath))
+            {
+                errorText = "Output file already exists";
+            }
+            else
+            {
+                try
+                {
+                    var outputFileName = Path.GetFileName(outputFilePath);
+                    var outputFileDirectory = Path.GetDirectoryName(outputFilePath);
+                    if (outputFileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+                        || (outputFileDirectory is not null 
+                            && outputFileDirectory.IndexOfAny(Path.GetInvalidPathChars()) >= 0))
+                    {
+                        errorText = "Invalid output file";
+                    }
+                }
+                catch (ArgumentException e)
+                {
+                    errorText = $"Invalid output file: {e.Message}";
+                }
+            }
+
+            if (string.IsNullOrEmpty(errorText))
+                return;
+            
+            Log.Fatal(errorText + ": '{OutputFilePath}'", outputFilePath);
+            result.ErrorMessage = errorText;
+        });
         
         var outputDuplicatesOnlyOption = new Option<bool?>(
             aliases: ["--output-duplicates-only", "-u"],
-            description: "Only include files with duplicate hash values in output.",
+            description: "Only include files with duplicate hash values in output",
             getDefaultValue: () => false);
+
+        var duplicateFileHandlingMethodOption = new Option<DuplicateFileHandlingMethod?>(
+            aliases: ["--duplicate-file-handling-method", "-m"],
+            description: "Duplicate file handling method",
+            getDefaultValue: () => DuplicateFileHandlingMethod.NoAction);
+        
+        var moveDuplicateFilesToDirectoryOption = new Option<string?>(
+            aliases: ["--move-duplicate-files-to-directory", "-M"],
+            description: "Directory to move duplicate files to; ignored if " +
+                         "--duplicate-file-handling-method is not Move.",
+            getDefaultValue: () =>
+                CommandLineConfigurationProvider.ScanDirectoryToken
+                + Path.DirectorySeparatorChar + "Duplicates");
 
         var rootCommand =
             new RootCommand(description: "FireMoth file analysis and deduplication program.");
@@ -94,12 +156,28 @@ public static class Program
         rootCommand.AddOption(recursiveScanOption);
         rootCommand.AddOption(outputFileOption);
         rootCommand.AddOption(outputDuplicatesOnlyOption);
-        rootCommand.Handler = CommandHandler.Create<IHost, ParseResult, string, bool, string, bool>(
-            async (host, parseResult, directory, recursive, output, duplicatesOnly) =>
+        rootCommand.AddOption(duplicateFileHandlingMethodOption);
+        rootCommand.AddOption(moveDuplicateFilesToDirectoryOption);
+        rootCommand.Handler = CommandHandler.Create<
+                IHost,
+                ParseResult,
+                string,
+                bool,
+                string,
+                bool,
+                DuplicateFileHandlingMethod,
+                string>(
+            async (
+                host,
+                parseResult,
+                scanDirectory,
+                recursiveScan,
+                outputFile,
+                outputDuplicatesOnly,
+                duplicateFileHandlingMethod,
+                moveDuplicateFilesToDirectory) =>
             {
-                Log.Debug(
-                    "Command line parse result: {ParsedCommandLine}",
-                    parseResult);
+                Log.Debug("Command line parse result: {ParsedCommandLine}", parseResult);
                 await RunAsync(host);
             });
         
@@ -129,14 +207,13 @@ public static class Program
                     })
                     .ConfigureServices((hostContext, services) =>
                     {
-                        _outputFileName = GetOutputFileName(
-                            hostContext.Configuration.GetValue<string>("CommandLine:output"));
-                        _outputDuplicatesOnly = hostContext.Configuration.GetValue<bool>(
-                            "CommandLine:output-duplicates-only");
-                        services.AddFireMothServices(hostContext.Configuration)
-                                .AddTransient(_ => new StreamWriter(_outputFileName));
                         services.Configure<DirectoryScanOptions>(
                             hostContext.Configuration.GetSection("CommandLine"));
+                        services.Configure<DuplicateFileHandlingOptions>(
+                            hostContext.Configuration.GetSection("CommandLine"));
+                        services.Configure<ScanOutputOptions>(
+                            hostContext.Configuration.GetSection("CommandLine"));
+                        services.AddFireMothServices(hostContext.Configuration);
                     });
             });
         
@@ -157,7 +234,7 @@ public static class Program
                 await InitializeDatabaseAsync(scope);
                 scanResult = await ScanDirectoryAsync(scope);
                 await OutputScanResult(scope, scanResult);
-                await HandleFileOpsAsync(scope);
+                await HandleTasksAsync(scope);
                 stopwatch.Stop();
             }
             
@@ -170,28 +247,33 @@ public static class Program
         {
             Log.Fatal(
                 exception,
-                "FireMoth.Console could not complete: {ExceptionMessage}.",
+                "FireMoth.Console encountered an unhandled exception: {ExceptionMessage}",
                 exception.Message);
         }
         finally
         {
-            Log.Information("Shutting down");
+            Log.Information("FireMoth.Console shutting down.");
             Log.CloseAndFlush();
-        }          
+        }
     }
 
     private static async Task OutputScanResult(IServiceScope scope, ScanResult result)
     {
+        var outputOptions =
+            scope.ServiceProvider.GetRequiredService<IOptions<ScanOutputOptions>>().Value;
+        var outputStream = scope.ServiceProvider.GetRequiredService<StreamWriter>();
+        var outputStreamPath = ((FileStream)(outputStream.BaseStream)).Name;
         IEnumerable<FileFingerprint> fingerprintsToOutput;
-        if (_outputDuplicatesOnly is null or false)
+        if (!outputOptions.OutputDuplicateInfoOnly)
         {
-            Log.Information("Writing output to '{OutputFileName}'.", _outputFileName);
+            Log.Information(
+                "Writing output to '{OutputFileName}'.", outputStreamPath);
             fingerprintsToOutput = result.ScannedFiles;
         }
         else
         {
             Log.Information(
-                "Writing output (duplicates only) to '{OutputFileName}'.", _outputFileName);
+                "Writing output (duplicates only) to '{OutputFileName}'.", outputStreamPath);
             var fingerprintRepository =
                 scope.ServiceProvider.GetRequiredService<IFileFingerprintRepository>();
             var duplicateFingerprints = 
@@ -203,7 +285,7 @@ public static class Program
         await resultWriter.WriteFileFingerprintsAsync(fingerprintsToOutput);
     }
 
-    private static async Task HandleFileOpsAsync(IServiceScope scope)
+    private static async Task HandleTasksAsync(IServiceScope scope)
     {
         var taskHandlers = scope.ServiceProvider.GetServices<ITaskHandler>();
         foreach (var taskHandler in taskHandlers)
@@ -240,25 +322,5 @@ public static class Program
             "{SkippedFileCount} file(s) could not be scanned:", scanResult.SkippedFiles.Count);
         foreach (var file in scanResult.SkippedFiles)
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
-    }
-
-    private static string GetOutputFileName(string? outputFile)
-    {
-        if (string.IsNullOrWhiteSpace(outputFile))
-        {
-            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
-                   + Path.DirectorySeparatorChar + DefaultFilePrefix
-                   + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
-                   + '.' + DefaultFileExtension;
-        }
-
-        var outputFileFullPath = Path.GetFullPath(outputFile);
-        
-        if (!File.Exists(outputFileFullPath))
-            return Path.GetFullPath(outputFileFullPath);
-
-        var fileExistsError = $"Output file '{outputFileFullPath}' already exists";
-        Log.Fatal(fileExistsError);
-        throw new IOException(fileExistsError);
     }
 }

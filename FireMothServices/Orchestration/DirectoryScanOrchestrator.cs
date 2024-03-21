@@ -61,7 +61,7 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
 
         var fileList = Directory
             .EnumerateFiles(
-                _directoryScanOptions.Directory,
+                _directoryScanOptions.Directory.ToString(),
                 AllFilesSearchPattern,
                 new EnumerationOptions
                 {

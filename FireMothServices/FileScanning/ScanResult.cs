@@ -16,7 +16,7 @@ public class ScanResult
     /// <summary>
     /// Gets a list of <see cref="FileFingerprint"/>s for files that have been successfully scanned.
     /// </summary>
-    public List<FileFingerprint> ScannedFiles { get; } = new();
+    public List<FileFingerprint> ScannedFiles { get; } = [];
 
     /// <summary>
     /// Gets a key-value list of files that were skipped and the reason for the skip.
@@ -26,7 +26,7 @@ public class ScanResult
     /// <summary>
     /// Gets a list of errors that occurred.
     /// </summary>
-    public List<ScanError> Errors { get; } = new();
+    public List<ScanError> Errors { get; } = [];
 
     /// <summary>
     /// Combines two <see cref="ScanResult"/> objects by combining their

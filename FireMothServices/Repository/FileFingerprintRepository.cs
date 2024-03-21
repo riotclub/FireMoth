@@ -50,9 +50,9 @@ public class FileFingerprintRepository : IFileFingerprintRepository
     {
         var allFingerprints = await _dataAccessLayer.GetAsync();
         return allFingerprints.GroupBy(fp => fp.Base64Hash)
-                              .Where(group => group.Count() > 1);
+            .Where(group => group.Count() > 1);
     }
-
+    
     /// <inheritdoc/>
     public async Task<bool> DeleteAsync(FileFingerprint fileFingerprint) =>
         await _dataAccessLayer.DeleteAsync(fileFingerprint);
