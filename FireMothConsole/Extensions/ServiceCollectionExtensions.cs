@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Console.Extensions;
 
 using System;
+using System.Globalization;
 using System.IO;
 using CsvHelper;
 using Microsoft.Data.Sqlite;
@@ -21,12 +22,17 @@ using RiotClub.FireMoth.Services.Output;
 using RiotClub.FireMoth.Services.Output.Csv;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tasks;
+using Serilog;
 
 /// <summary>
 /// Extensions to support service configuration.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    private const string DefaultFilePrefix = "FireMoth_";
+    private const string DefaultFileExtension = "csv";
+    private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
+    
     /// <summary>
     /// Adds services required to perform directory scanning via the FireMoth API.
     /// </summary>
@@ -70,10 +76,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
         services.AddTransient<IFactory, Factory>();     // CSVHelper factory
 
-        var directoryScanOptions = 
-            serviceProvider.GetRequiredService<IOptions<DirectoryScanOptions>>();
-        // Null-forgiven; we check for null values in command-line argument validator in Program
-        services.AddTransient(_ => new StreamWriter(directoryScanOptions.Value.Directory!));
+        var outputOptions = serviceProvider.GetRequiredService<IOptions<ScanOutputOptions>>().Value;
+        // Null-forgiven; we check for null values in command-line argument validator in
+        // Program.BuildCommandLineParser
+        services.AddScoped(_ => new StreamWriter(GetOutputFileName(outputOptions.OutputFile)));
 
         return services;
     }
@@ -107,4 +113,26 @@ public static class ServiceCollectionExtensions
         
         return sqliteConnectionStringBuilder.ConnectionString;
     }
+    
+
+    private static string GetOutputFileName(string? outputFile)
+    {
+        // If no outputFile was provided, use default path and filename.
+        if (string.IsNullOrWhiteSpace(outputFile))
+        {
+            return GetOutputFilePath(outputFile) + Path.DirectorySeparatorChar + DefaultFilePrefix
+                   + Program.ProgramStartDateTime.ToString(
+                       DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)                   
+                   + '.' + DefaultFileExtension;
+        }
+
+        return Path.GetFullPath(outputFile);
+    }
+    
+    private static string? GetOutputFilePath(string? outputFile)
+    {
+        return string.IsNullOrWhiteSpace(outputFile) 
+            ? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) 
+            : Path.GetDirectoryName(outputFile);
+    }    
 }
