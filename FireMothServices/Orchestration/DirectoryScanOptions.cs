@@ -5,8 +5,6 @@
 
 namespace RiotClub.FireMoth.Services.Orchestration;
 
-using System.IO;
-
 /// <summary>
 /// Specifies options that are used when performing a directory scan.
 /// </summary>

@@ -18,8 +18,8 @@ public class DuplicateFileHandlingOptions
     public DuplicateFileHandlingMethod DuplicateFileHandlingMethod { get; set; }
     
     /// <summary>
-    /// A flag indicating whether or not duplicate file deletion or moving should be user-
-    /// interactive or not.
+    /// A flag indicating whether or not duplicate file deletion or moving should be
+    /// user-interactive or not.
     /// </summary>
     public bool Interactive { get; set; }
     

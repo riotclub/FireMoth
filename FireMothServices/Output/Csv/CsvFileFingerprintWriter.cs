@@ -34,8 +34,6 @@ public class CsvFileFingerprintWriter : IFileFingerprintWriter, IDisposable
     /// <see cref="CsvWriter"/> instance for writing CSV output.</param>
     /// <param name="logger">The <see cref="ILogger{CsvFileFingerprintWriter}"/> to which log output
     /// is written.</param>
-    /// <param name="leaveOpen">If <c>true</c>, the underlying <see cref="TextWriter"/> will not be
-    /// closed when the <see cref="CsvFileFingerprintWriter"/> is disposed.</param>
     public CsvFileFingerprintWriter(
         StreamWriter outputWriter,
         IFactory csvWriterFactory,

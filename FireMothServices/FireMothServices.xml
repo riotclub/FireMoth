@@ -419,8 +419,6 @@
             <see cref="T:CsvHelper.CsvWriter"/> instance for writing CSV output.</param>
             <param name="logger">The <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which log output
             is written.</param>
-            <param name="leaveOpen">If <c>true</c>, the underlying <see cref="T:System.IO.TextWriter"/> will not be
-            closed when the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> is disposed.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
             <inheritdoc/>
@@ -456,6 +454,22 @@
             </summary>
             <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to
             write.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Output.ScanOutputOptions">
+            <summary>
+            Specifies options that are used when performing a directory scan.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Output.ScanOutputOptions.OutputFile">
+            <summary>
+            Gets or sets the path of the file to output.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Output.ScanOutputOptions.OutputDuplicateInfoOnly">
+            <summary>
+            Gets or sets a value indicating whether only file fingerprint data for exact data duplicates
+            will be included in the output.
+            </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.FileFingerprint">
             <summary>
@@ -700,8 +714,8 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.Interactive">
             <summary>
-            A flag indicating whether or not duplicate file deletion or moving should be user-
-            interactive or not.
+            A flag indicating whether or not duplicate file deletion or moving should be
+            user-interactive or not.
             </summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory">
