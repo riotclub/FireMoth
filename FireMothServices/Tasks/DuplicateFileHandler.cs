@@ -6,7 +6,9 @@
 namespace RiotClub.FireMoth.Services.Tasks;
 
 using System;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -66,7 +68,6 @@ public class DuplicateFileHandler : ITaskHandler
                 _logger.LogDebug("Performing move operation for duplicate files.");
                 throw new NotImplementedException(
                     "Move method for duplicate files not yet implemented.");
-                break;
             case DuplicateFileHandlingMethod.NoAction:
                 _logger.LogDebug("Performing no action for duplicate files.");
                 break;
@@ -85,6 +86,9 @@ public class DuplicateFileHandler : ITaskHandler
     {
         var duplicateRecords = 
             await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
+
+        var deletedFilesCount = 0;
+        long deletedFilesSize = 0;
         
         foreach (var grouping in duplicateRecords)
         {
@@ -97,7 +101,25 @@ public class DuplicateFileHandler : ITaskHandler
                     "Deleting file '{DeletingDuplicateFile}'; duplicate of '{DuplicateFile}'.",
                     fingerprint.FullPath,
                     preservedFile.FullPath);
+                try
+                {
+                    File.Delete(fingerprint.FullPath);
+                    deletedFilesCount++;
+                    deletedFilesSize += fingerprint.FileSize;
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+                {
+                    _logger.LogError(
+                        "Unable to delete file '{FileFullPath}: {ExceptionMessage}'",
+                        fingerprint.FullPath,
+                        e.Message);
+                }
             }
         }
+        
+        _logger.LogInformation(
+            "Deleted {DeletedFilesCount} files ({DeletedFilesSize} bytes).",
+            deletedFilesCount,
+            deletedFilesSize);
     }
 }
