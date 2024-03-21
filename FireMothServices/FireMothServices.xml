@@ -719,7 +719,7 @@
             <summary>
             Performs the task for this task handler.
             </summary>
-            <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a <see cref="T:System.Boolean"/>result indicating
+            <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a <see cref="T:System.Boolean"/> result indicating
             whether the task completed successfully (<c>true</c>) or failed (<c>false</c>).</returns>
         </member>
     </members>

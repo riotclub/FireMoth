@@ -12,6 +12,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Services.DataAccess;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.DataAnalysis;
@@ -55,19 +56,24 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataAccessLayer<FileFingerprint>, SqliteDataAccessLayer>();
 #endregion
 
-        //services.Configure<DuplicateFileHandlingOptions>(config.GetSe)
-        var duplicateHandlingMethod = config.GetValue<DuplicateFileHandlingMethod>(
-            "DuplicatesAction");
-        if (duplicateHandlingMethod
+        services.Configure<DuplicateFileHandlingOptions>(config.GetSection("CommandLine"));
+        var serviceProvider = services.BuildServiceProvider();
+        var duplicateOptions = serviceProvider
+            .GetRequiredService<IOptions<DuplicateFileHandlingOptions>>();
+        if (duplicateOptions.Value.DuplicateFileHandlingMethod
             is DuplicateFileHandlingMethod.Delete or DuplicateFileHandlingMethod.Move)
         {
             services.AddTransient<ITaskHandler, DuplicateFileHandler>();
-            services.AddTransient<ITaskHandler, NullHandler>();
         }
         
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
         services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
         services.AddTransient<IFactory, Factory>();     // CSVHelper factory
+
+        var directoryScanOptions = 
+            serviceProvider.GetRequiredService<IOptions<DirectoryScanOptions>>();
+        // Null-forgiven; we check for null values in command-line argument validator in Program
+        services.AddTransient(_ => new StreamWriter(directoryScanOptions.Value.Directory!));
 
         return services;
     }

@@ -12,19 +12,20 @@ namespace RiotClub.FireMoth.Services.Tasks;
 public class DuplicateFileHandlingOptions
 {
     /// <summary>
-    /// Property used to bind this options class to its associated configuration options.
-    /// </summary>
-    public const string DuplicateFileHandling = "DuplicateFileHandling";
-    
-    /// <summary>
     /// A <see cref="DuplicateFileHandlingMethod"/> used to indicate how duplicate files should be
     /// handled.
     /// </summary>
     public DuplicateFileHandlingMethod DuplicateFileHandlingMethod { get; set; }
     
     /// <summary>
+    /// A flag indicating whether or not duplicate file deletion or moving should be user-
+    /// interactive or not.
+    /// </summary>
+    public bool Interactive { get; set; }
+    
+    /// <summary>
     /// The full path where duplicate files will be moved to when
     /// <see cref="DuplicateFileHandlingMethod"/> is <see cref="DuplicateFileHandlingMethod.Move"/>.
     /// </summary>
-    public string? MoveDuplicateFilesToDir { get; set; }
+    public string? MoveDuplicateFilesToDirectory { get; set; }
 }

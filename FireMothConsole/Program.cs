@@ -42,6 +42,7 @@ public static class Program
 
     private static string? _outputFileName;
     private static bool? _outputDuplicatesOnly;
+    private static DateTime _programStartDateTime;
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -60,19 +61,30 @@ public static class Program
                 rollOnFileSizeLimit: true,
                 retainedFileCountLimit: BootstrapLogRetainedFileCountLimit)
             .CreateBootstrapLogger();
-
+        _programStartDateTime = DateTime.Now;
         var parser = BuildCommandLineParser(args);
         return parser.InvokeAsync(args).Result;
     }    
     
     private static Parser BuildCommandLineParser(string[] args)
     {
+        // TODO: System.CommandLine should accept Option<DirectoryInfo> here, but when attempting to
+        //       bind the argument with that type, it always ends up null. Figure out why.
         var scanDirectoryOption = new Option<string>(
             aliases: ["--directory", "-d"],
             description: "The directory to scan")
         {
             IsRequired = true
         };
+        scanDirectoryOption.AddValidator(result =>
+        {
+            var scanDirectory = result.GetValueForOption(scanDirectoryOption);
+            if (string.IsNullOrWhiteSpace(scanDirectory) || !Directory.Exists(scanDirectory))
+            {
+                Log.Fatal("Scan directory '{ScanDirectory}' does not exist.", scanDirectory);
+                result.ErrorMessage = $"Scan directory '{scanDirectory}' does not exist.";
+            }
+        });
 
         var recursiveScanOption = new Option<bool>(
             aliases: ["--recursive", "-r"],
@@ -85,8 +97,21 @@ public static class Program
         
         var outputDuplicatesOnlyOption = new Option<bool?>(
             aliases: ["--output-duplicates-only", "-u"],
-            description: "Only include files with duplicate hash values in output.",
+            description: "Only include files with duplicate hash values in output",
             getDefaultValue: () => false);
+
+        var duplicateFileHandlingMethodOption = new Option<DuplicateFileHandlingMethod?>(
+            aliases: ["--duplicate-file-handling-method", "-m"],
+            description: "Duplicate file handling method",
+            getDefaultValue: () => DuplicateFileHandlingMethod.NoAction);
+        
+        var moveDuplicateFilesToDirectoryOption = new Option<string?>(
+            aliases: ["--move-duplicate-files-to-directory", "-M"],
+            description: "Directory to move duplicate files to; ignored if " +
+                         "--duplicate-file-handling-method is not Move.",
+            getDefaultValue: () =>
+                CommandLineConfigurationProvider.ScanDirectoryToken
+                + Path.DirectorySeparatorChar + "Duplicates");
 
         var rootCommand =
             new RootCommand(description: "FireMoth file analysis and deduplication program.");
@@ -94,12 +119,28 @@ public static class Program
         rootCommand.AddOption(recursiveScanOption);
         rootCommand.AddOption(outputFileOption);
         rootCommand.AddOption(outputDuplicatesOnlyOption);
-        rootCommand.Handler = CommandHandler.Create<IHost, ParseResult, string, bool, string, bool>(
-            async (host, parseResult, directory, recursive, output, duplicatesOnly) =>
+        rootCommand.AddOption(duplicateFileHandlingMethodOption);
+        rootCommand.AddOption(moveDuplicateFilesToDirectoryOption);
+        rootCommand.Handler = CommandHandler.Create<
+                IHost,
+                ParseResult,
+                string,
+                bool,
+                string,
+                bool,
+                DuplicateFileHandlingMethod,
+                string>(
+            async (
+                host,
+                parseResult,
+                scanDirectory,
+                recursiveScan,
+                outputFile,
+                outputDuplicatesOnly,
+                duplicateFileHandlingMethod,
+                moveDuplicateFilesToDirectory) =>
             {
-                Log.Debug(
-                    "Command line parse result: {ParsedCommandLine}",
-                    parseResult);
+                Log.Debug("Command line parse result: {ParsedCommandLine}", parseResult);
                 await RunAsync(host);
             });
         
@@ -129,14 +170,16 @@ public static class Program
                     })
                     .ConfigureServices((hostContext, services) =>
                     {
+                        // Can we just grab these straight from the options after binding? 
                         _outputFileName = GetOutputFileName(
                             hostContext.Configuration.GetValue<string>("CommandLine:output"));
                         _outputDuplicatesOnly = hostContext.Configuration.GetValue<bool>(
                             "CommandLine:output-duplicates-only");
-                        services.AddFireMothServices(hostContext.Configuration)
-                                .AddTransient(_ => new StreamWriter(_outputFileName));
                         services.Configure<DirectoryScanOptions>(
                             hostContext.Configuration.GetSection("CommandLine"));
+                        services.Configure<DuplicateFileHandlingOptions>(
+                            hostContext.Configuration.GetSection("CommandLine"));
+                        services.AddFireMothServices(hostContext.Configuration);
                     });
             });
         
@@ -170,7 +213,7 @@ public static class Program
         {
             Log.Fatal(
                 exception,
-                "FireMoth.Console could not complete: {ExceptionMessage}.",
+                "FireMoth.Console could not complete: {ExceptionMessage}",
                 exception.Message);
         }
         finally
@@ -242,23 +285,40 @@ public static class Program
             Log.Information("'{SkippedFile}'; reason: {SkipReason}", file.Key, file.Value);
     }
 
+    private static string? GetOutputFilePath(string? outputFile)
+    {
+        return string.IsNullOrWhiteSpace(outputFile) 
+            ? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) 
+            : Path.GetDirectoryName(outputFile);
+    }
+    
     private static string GetOutputFileName(string? outputFile)
     {
+        // If no outputFile was provided, use default path and filename.
         if (string.IsNullOrWhiteSpace(outputFile))
         {
-            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
-                   + Path.DirectorySeparatorChar + DefaultFilePrefix
-                   + DateTime.Now.ToString(DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)
+            return GetOutputFilePath(outputFile) + Path.DirectorySeparatorChar + DefaultFilePrefix
+                   + _programStartDateTime.ToString(
+                       DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)                   
                    + '.' + DefaultFileExtension;
         }
 
-        var outputFileFullPath = Path.GetFullPath(outputFile);
+        var outputFilePath = Path.GetFullPath(outputFile);
+        string? errorText = null;
         
-        if (!File.Exists(outputFileFullPath))
-            return Path.GetFullPath(outputFileFullPath);
+        // If the outputFile is an existing directory, throw an IO error.
+        if (Directory.Exists(outputFilePath))
+            errorText = $"Cannot write to specified output path '{outputFilePath}'; path " +
+                        $"is an existing directory.";
 
-        var fileExistsError = $"Output file '{outputFileFullPath}' already exists";
-        Log.Fatal(fileExistsError);
-        throw new IOException(fileExistsError);
+        // If the outputFile already exists, throw an IO error.
+        if (File.Exists(outputFilePath))
+            errorText = $"Output file '{outputFilePath}' already exists";
+
+        if (errorText is null)
+            return Path.GetFullPath(outputFilePath);
+            
+        Log.Fatal(errorText);
+        throw new IOException(errorText);
     }
 }
