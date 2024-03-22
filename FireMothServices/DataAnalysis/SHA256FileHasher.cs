@@ -8,7 +8,7 @@ namespace RiotClub.FireMoth.Services.DataAnalysis;
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using Output;
+using RiotClub.FireMoth.Services.Tasks.Output;
 
 /// <summary>
 /// Provides file hashing services using the SHA256 algorithm.
@@ -49,7 +49,8 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
         ConsoleProgressBar.WriteProgressBar(1.0f, false);
         ConsoleProgressBar.TrySetCursorVisibility(true);
         
-        return _hashAlgorithm.Hash ?? throw new InvalidOperationException("Unable to compute hash.");
+        return _hashAlgorithm.Hash
+               ?? throw new InvalidOperationException("Unable to compute hash.");
     }
     
     /// <inheritdoc/>

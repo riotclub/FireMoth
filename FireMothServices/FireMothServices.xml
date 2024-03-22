@@ -383,94 +383,6 @@
             <param name="files">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the full paths of the files to scan.</param>
             <returns>A <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanResult"/> value indicating the result of the scanning operation.</returns>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.Output.ConsoleProgressBar">
-            <summary>
-            Provides a method to display a progress bar in a console window.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.ConsoleProgressBar.WriteProgressBar(System.Single,System.Boolean)">
-            <summary>
-            Writes a progress bar to console standard output.
-            </summary>
-            <param name="progress">A <see cref="T:System.Single"/> with the amount of progress to display.</param>
-            <param name="resetCursorLocation">If <c>true</c>, attempts to reset the cursor to its
-            original location after displaying the progress bar. This functionality is not supported in
-            all environments.</param>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.ConsoleProgressBar.TrySetCursorVisibility(System.Boolean)">
-            <summary>
-            Attempts to set console cursor visibility to the provided value.
-            </summary>
-            <param name="visible"><c>true</c> to set the cursor visible; false otherwise.</param>
-            <returns><c>true</c> if on Windows platform; false otherwise.</returns>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter">
-            <summary>
-            Writes <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> data in CSV format.
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,CsvHelper.IFactory,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter"/> class. 
-            </summary>
-            <param name="outputWriter">The <see cref="T:System.IO.StreamWriter"/> object to which data is written.
-            </param>
-            <param name="csvWriterFactory"> The <see cref="T:CsvHelper.IFactory"/> object used to create a
-            <see cref="T:CsvHelper.CsvWriter"/> instance for writing CSV output.</param>
-            <param name="logger">The <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which log output
-            is written.</param>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.Dispose">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.CsvFileFingerprintWriter.Dispose(System.Boolean)">
-            <summary>
-            Releases unmanaged and, optionally, managed resources.
-            </summary>
-            <param name="disposing">If true, managed resources are freed.</param>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.Output.Csv.FileFingerprintMap">
-            <summary>
-            A mapping between an <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> and CSV headers.
-            </summary>
-            <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.Csv.FileFingerprintMap.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Output.Csv.FileFingerprintMap"/> class.
-            </summary>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.Output.IFileFingerprintWriter">
-            <summary>
-            Defines the public interface for a class that implements 
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Output.IFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
-            <summary>
-            Writes the provided collection of file fingerprints.
-            </summary>
-            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to
-            write.</param>
-        </member>
-        <member name="T:RiotClub.FireMoth.Services.Output.ScanOutputOptions">
-            <summary>
-            Specifies options that are used when performing a directory scan.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.Output.ScanOutputOptions.OutputFile">
-            <summary>
-            Gets or sets the path of the file to output.
-            </summary>
-        </member>
-        <member name="P:RiotClub.FireMoth.Services.Output.ScanOutputOptions.OutputDuplicateInfoOnly">
-            <summary>
-            Gets or sets a value indicating whether only file fingerprint data for exact data duplicates
-            will be included in the output.
-            </summary>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.FileFingerprint">
             <summary>
             Contains data that uniquely identifies a file and its data.
@@ -735,6 +647,96 @@
             </summary>
             <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a <see cref="T:System.Boolean"/> result indicating
             whether the task completed successfully (<c>true</c>) or failed (<c>false</c>).</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar">
+            <summary>
+            Provides a method to display a progress bar in a console window.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar.WriteProgressBar(System.Single,System.Boolean)">
+            <summary>
+            Writes a progress bar to console standard output.
+            </summary>
+            <param name="progress">A <see cref="T:System.Single"/> with the amount of progress to display.</param>
+            <param name="resetCursorLocation">If <c>true</c>, attempts to reset the cursor to its
+            original location after displaying the progress bar. This functionality is not supported in
+            all environments.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar.TrySetCursorVisibility(System.Boolean)">
+            <summary>
+            Attempts to set console cursor visibility to the provided value.
+            </summary>
+            <param name="visible"><c>true</c> to set the cursor visible; false otherwise.</param>
+            <returns><c>true</c> if on Windows platform; false otherwise.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter">
+            <summary>
+            Writes <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> data in CSV format.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter.#ctor(System.IO.StreamWriter,RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,CsvHelper.IFactory,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter})">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter"/> class. 
+            </summary>
+            <param name="streamWriter">The stream to which data is written. </param>
+            <param name="fileFingerprintRepository">Used to retrieve <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>s to
+            be written to the output.</param>
+            <param name="csvWriterFactory">Used to create a <see cref="T:CsvHelper.CsvWriter"/> instance for writing
+            CSV output.</param>
+            <param name="scanOutputOptions">Used to retrieve duplicate scan output options via
+            <see cref="P:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions.OutputDuplicateInfoOnly"/>.</param>
+            <param name="logger">Used to output logging data.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter.RunTaskAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.Csv.CsvFileFingerprintWriter.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and, optionally, managed resources.
+            </summary>
+            <param name="disposing">If true, managed resources are freed.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.Output.Csv.FileFingerprintMap">
+            <summary>
+            A mapping between an <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> and CSV headers.
+            </summary>
+            <seealso cref="T:CsvHelper.Configuration.ClassMap"/>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.Csv.FileFingerprintMap.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Tasks.Output.Csv.FileFingerprintMap"/> class.
+            </summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.Output.IFileFingerprintWriter">
+            <summary>
+            Defines the public interface for a class that implements 
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.IFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
+            <summary>
+            Writes the provided collection of file fingerprints.
+            </summary>
+            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to
+            write.</param>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions">
+            <summary>
+            Specifies options that are used when performing a directory scan.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions.OutputFile">
+            <summary>
+            Gets or sets the path of the file to output.
+            </summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions.OutputDuplicateInfoOnly">
+            <summary>
+            Gets or sets a value indicating whether only file fingerprint data for exact data duplicates
+            will be included in the output.
+            </summary>
         </member>
     </members>
 </doc>

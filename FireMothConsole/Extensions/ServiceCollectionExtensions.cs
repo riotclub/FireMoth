@@ -18,11 +18,10 @@ using RiotClub.FireMoth.Services.DataAccess;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.DataAnalysis;
 using RiotClub.FireMoth.Services.Orchestration;
-using RiotClub.FireMoth.Services.Output;
-using RiotClub.FireMoth.Services.Output.Csv;
+using RiotClub.FireMoth.Services.Tasks.Output;
+using RiotClub.FireMoth.Services.Tasks.Output.Csv;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tasks;
-using Serilog;
 
 /// <summary>
 /// Extensions to support service configuration.
@@ -62,6 +61,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataAccessLayer<FileFingerprint>, SqliteDataAccessLayer>();
 #endregion
 
+        services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
+
         services.Configure<DuplicateFileHandlingOptions>(config.GetSection("CommandLine"));
         var serviceProvider = services.BuildServiceProvider();
         var duplicateOptions = serviceProvider
@@ -71,11 +72,8 @@ public static class ServiceCollectionExtensions
         {
             services.AddTransient<ITaskHandler, DuplicateFileHandler>();
         }
-        
-        services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
-        services.AddTransient<IFileFingerprintWriter, CsvFileFingerprintWriter>();
+        services.AddTransient<ITaskHandler, CsvFileFingerprintWriter>();
         services.AddTransient<IFactory, Factory>();     // CSVHelper factory
-
         var outputOptions = serviceProvider.GetRequiredService<IOptions<ScanOutputOptions>>().Value;
         // Null-forgiven; we check for null values in command-line argument validator in
         // Program.BuildCommandLineParser

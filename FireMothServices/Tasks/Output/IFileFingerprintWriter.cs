@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Output;
+namespace RiotClub.FireMoth.Services.Tasks.Output;
 
 using System.Collections.Generic;
 using System.Threading.Tasks;

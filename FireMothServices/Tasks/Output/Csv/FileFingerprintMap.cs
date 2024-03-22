@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Output.Csv;
+namespace RiotClub.FireMoth.Services.Tasks.Output.Csv;
 
 using CsvHelper.Configuration;
 using RiotClub.FireMoth.Services.Repository;
