@@ -133,8 +133,8 @@ public static class Program
             result.ErrorMessage = errorText;
         });
         
-        var outputDuplicatesOnlyOption = new Option<bool?>(
-            aliases: ["--output-duplicates-only", "-u"],
+        var outputDuplicateInfoOnlyOption = new Option<bool?>(
+            aliases: ["--output-duplicate-info-only", "-u"],
             description: "Only include files with duplicate hash values in output",
             getDefaultValue: () => false);
 
@@ -156,7 +156,7 @@ public static class Program
         rootCommand.AddOption(scanDirectoryOption);
         rootCommand.AddOption(recursiveScanOption);
         rootCommand.AddOption(outputFileOption);
-        rootCommand.AddOption(outputDuplicatesOnlyOption);
+        rootCommand.AddOption(outputDuplicateInfoOnlyOption);
         rootCommand.AddOption(duplicateFileHandlingMethodOption);
         rootCommand.AddOption(moveDuplicateFilesToDirectoryOption);
         rootCommand.Handler = CommandHandler.Create<
@@ -174,7 +174,7 @@ public static class Program
                 scanDirectory,
                 recursiveScan,
                 outputFile,
-                outputDuplicatesOnly,
+                outputDuplicateInfoOnly,
                 duplicateFileHandlingMethod,
                 moveDuplicateFilesToDirectory) =>
             {
