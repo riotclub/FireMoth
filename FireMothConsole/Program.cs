@@ -171,6 +171,9 @@ public static class Program
             async (
                 host,
                 parseResult,
+                // These "unused" arguments to the async delegate need to be here because the
+                // System.CommandLine library uses introspection to map these values when parsing
+                // the command line.
                 scanDirectory,
                 recursiveScan,
                 outputFile,
@@ -237,7 +240,6 @@ public static class Program
                     scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
                 scanResult = await scanner.ScanDirectoryAsync();
                 await HandlePostScanTasksAsync(scope);
-                // await OutputScanResult(scope, scanResult);
                 stopwatch.Stop();
             }
             

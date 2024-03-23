@@ -2,7 +2,7 @@
     "profiles": {
         "FireMothConsole": {
             "commandName": "Project",
-            "commandLineArgs": "-d \"D:\\FireMoth Test Data\" -m delete",
+            "commandLineArgs": "-d \"D:\\FireMoth Test Data\" -m delete -o D:\\bork.csv",
             "environmentVariables": {
                 "DOTNET_ENVIRONMENT": "Development"
             }
