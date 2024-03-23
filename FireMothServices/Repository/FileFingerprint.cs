@@ -87,7 +87,8 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
         !(left == right);
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => Equals(obj as FileFingerprint);
+    public override bool Equals(object? obj) =>
+        Equals(obj as FileFingerprint);
 
     /// <inheritdoc/>
     public bool Equals(FileFingerprint? other) =>
