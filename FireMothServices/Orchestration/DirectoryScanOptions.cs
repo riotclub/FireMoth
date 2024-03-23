@@ -13,11 +13,11 @@ public class DirectoryScanOptions
     /// <summary>
     /// Gets or sets the directory to be scanned.
     /// </summary>
-    public string? Directory { get; set; }
+    public string? Directory { get; init; }
 
     /// <summary>
     /// Gets or sets a value indicating whether subdirectories of <see cref="Directory"/> will
     /// be recursively scanned.
     /// </summary>
-    public bool Recursive { get; set; }
+    public bool Recursive { get; init; }
 }

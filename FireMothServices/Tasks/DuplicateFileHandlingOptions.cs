@@ -15,17 +15,17 @@ public class DuplicateFileHandlingOptions
     /// A <see cref="DuplicateFileHandlingMethod"/> used to indicate how duplicate files should be
     /// handled.
     /// </summary>
-    public DuplicateFileHandlingMethod DuplicateFileHandlingMethod { get; set; }
+    public DuplicateFileHandlingMethod DuplicateFileHandlingMethod { get; init; }
     
     /// <summary>
     /// A flag indicating whether or not duplicate file deletion or moving should be
     /// user-interactive or not.
     /// </summary>
-    public bool Interactive { get; set; }
+    public bool Interactive { get; init; }
     
     /// <summary>
     /// The full path where duplicate files will be moved to when
     /// <see cref="DuplicateFileHandlingMethod"/> is <see cref="DuplicateFileHandlingMethod.Move"/>.
     /// </summary>
-    public string? MoveDuplicateFilesToDirectory { get; set; }
+    public string? MoveDuplicateFilesToDirectory { get; init; }
 }
