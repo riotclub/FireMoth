@@ -72,11 +72,10 @@ public static class ServiceCollectionExtensions
         {
             services.AddTransient<ITaskHandler, DuplicateFileHandler>();
         }
+        
         services.AddTransient<ITaskHandler, CsvFileFingerprintWriter>();
         services.AddTransient<IFactory, Factory>();     // CSVHelper factory
         var outputOptions = serviceProvider.GetRequiredService<IOptions<ScanOutputOptions>>().Value;
-        // Null-forgiven; we check for null values in command-line argument validator in
-        // Program.BuildCommandLineParser
         services.AddScoped(_ => new StreamWriter(GetOutputFileName(outputOptions.OutputFile)));
 
         return services;
@@ -111,14 +110,16 @@ public static class ServiceCollectionExtensions
         
         return sqliteConnectionStringBuilder.ConnectionString;
     }
-    
 
     private static string GetOutputFileName(string? outputFile)
     {
         // If no outputFile was provided, use default path and filename.
         if (string.IsNullOrWhiteSpace(outputFile))
         {
-            return GetOutputFilePath(outputFile) + Path.DirectorySeparatorChar + DefaultFilePrefix
+            var outputFilePath = string.IsNullOrWhiteSpace(outputFile) 
+                ? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) 
+                : Path.GetDirectoryName(outputFile);
+            return outputFilePath + Path.DirectorySeparatorChar + DefaultFilePrefix
                    + Program.ProgramStartDateTime.ToString(
                        DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)                   
                    + '.' + DefaultFileExtension;
@@ -126,11 +127,4 @@ public static class ServiceCollectionExtensions
 
         return Path.GetFullPath(outputFile);
     }
-    
-    private static string? GetOutputFilePath(string? outputFile)
-    {
-        return string.IsNullOrWhiteSpace(outputFile) 
-            ? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) 
-            : Path.GetDirectoryName(outputFile);
-    }    
 }

@@ -13,7 +13,7 @@ using RiotClub.FireMoth.Services.Repository;
 /// </summary>
 /// <seealso cref="ClassMap"/>
 // ReSharper disable once ClassNeverInstantiated.Global
-internal sealed class FileFingerprintMap : ClassMap<IFileFingerprint>
+internal sealed class FileFingerprintMap : ClassMap<FileFingerprint>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprintMap"/> class.

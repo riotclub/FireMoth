@@ -49,8 +49,8 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
         ConsoleProgressBar.WriteProgressBar(1.0f, false);
         ConsoleProgressBar.TrySetCursorVisibility(true);
         
-        return _hashAlgorithm.Hash
-               ?? throw new InvalidOperationException("Unable to compute hash.");
+        return _hashAlgorithm.Hash 
+            ?? throw new InvalidOperationException("Unable to compute hash.");
     }
     
     /// <inheritdoc/>

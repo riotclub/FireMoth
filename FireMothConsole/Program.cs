@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Console;
 
 using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
@@ -13,10 +14,12 @@ using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Console.Extensions;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
@@ -24,6 +27,7 @@ using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Tasks.Output;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tasks;
+using RiotClub.FireMoth.Services.Tasks.Output.Csv;
 using Serilog;
 
 /// <summary>
@@ -233,6 +237,7 @@ public static class Program
                     scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
                 scanResult = await scanner.ScanDirectoryAsync();
                 await HandlePostScanTasksAsync(scope);
+                // await OutputScanResult(scope, scanResult);
                 stopwatch.Stop();
             }
             
@@ -254,13 +259,15 @@ public static class Program
             Log.CloseAndFlush();
         }
     }
-
+    
     private static async Task HandlePostScanTasksAsync(IServiceScope scope)
     {
         var taskHandlers = scope.ServiceProvider.GetServices<ITaskHandler>();
         foreach (var taskHandler in taskHandlers)
         {
-            Log.Debug("Running post-scan task handler of type '{TaskHandlerType}'.", taskHandler.GetType());
+            Log.Debug(
+                "Running post-scan task handler of type '{TaskHandlerType}'.",
+                taskHandler.GetType());
             await taskHandler.RunTaskAsync();
 
             var disposableHandler = taskHandler as IDisposable;

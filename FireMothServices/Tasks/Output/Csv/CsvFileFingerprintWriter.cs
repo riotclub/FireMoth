@@ -6,6 +6,7 @@
 namespace RiotClub.FireMoth.Services.Tasks.Output.Csv;
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -57,7 +58,7 @@ public class CsvFileFingerprintWriter : ITaskHandler, IDisposable
 
         _csvWriter = csvWriterFactory.CreateWriter(streamWriter, CultureInfo.InvariantCulture);
         _csvWriter.Context.RegisterClassMap<FileFingerprintMap>();
-        _csvWriter.WriteHeader<IFileFingerprint>();
+        _csvWriter.WriteHeader<FileFingerprint>();
         _csvWriter.NextRecord();
     }
 

@@ -710,18 +710,6 @@
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Tasks.Output.Csv.FileFingerprintMap"/> class.
             </summary>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.Tasks.Output.IFileFingerprintWriter">
-            <summary>
-            Defines the public interface for a class that implements 
-            </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tasks.Output.IFileFingerprintWriter.WriteFileFingerprintsAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.IFileFingerprint})">
-            <summary>
-            Writes the provided collection of file fingerprints.
-            </summary>
-            <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> collection to
-            write.</param>
-        </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions">
             <summary>
             Specifies options that are used when performing a directory scan.
