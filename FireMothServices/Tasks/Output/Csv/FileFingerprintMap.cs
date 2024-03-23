@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Output.Csv;
+namespace RiotClub.FireMoth.Services.Tasks.Output.Csv;
 
 using CsvHelper.Configuration;
 using RiotClub.FireMoth.Services.Repository;
@@ -13,7 +13,7 @@ using RiotClub.FireMoth.Services.Repository;
 /// </summary>
 /// <seealso cref="ClassMap"/>
 // ReSharper disable once ClassNeverInstantiated.Global
-internal sealed class FileFingerprintMap : ClassMap<IFileFingerprint>
+internal sealed class FileFingerprintMap : ClassMap<FileFingerprint>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFingerprintMap"/> class.

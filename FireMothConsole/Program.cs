@@ -24,9 +24,10 @@ using RiotClub.FireMoth.Console.Extensions;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
-using RiotClub.FireMoth.Services.Output;
+using RiotClub.FireMoth.Services.Tasks.Output;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tasks;
+using RiotClub.FireMoth.Services.Tasks.Output.Csv;
 using Serilog;
 
 /// <summary>
@@ -132,8 +133,8 @@ public static class Program
             result.ErrorMessage = errorText;
         });
         
-        var outputDuplicatesOnlyOption = new Option<bool?>(
-            aliases: ["--output-duplicates-only", "-u"],
+        var outputDuplicateInfoOnlyOption = new Option<bool?>(
+            aliases: ["--output-duplicate-info-only", "-u"],
             description: "Only include files with duplicate hash values in output",
             getDefaultValue: () => false);
 
@@ -155,7 +156,7 @@ public static class Program
         rootCommand.AddOption(scanDirectoryOption);
         rootCommand.AddOption(recursiveScanOption);
         rootCommand.AddOption(outputFileOption);
-        rootCommand.AddOption(outputDuplicatesOnlyOption);
+        rootCommand.AddOption(outputDuplicateInfoOnlyOption);
         rootCommand.AddOption(duplicateFileHandlingMethodOption);
         rootCommand.AddOption(moveDuplicateFilesToDirectoryOption);
         rootCommand.Handler = CommandHandler.Create<
@@ -170,10 +171,13 @@ public static class Program
             async (
                 host,
                 parseResult,
+                // These "unused" arguments to the async delegate need to be here because the
+                // System.CommandLine library uses introspection to map these values when parsing
+                // the command line.
                 scanDirectory,
                 recursiveScan,
                 outputFile,
-                outputDuplicatesOnly,
+                outputDuplicateInfoOnly,
                 duplicateFileHandlingMethod,
                 moveDuplicateFilesToDirectory) =>
             {
@@ -232,9 +236,10 @@ public static class Program
             {
                 stopwatch.Start();
                 await InitializeDatabaseAsync(scope);
-                scanResult = await ScanDirectoryAsync(scope);
-                await OutputScanResult(scope, scanResult);
-                await HandleTasksAsync(scope);
+                var scanner =
+                    scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
+                scanResult = await scanner.ScanDirectoryAsync();
+                await HandlePostScanTasksAsync(scope);
                 stopwatch.Stop();
             }
             
@@ -256,49 +261,20 @@ public static class Program
             Log.CloseAndFlush();
         }
     }
-
-    private static async Task OutputScanResult(IServiceScope scope, ScanResult result)
-    {
-        var outputOptions =
-            scope.ServiceProvider.GetRequiredService<IOptions<ScanOutputOptions>>().Value;
-        var outputStream = scope.ServiceProvider.GetRequiredService<StreamWriter>();
-        var outputStreamPath = ((FileStream)(outputStream.BaseStream)).Name;
-        IEnumerable<FileFingerprint> fingerprintsToOutput;
-        if (!outputOptions.OutputDuplicateInfoOnly)
-        {
-            Log.Information(
-                "Writing output to '{OutputFileName}'.", outputStreamPath);
-            fingerprintsToOutput = result.ScannedFiles;
-        }
-        else
-        {
-            Log.Information(
-                "Writing output (duplicates only) to '{OutputFileName}'.", outputStreamPath);
-            var fingerprintRepository =
-                scope.ServiceProvider.GetRequiredService<IFileFingerprintRepository>();
-            var duplicateFingerprints = 
-                await fingerprintRepository.GetRecordsWithDuplicateHashesAsync();
-            fingerprintsToOutput = duplicateFingerprints.ToList();
-        }
-        
-        var resultWriter = scope.ServiceProvider.GetRequiredService<IFileFingerprintWriter>();
-        await resultWriter.WriteFileFingerprintsAsync(fingerprintsToOutput);
-    }
-
-    private static async Task HandleTasksAsync(IServiceScope scope)
+    
+    private static async Task HandlePostScanTasksAsync(IServiceScope scope)
     {
         var taskHandlers = scope.ServiceProvider.GetServices<ITaskHandler>();
         foreach (var taskHandler in taskHandlers)
         {
-            Log.Debug("Running task handler of type '{TaskHandlerType}'.", taskHandler.GetType());
+            Log.Debug(
+                "Running post-scan task handler of type '{TaskHandlerType}'.",
+                taskHandler.GetType());
             await taskHandler.RunTaskAsync();
+
+            var disposableHandler = taskHandler as IDisposable;
+            disposableHandler?.Dispose();
         }
-    }
-    
-    private static async Task<ScanResult> ScanDirectoryAsync(IServiceScope scope)
-    {
-        var scanner = scope.ServiceProvider.GetRequiredService<IDirectoryScanOrchestrator>();
-        return await scanner.ScanDirectoryAsync();
     }
     
     private static async Task InitializeDatabaseAsync(IServiceScope scope)

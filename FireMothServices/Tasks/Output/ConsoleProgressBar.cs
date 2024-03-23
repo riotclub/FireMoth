@@ -1,7 +1,7 @@
 using System;
 using System.Security;
 
-namespace RiotClub.FireMoth.Services.Output;
+namespace RiotClub.FireMoth.Services.Tasks.Output;
 
 /// <summary>
 /// Provides a method to display a progress bar in a console window.
