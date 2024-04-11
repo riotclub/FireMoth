@@ -48,27 +48,21 @@
             <returns>The number of rows that were deleted.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer">
-            <summary>
-            Implementation of a data access layer that persists data to memory.
-            </summary>
+            <summary>Implementation of a data access layer that persists data to memory.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.#ctor(Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer"/> class.
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer"/> class.
             </summary>
-            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger"/> used to log information.</param>
+            <param name="logger">Used to log information.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.GetAsync(System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.Boolean},System.Func{RiotClub.FireMoth.Services.Repository.FileFingerprint,System.String})">
-            <summary>
-            Retrieves file fingerprints from the data access layer.
-            </summary>
+            <summary>Retrieves file fingerprints from the data access layer.</summary>
             <param name="filter">A lambda expression that specifies a filter condition.</param>
             <param name="orderBy">A lambda expression that specifies an ordering.</param>
             <returns>IEnumerable collection of file fingerprints.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.AddAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
-            <summary>
-            Adds the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to the data access layer.
+            <summary>Adds the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to the data access layer.
             </summary>
             <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to add.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>

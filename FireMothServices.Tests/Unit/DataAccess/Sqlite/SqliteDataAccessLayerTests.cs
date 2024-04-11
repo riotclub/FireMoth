@@ -1,9 +1,9 @@
-﻿// <copyright file="MemoryDataAccessLayerTests.cs" company="Riot Club">
+﻿// <copyright file="SqliteDataAccessLayerTests.cs" company="Riot Club">
 // Copyright (c) Riot Club. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory;
+namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite;
 
 using System;
 using System.Collections.Generic;
@@ -11,8 +11,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Moq.AutoMock;
-using RiotClub.FireMoth.Services.DataAccess.InMemory;
+using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
 using Xunit;
@@ -55,12 +58,12 @@ using Xunit;
 /// - Deletes all records from the data access layer.
 /// - Returns the number of records that were deleted from the data access layer.
 /// </summary>
-public class MemoryDataAccessLayerTests
+public class SqliteDataAccessLayerTests
 {
     private readonly AutoMocker _mocker = new();
     private readonly Fixture _fixture = new();
     
-    public MemoryDataAccessLayerTests()
+    public SqliteDataAccessLayerTests()
     {
         _fixture.Customizations.Add(new Base64HashSpecimenBuilder());
         _fixture.Customizations.Add(new FileNameSpecimenBuilder());
@@ -73,9 +76,10 @@ public class MemoryDataAccessLayerTests
     {
         // Arrange, Act
         // ReSharper disable once ObjectCreationAsStatement
-#pragma warning disable CA1806
-        Action ctorAction = () => new MemoryDataAccessLayer(null!);
-#pragma warning restore CA1806
+        var mockFireMothContext = new Mock<FireMothContext>();
+    #pragma warning disable CA1806
+        Action ctorAction = () => new SqliteDataAccessLayer(null!, mockFireMothContext.Object);
+    #pragma warning restore CA1806
 
         // Assert
         ctorAction.Should().ThrowExactly<ArgumentNullException>();
@@ -89,14 +93,31 @@ public class MemoryDataAccessLayerTests
     public async void GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
-        var expected = await AddFileFingerprintsAsync(sut);
+        // ReSharper disable once ObjectCreationAsStatement
+        var mockDbSet = new Mock<DbSet<FileFingerprint>>();
+        var mockFireMothContext = new Mock<FireMothContext>();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);
+        var mockLogger = new Mock<ILogger<SqliteDataAccessLayer>>();
 
+        var sut = new SqliteDataAccessLayer(mockLogger.Object, mockFireMothContext.Object);
+        
         // Act
         var result = await sut.GetAsync();
-
+        
         // Assert
-        result.Should().Equal(expected);
+        result.Should().NotBeNull();
+/*
+ *             var mockSet = new Mock<DbSet<Blog>>();
+
+            var mockContext = new Mock<BloggingContext>();
+            mockContext.Setup(m => m.Blogs).Returns(mockSet.Object);
+
+            var service = new BlogService(mockContext.Object);
+            service.AddBlog("ADO.NET Blog", "http://blogs.msdn.com/adonet");
+
+            mockSet.Verify(m => m.Add(It.IsAny<Blog>()), Times.Once());
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+ */ 
     }
 
     /// <summary>GetAsync: If non-null filter and null orderBy expressions are passed, a filtered
@@ -105,7 +126,7 @@ public class MemoryDataAccessLayerTests
     public async void GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var fingerprints = await AddFileFingerprintsAsync(sut);
         bool FilterFunction(IFileFingerprint fingerprint) => fingerprint.FileName.Contains('X');
         var expected = fingerprints.Where(FilterFunction);
@@ -123,7 +144,7 @@ public class MemoryDataAccessLayerTests
     public async void GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var fingerprints = await AddFileFingerprintsAsync(sut);
         string OrderByFunction(IFileFingerprint fingerprint) => fingerprint.FileName;
         var expected = fingerprints.OrderBy(OrderByFunction);
@@ -141,7 +162,7 @@ public class MemoryDataAccessLayerTests
     public async void GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var fingerprints = await AddFileFingerprintsAsync(sut);
         bool FilterFunction(IFileFingerprint fingerprint) => fingerprint.FileName.Contains('X');        
         var filtered = fingerprints.Where(FilterFunction);
@@ -163,7 +184,7 @@ public class MemoryDataAccessLayerTests
     public void AddAsync_NullFileFingerprint_ThrowsArgumentNullException()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
 
         // Act
         Action addAsyncAction = () => sut.AddAsync(null!);
@@ -178,7 +199,7 @@ public class MemoryDataAccessLayerTests
     public async Task AddAsync_NonNullFileFingerprint_AddsRecord()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         await AddFileFingerprintsAsync(sut);
         var testFileFingerprint = _fixture.Create<FileFingerprint>();
         var expected = new List<FileFingerprint> { testFileFingerprint };
@@ -199,7 +220,7 @@ public class MemoryDataAccessLayerTests
     public void AddManyAsync_NullIEnumerable_ThrowsArgumentNullException()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
 
         // Act
         Action addManyAsyncAction = () => sut.AddManyAsync(null!);
@@ -214,7 +235,7 @@ public class MemoryDataAccessLayerTests
     public async void AddManyAsync_NonNullIEnumerable_AddsRecords()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         await AddFileFingerprintsAsync(sut);
         var existingFileFingerprints = (await sut.GetAsync()).ToList();
         var testFileFingerprints = _fixture.CreateMany<FileFingerprint>(3).ToList();
@@ -236,7 +257,7 @@ public class MemoryDataAccessLayerTests
     public void DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
 
         // Act
         Action deleteAsyncAction = () => sut.DeleteAsync(null!);
@@ -251,7 +272,7 @@ public class MemoryDataAccessLayerTests
     public async void DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var expected = (await AddFileFingerprintsAsync(sut)).ToList();
         var itemToDelete = expected[10];
         expected.Remove(itemToDelete);
@@ -270,7 +291,7 @@ public class MemoryDataAccessLayerTests
     public async void DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var originalItems = (await AddFileFingerprintsAsync(sut)).ToList();
         var itemToDelete = originalItems[0];
 
@@ -287,7 +308,7 @@ public class MemoryDataAccessLayerTests
     public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var expected = (await AddFileFingerprintsAsync(sut)).ToList();
         var randomFingerprint = _fixture.Create<FileFingerprint>();
 
@@ -305,7 +326,7 @@ public class MemoryDataAccessLayerTests
     public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var randomFingerprint = _fixture.Create<FileFingerprint>();
 
         // Act
@@ -322,7 +343,7 @@ public class MemoryDataAccessLayerTests
     public async void DeleteAllAsync_MethodCalled_DeletesAllRecords()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         await AddFileFingerprintsAsync(sut);
             
         // Act
@@ -339,7 +360,7 @@ public class MemoryDataAccessLayerTests
     public async void DeleteAllAsync_MethodCalled_ReturnsDeletedRecordCount()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
+        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
         var addedFileFingerprints = (await AddFileFingerprintsAsync(sut)).ToList();
         var expected = addedFileFingerprints.Count;
             
@@ -352,7 +373,7 @@ public class MemoryDataAccessLayerTests
 #endregion
 
     private async Task<IEnumerable<FileFingerprint>> AddFileFingerprintsAsync(
-        MemoryDataAccessLayer dataAccessLayer)
+        SqliteDataAccessLayer dataAccessLayer)
     {
         var fileFingerprints = _fixture.CreateMany<FileFingerprint>(50);
         var fileFingerprintList = fileFingerprints.ToList();

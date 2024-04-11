@@ -17,7 +17,6 @@ internal class FileFingerprintTypeConfiguration : IEntityTypeConfiguration<FileF
         builder.Property<int>("Id")
                .ValueGeneratedOnAdd();
         builder.HasKey("Id");
-        
         builder.Property("FileName")
                .HasColumnType("varchar(256)");
         builder.Property("DirectoryName")

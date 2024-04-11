@@ -3,48 +3,38 @@
 /DataAccess/InMemory/MemoryDataAccessLayer
 ------------------------------------------------------------------------------------
 Ctor
-    - Null ILogger throws ArgumentNullException
+- If null ILogger is passed, an ArgumentNullException is thrown.
 
 GetAsync
-    - Providing null filter and null orderBy expressions returns non-filtered and non-ordered collection
-      of records.
-    - Providing valid filter and null orderBy expressions returns filtered and non-ordered collection
-      of records.
-    - Providing null filter and valid orderBy expressions returns non-filtered and ordered collection of
-      records.
-    - Providing valid filter and orderBy expressions returns filtered and ordered collection of records.
+- If null filter and null orderBy expressions are passed, an unfiltered and unordered collection of records is returned.
+- If non-null filter and null orderBy expressions are passed, a filtered and unordered collection of records is returned.
+- If null filter and non-null orderBy expressions are passed, an unfiltered and ordered collection of records is returned.
+- If non-null filter and non-null orderBy expressions are passed, a filtered and ordered collection of records is returned.
 
 AddAsync
-    - Null FileFingerprint throws ArgumentNullException
-    - Valid FileFingerprint adds the record to the data access layer.
+- If null FileFingerprint is passed, an ArgumentNullException is thrown.
+- If non-null FileFingerprint is passed, a record is added to the data access layer.
     
 AddManyAsync
-    - Null IEnumerable<FileFingerprint> throws ArgumentNullException
-    - Valid IEnumerable<FileFingerprint> adds the records to the data access layer.
+- If null IEnumerable{FileFingerprint} is passed, an ArgumentNullException is thrown.
+- If non-null IEnumerable{FileFingerprint} is passed, the records are added to the data access layer.
     
 DeleteAsync
-    - Null FileFingerprint throws ArgumentNullException.
-    - Valid FileFingerprint that exists in the data access layer deletes the record.
-    - Valid FileFingerprint that exists in the data access layer returns true.
-    - Valid FileFingerprint that does not exist in the data access layer does not modify the data access
-      layer's existing records.
-    - Valid FileFingerprint that does not exist in the data access layer returns false.
+- If null FileFingerprint is passed, an ArgumentNullException is thrown.
+- If non-null FileFingerprint that matches a record in the data access layer is passed, the record is deleted.
+- If non-null FileFingerprint that matches a record in the data access layer is passed, true is returned.
+- If non-null FileFingerprint that does not match a record in the data access layer is passed, the data access layer's existing records are not modified.
+- If non-null FileFingerprint that does not match a record in the data access layer is passed, false is returned.
     
 DeleteAllAsync
-    - Deletes all records from the data access layer.
-    - Returns the number of records that were deleted from the data access layer.
-    
-------------------------------------------------------------------------------------
-/DataAccess/Sqlite/FileFingerprintTypeConfiguration
-------------------------------------------------------------------------------------
-Configure
-    - Properly configures FileFingerprint entity.
+- Deletes all records from the data access layer.
+- Returns the number of records that were deleted from the data access layer.
     
 ------------------------------------------------------------------------------------
 /DataAccess/Sqlite/FireMothContext
 ------------------------------------------------------------------------------------
 OnModelCreating
-    - After call, FileFingerprint entity type is properly configured
+- After call, FileFingerprint entity type is properly configured
     
 ------------------------------------------------------------------------------------
 /DataAccess/Sqlite/SqliteDataAccessLayer
@@ -52,25 +42,12 @@ Note: Unit tests should utilize mocks to test class functionality; actual SQLite
       interactions are tested in the integration tests.
 ------------------------------------------------------------------------------------
 Ctor
-    - Null ILogger throws ArgumentNullException
-    - Null FireMothContext throws ArgumentNullException
+- If null ILogger is passed, an ArgumentNullException is thrown.
+- If null FireMothContext is passed, an ArgumentNullException is thrown.
 
-GetAsync
-    - Providing null filter and null orderBy expressions returns non-filtered and non-ordered collection
-      of records.
-    - Providing valid filter and null orderBy expressions returns filtered and non-ordered collection
-      of records.
-    - Providing null filter and valid orderBy expressions returns non-filtered and ordered collection of
-      records.
-    - Providing valid filter and orderBy expressions returns filtered and ordered collection of records.
-
-AddAsync
-    - Null FileFingerprint throws ArgumentNullException
-    - Valid FileFingerprint adds the record to the data access layer.
-    
 AddManyAsync
-    - Null IEnumerable<FileFingerprint> throws ArgumentNullException
-    - Valid IEnumerable<FileFingerprint> adds the records to the data access layer.
+- If null IEnumerable{FileFingerprint} is passed, an ArgumentNullException is thrown.
+- If non-null IEnumerable{FileFingerprint} is passed, the records are added to the data access layer.
     
 DeleteAsync
     - Null FileFingerprint throws ArgumentNullException.
