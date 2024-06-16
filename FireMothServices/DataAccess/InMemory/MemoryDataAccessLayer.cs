@@ -12,28 +12,22 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
 
-/// <summary>
-/// Implementation of a data access layer that persists data to memory.
-/// </summary>
+/// <summary>Implementation of a data access layer that persists data to memory.</summary>
 public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
 {
     private List<FileFingerprint> _fileFingerprints;
     private readonly ILogger<MemoryDataAccessLayer> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemoryDataAccessLayer"/> class.
+    /// <summary>Initializes a new instance of the <see cref="MemoryDataAccessLayer"/> class.
     /// </summary>
-    /// <param name="logger">An <see cref="ILogger"/> used to log information.</param>
+    /// <param name="logger">Used to log information.</param>
     public MemoryDataAccessLayer(ILogger<MemoryDataAccessLayer> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         _fileFingerprints = new List<FileFingerprint>();
     }
 
-    /// <summary>
-    /// Retrieves file fingerprints from the data access layer.
-    /// </summary>
+    /// <summary>Retrieves file fingerprints from the data access layer.</summary>
     /// <param name="filter">A lambda expression that specifies a filter condition.</param>
     /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
     /// <returns>IEnumerable collection of file fingerprints.</returns>
@@ -52,8 +46,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
         return Task.FromResult(result);
     }
 
-    /// <summary>
-    /// Adds the provided <see cref="IFileFingerprint"/> to the data access layer.
+    /// <summary>Adds the provided <see cref="IFileFingerprint"/> to the data access layer.
     /// </summary>
     /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to add.</param>
     /// <exception cref="ArgumentNullException">Thrown when provided <see cref="IFileFingerprint"/>
@@ -68,9 +61,8 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Adds the provided collection of <see cref="IFileFingerprint"/>s to the data access layer.
-    /// </summary>
+    /// <summary> Adds the provided collection of <see cref="IFileFingerprint"/>s to the data access
+    /// layer.</summary>
     /// <param name="fileFingerprints">An <see cref="IEnumerable{IFileFingerprint}"/> containing
     /// items to add.</param>
     /// <exception cref="ArgumentNullException">Thrown when provided collection is null.</exception>
@@ -107,7 +99,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
     public Task<int> DeleteAllAsync()
     {
         var recordCount = _fileFingerprints.Count;
-        _fileFingerprints = new List<FileFingerprint>();
+        _fileFingerprints = [];
 
         return Task.FromResult(recordCount);
     }

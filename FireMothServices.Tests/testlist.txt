@@ -1,106 +1,82 @@
 ﻿FireMoth.Services Unit Tests
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /DataAccess/InMemory/MemoryDataAccessLayer
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - Null ILogger throws ArgumentNullException
+- Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
 
 GetAsync
-    - Providing null filter and null orderBy expressions returns non-filtered and non-ordered collection
-      of records.
-    - Providing valid filter and null orderBy expressions returns filtered and non-ordered collection
-      of records.
-    - Providing null filter and valid orderBy expressions returns non-filtered and ordered collection of
-      records.
-    - Providing valid filter and orderBy expressions returns filtered and ordered collection of records.
+- Passing null filter and null orderBy expressions returns an unfiltered and unordered collection of records.
+- Passing non-null filter and null orderBy expressions returns a filtered and unordered collection of records.
+- Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection of records.
+- Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
 
 AddAsync
-    - Null FileFingerprint throws ArgumentNullException
-    - Valid FileFingerprint adds the record to the data access layer.
+- Passing a null FileFingerprint throws an ArgumentNullException.
+- Passing a non-null FileFingerprint adds a record to the data access layer.
     
 AddManyAsync
-    - Null IEnumerable<FileFingerprint> throws ArgumentNullException
-    - Valid IEnumerable<FileFingerprint> adds the records to the data access layer.
+- Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
+- Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
     
 DeleteAsync
-    - Null FileFingerprint throws ArgumentNullException.
-    - Valid FileFingerprint that exists in the data access layer deletes the record.
-    - Valid FileFingerprint that exists in the data access layer returns true.
-    - Valid FileFingerprint that does not exist in the data access layer does not modify the data access
-      layer's existing records.
-    - Valid FileFingerprint that does not exist in the data access layer returns false.
+- Passing a null FileFingerprint throws an ArgumentNullException.
+- Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+- Passing a FileFingerprint that matches a record in the data access layer returns true.
+- Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
+- Passing a FileFingerprint that does not match a record in the data access layer returns false.
     
 DeleteAllAsync
-    - Deletes all records from the data access layer.
-    - Returns the number of records that were deleted from the data access layer.
+- Deletes all records from the data access layer.
+- Returns the number of records that were deleted from the data access layer.
     
-------------------------------------------------------------------------------------
-/DataAccess/Sqlite/FileFingerprintTypeConfiguration
-------------------------------------------------------------------------------------
-Configure
-    - Properly configures FileFingerprint entity.
-    
-------------------------------------------------------------------------------------
-/DataAccess/Sqlite/FireMothContext
-------------------------------------------------------------------------------------
-OnModelCreating
-    - After call, FileFingerprint entity type is properly configured
-    
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /DataAccess/Sqlite/SqliteDataAccessLayer
-Note: Unit tests should utilize mocks to test class functionality; actual SQLite DB
-      interactions are tested in the integration tests.
-------------------------------------------------------------------------------------
+Note: Unit tests should utilize mocks to test class functionality; actual SQLite DB interactions are tested in the
+      integration tests.
+------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - Null ILogger throws ArgumentNullException
-    - Null FireMothContext throws ArgumentNullException
+- Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
+- Passing a null FireMothContext throws an ArgumentNullException.
 
 GetAsync
-    - Providing null filter and null orderBy expressions returns non-filtered and non-ordered collection
-      of records.
-    - Providing valid filter and null orderBy expressions returns filtered and non-ordered collection
-      of records.
-    - Providing null filter and valid orderBy expressions returns non-filtered and ordered collection of
-      records.
-    - Providing valid filter and orderBy expressions returns filtered and ordered collection of records.
+- Passing null filter and null orderBy expressions returns an unfiltered and unordered collection of records.
+- Passing non-null filter and null orderBy expressions returns a filtered and unordered collection of records.
+- Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection of records.
+- Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
 
 AddAsync
-    - Null FileFingerprint throws ArgumentNullException
-    - Valid FileFingerprint adds the record to the data access layer.
+- Passing a null FileFingerprint throws an ArgumentNullException.
+- Passing a non-null FileFingerprint adds a record to the data access layer.
     
 AddManyAsync
-    - Null IEnumerable<FileFingerprint> throws ArgumentNullException
-    - Valid IEnumerable<FileFingerprint> adds the records to the data access layer.
+- Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
+- Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
     
 DeleteAsync
-    - Null FileFingerprint throws ArgumentNullException.
-    - Valid FileFingerprint that exists in the data access layer deletes the record.
-    - Valid FileFingerprint that exists in the data access layer returns true.
-    - Valid FileFingerprint that does not exist in the data access layer does not modify the data access
-      layer's existing records.
-    - Valid FileFingerprint that does not exist in the data access layer returns false.
+- Passing a null FileFingerprint throws an ArgumentNullException.
+- Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+- Passing a FileFingerprint that matches a record in the data access layer returns true.
+- Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
+- Passing a FileFingerprint that does not match a record in the data access layer returns false.
     
-DeleteAllAsync
-    - Deletes all records from the data access layer.
-    - Returns the number of records that were deleted from the data access layer.
-    
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /DataAnalysis/SHA256FileHasher
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 ComputeHashFromStream
-    - If disposed, throws ObjectDisposedException.
-    - Null Stream throws ArgumentNullException.
-    - Valid Stream containing data returns proper hash of the data.
-    - Valid Stream containing no data returns ???
-        - What is it supposed to return? I suspect an empty byte array but test and
-          find out.
+- If object is disposed, throws an ObjectDisposedException.
+- Passing a null Stream throws an ArgumentNullException.
+- Passing a Stream containing data returns a proper hash of the data.
+- Passing a Stream containing no data returns ???
+    - What is it supposed to return? I suspect an empty byte array but test and
+      find out.
         
 Dispose
-    - After call, object is disposed.
+- After call, object is disposed.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Extensions/StringExtensions
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 IsEmptyOrWhiteSpace
     - Null strings return true.
     - Empty or whitespace strings return true.
@@ -111,9 +87,9 @@ IsBase64String
     - Non-base64 string returns false.
     - Valid base64 string returns true.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /FileScanning/ScanError
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - If message is null, ArgumentNullException is thrown.
     - If message is empty, ArgumentException is thrown.
@@ -159,9 +135,9 @@ GetHashCode
     - Objects with different property values return different hash codes.
     - Objects with equal property values return the same hash code.
     
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /FileScanning/ScanResult
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - Initializes all collection properties.
 
@@ -183,9 +159,9 @@ OperatorPlus
     - If left and right operands are non-null, returns new ScanResult with combined
       values from both operands.
       
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOptions
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 GetDirectory (Property)
     - Returns Directory property.
     
@@ -198,9 +174,9 @@ GetRecursive (property)
 SetRecursive (property)
     - Sets Recursive property.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOrchestrator
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - If IFileScanOrchestrator is null, ArgumentNullException is thrown.
     - If IOptions<DirectoryScanOptions> is null, ArgumentNullException is thrown.
@@ -222,9 +198,9 @@ ScanDirectoryAsync
       returns a new, empty ScanResult.
     - The method outputs appropriate log information.
     
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Orchestration/FileScanOrchestrator
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - If IFileFingerprintRepository is null, ArgumentNullException is thrown.
     - If IFileHasher is null, ArgumentNullException is thrown.
@@ -239,9 +215,9 @@ ScanFilesAsync
       containing the correct results of the scan is returned.
     - The method outputs appropriate log information.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Repository/FileFingerprint
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - Null fileName throws ArgumentNullException
     - Null directoryName throws ArgumentNullException
@@ -294,9 +270,9 @@ GetHashCode
     - Objects with different property values return different hash codes.
     - Objects with equal property values return the same hash code.    
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Repository/FileFingerprintRepository
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - Null IDataAccessLayer<FileFingerprint> throws ArgumentNullException
     
@@ -309,9 +285,9 @@ GetAsync
 GetRecordsWithDuplicateHashesAsync 
     - Returns correct results after invocation.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Tasks/Output/Csv/CsvFileFingerprintWriter
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - If StreamWriter is null, ArgumentNullException is thrown.
     - If ILogger is null, ArgumentNullException is thrown.
@@ -324,20 +300,20 @@ WriteFileFingerprintsAsync
       calls made to the 
     - If object is disposed, ObjectDisposedException is thrown.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Tasks/Output/Csv/FileFingerprintMap
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - After call, ClassMap has been registered to associated CsvWriter.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Tasks/Output/ConsoleProgressBar
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 [Not very testable. Refactor someday if we keep using it.]
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Tasks/Output/ScanOutputOptions
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 GetOutputFile (Property)
     - Returns OutputFile property.
     
@@ -350,9 +326,9 @@ GetOutputDuplicateInfoOnly (property)
 SetOutputDuplicateInfoOnly (property)
     - Sets OutputDuplicateInfoOnly property.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Tasks/DuplicateFileHandler
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Ctor
     - Null IFileFingerprintRepository throws ArgumentNullException
     - Null IOptions<DuplicateFileHandlingOptions> throws ArgumentNullException
@@ -366,9 +342,9 @@ RunAsync
     - If invoked with option DuplicateFileHandlingOptions.NoAction, no files are
       deleted or moved.
 
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 /Tasks/DuplicateFileHandlingOptions
-------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 GetDuplicateFileHandlingMethod
     - Returns the DuplicateFileHandlingMethod
 

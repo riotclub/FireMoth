@@ -54,103 +54,202 @@
         <member name="T:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests">
              <summary>
              Ctor
-                 - If ILogger is null, an ArgumentNullException is thrown.
+             - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
             
              GetAsync
-                 - Call without filter or orderBy parameters returns all FileFingerprints.
-                 - Call with filter returns filtered results.
-                 - Call with orderBy returns ordered results.
-                 - Call with both filter and orderBy parameters returns filtered and ordered results.
+             - Passing null filter and null orderBy expressions returns an unfiltered and unordered
+               collection of records.
+             - Passing non-null filter and null orderBy expressions returns a filtered and unordered
+               collection of records.
+             - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
+               collection of records.
+             - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
+               collection of records.
             
              AddAsync
-                 - If null FileFingerprint is provided, throw ArgumentNullException.
-                 - After call, provided FileFingerprint has been added to the data access layer.
-            
+             - Passing a null FileFingerprint throws an ArgumentNullException.
+             - Passing a non-null FileFingerprint adds a record to the data access layer.
+                 
              AddManyAsync
-                 - If null IEnumerable is provided, throw ArgumentNullException.
-                 - After call, provided FileFingerprints have been added to the data access layer.
-            
+             - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
+             - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
+                 
              DeleteAsync
-                 - If null FileFingerprint is provided, throw ArgumentNullException.
-                 - When data access layer contains a matching FileFingerprint, matching value is deleted.
-                 - When data access layer contains a matching FileFingerprint, true is returned.
-                 - When data access layer does not contain a matching FileFingerprint, no changes are made to
-                   the data access layer.
-                 - When data access layer does not contain a matching FileFingerprint, false is returned.
+             - Passing a null FileFingerprint throws an ArgumentNullException.
+             - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+             - Passing a FileFingerprint that matches a record in the data access layer returns true.
+             - Passing a FileFingerprint that does not match a record in the data access layer does not
+               modify existing records.
+             - Passing a FileFingerprint that does not match a record in the data access layer returns false.
+                 
+             DeleteAllAsync
+             - Deletes all records from the data access layer.
+             - Returns the number of records that were deleted from the data access layer.
              </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.Ctor_ILoggerIsNull_ThrowsArgumentNullException">
-            <summary>
-            Ctor: If ILogger is null, an ArgumentNullException is thrown.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.Ctor_NullILogger_ThrowsArgumentNullException">
+            <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
+            ArgumentNullException.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_WithoutFilterOrOrderBy_ReturnsAllFileFingerprints">
-            <summary>
-            GetAsync: Call without filter or orderBy parameters returns all FileFingerprints
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection">
+            <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
+            and unordered collection of records.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_WithFilter_ReturnsFilteredResults">
-            <summary>
-            GetAsync: Call with filter returns filtered results
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection">
+            <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
+            and unordered collection of records.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_WithOrderBy_ReturnsOrderedResults">
-            <summary>
-            GetAsync: Call with orderBy returns ordered results.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection">
+            <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
+            unfiltered and ordered collection of records.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_WithFilterAndOrderBy_ReturnsFilteredAndOrderedResults">
-            <summary>
-            GetAsync: Call with both filter and orderBy parameters returns filtered and ordered results.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection">
+            <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
+            filtered and ordered collection of records.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_WithNullFileFingerprint_ThrowsArgumentNullException">
-            <summary>
-            AddAsync: If null FileFingerprint is provided, throw ArgumentNullException.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_NullFileFingerprint_ThrowsArgumentNullException">
+            <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_WithValidFileFingerprint_AddsFileFingerprint">
-            <summary>
-            AddAsync: After call, provided FileFingerprint has been added to the data access layer.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_NonNullFileFingerprint_AddsRecord">
+            <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
+            layer.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_WithNullIEnumerable_ThrowsArgumentNullException">
-            <summary>
-            AddManyAsync: If null IEnumerable is provided, throw ArgumentNullException.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_NullIEnumerable_ThrowsArgumentNullException">
+            <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
+            ArgumentNullException.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_WithValidFileFingerprints_AddsFileFingerprints">
-            <summary>
-            After call, provided FileFingerprints have been added to the data access layer.
-            </summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_NonNullIEnumerable_AddsRecords">
+            <summary>Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access
+            layer.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_WithNullFileFingerprint_ThrowsArgumentNullException">
-            <summary>
-            DeleteAsync: If null FileFingerprint is provided, throw ArgumentNullException.
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException">
+            <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted">
-            <summary>
-            DeleteAsync: When data access layer contains a matching FileFingerprint, matching value is
-            deleted.
-            </summary>
+            <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+            layer deletes the record.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue">
-            <summary>
-            DeleteAsync: When data access layer contains a matching FileFingerprint, true is returned.
-            </summary>
+            <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+            layer returns true.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade">
-            <summary>
-            DeleteAsync: When data access layer does not contain a matching FileFingerprint, no changes
-            are made to the data access layer.
-            </summary>
+            <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
+            access layer does not modify existing records.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse">
-            <summary>
-            DeleteAsync: When data access layer does not contain a matching FileFingerprint, false is
-            returned.
+            <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
+            access layer returns false.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAllAsync_MethodCalled_DeletesAllRecords">
+            <summary>DeleteAllAsync: Deletes all records from the data access layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAllAsync_MethodCalled_ReturnsDeletedRecordCount">
+            <summary>DeleteAllAsync: Returns the number of records that were deleted from the data
+            access layer.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests">
+             <summary>
+             Ctor
+             - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
+             - Passing a null FireMothContext throws an ArgumentNullException.
+            
+             GetAsync
+             - Passing null filter and null orderBy expressions returns an unfiltered and unordered
+               collection of records.
+             - Passing non-null filter and null orderBy expressions returns a filtered and unordered
+               collection of records.
+             - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
+               collection of records.
+             - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
+               collection of records.
+            
+             AddAsync
+             - Passing a null FileFingerprint throws an ArgumentNullException.
+             - Passing a non-null FileFingerprint adds a record to the data access layer.
+            
+             AddManyAsync
+             - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
+             - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
+            
+             DeleteAsync
+             - Passing a null FileFingerprint throws an ArgumentNullException.
+             - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+             - Passing a FileFingerprint that matches a record in the data access layer returns true.
+             - Passing a FileFingerprint that does not match a record in the data access layer does not
+               modify existing records.
+             - Passing a FileFingerprint that does not match a record in the data access layer returns false.
+            
+             DeleteAllAsync
+             - Deletes all records from the data access layer.
+             - Returns the number of records that were deleted from the data access layer.
+             </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_NullILogger_ThrowsArgumentNullException">
+            <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
+            ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_NullFireMothContext_ThrowsArgumentNullException">
+            <summary>Ctor: Passing a null FireMothContext throws an ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection">
+            <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
+            and unordered collection of records.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection">
+            <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
+            and unordered collection of records.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection">
+            <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
+            unfiltered and ordered collection of records.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection">
+            <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
+            filtered and ordered collection of records.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddAsync_NullFileFingerprint_ThrowsArgumentNullException">
+            <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddAsync_NonNullFileFingerprint_AddsRecord">
+            <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
+            layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddManyAsync_NullIEnumerable_ThrowsArgumentNullException">
+            <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
+            ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddManyAsync_NonNullIEnumerable_AddsRecords">
+            <summary>AddManyAsync: Passing a non-null IEnumerable{FileFingerprint} adds the records to
+            the data access layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException">
+            <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
             </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted">
+            <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+            layer deletes the record.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue">
+            <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
+            layer is passed, true is returned.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade">
+            <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
+            access layer is passed, the data access layer's existing records are not modified.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse">
+            <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
+            access layer is passed, false is returned.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAllAsync_MethodCalled_DeletesAllRecords">
+            <summary>DeleteAllAsync: Deletes all records from the data access layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAllAsync_MethodCalled_ReturnsDeletedRecordCount">
+            <summary>DeleteAllAsync: Returns the number of records that were deleted from the data
+            access layer.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Extensions.MockExtensions.VerifyLogCalled``1(Moq.Mock{Microsoft.Extensions.Logging.ILogger{``0}},System.String,Microsoft.Extensions.Logging.LogLevel)">
             <summary>

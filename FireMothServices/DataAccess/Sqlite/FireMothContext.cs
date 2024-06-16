@@ -20,6 +20,9 @@ public class FireMothContext : DbContext
     public FireMothContext(DbContextOptions<FireMothContext> options) : base(options)
     {
     }
+    
+    public FireMothContext()
+    { }
 
     /// <inheritdoc/>
     /// <seealso cref="FileFingerprintTypeConfiguration"/>
