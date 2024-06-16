@@ -261,12 +261,6 @@ public class SqliteDataAccessLayerTests
 #endregion
 
 #region DeleteAsync
-// DeleteAsync
-// - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
-// - Passing a FileFingerprint that matches a record in the data access layer returns true.
-// - Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
-// - Passing a FileFingerprint that does not match a record in the data access layer returns false.
-
     /// <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
     /// </summary>
     [Fact]
@@ -289,34 +283,32 @@ public class SqliteDataAccessLayerTests
     public async void DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted()
     {
         // Arrange
-        var mockDbSet = new Mock<DbSet<FileFingerprint>>();
-        var mockContext = new Mock<FireMothContext>();
-        var testFileFingerprint = _fixture.Create<FileFingerprint>();
-        mockContext.Setup(context => context.FileFingerprints).Returns(mockDbSet.Object);
-        mockDbSet
-            .Setup(set => set.FirstOrDefault(It.IsAny<Expression<Func<FileFingerprint, bool>>>()))
-            .Returns(testFileFingerprint);
-
-        var sut = new SqliteDataAccessLayer(_nullLogger, mockContext.Object);
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);        
+        var itemToDelete = mockDbSet.Object.ElementAt(10);
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);         
         
         // Act
-        await sut.DeleteAsync(testFileFingerprint);
+        await sut.DeleteAsync(itemToDelete);
         
         // Assert
-        mockDbSet.Verify(set => set.Remove(It.IsAny<FileFingerprint>()), Times.Once());
-        mockContext.Verify(context => context.SaveChanges(), Times.Once());
+        mockFireMothContext.Verify(set => set.Remove(itemToDelete), Times.Once());
+        mockFireMothContext.Verify(context => context.SaveChanges(), Times.Once());
     }
 
-    /// <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
-    /// layer is passed, true is returned.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+    /// layer returns true.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var originalItems = (await AddFileFingerprintsAsync(sut)).ToList();
-        var itemToDelete = originalItems[0];
-
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);        
+        var itemToDelete = mockDbSet.Object.ElementAt(10);
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);         
+        
         // Act
         var result = await sut.DeleteAsync(itemToDelete);
 
@@ -324,85 +316,45 @@ public class SqliteDataAccessLayerTests
         result.Should().BeTrue();
     }
     
-    /// <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
-    /// access layer is passed, the data access layer's existing records are not modified.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
+    /// access layer does not modify existing records.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var expected = (await AddFileFingerprintsAsync(sut)).ToList();
-        var randomFingerprint = _fixture.Create<FileFingerprint>();
-
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);        
+        var itemToDelete = _fixture.Create<FileFingerprint>();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);         
+        
         // Act
-        await sut.DeleteAsync(randomFingerprint);
-        var result = await sut.GetAsync();
+        await sut.DeleteAsync(itemToDelete);
         
         // Assert
-        result.Should().Equal(expected);
+        mockFireMothContext.Verify(set => set.Remove(itemToDelete), Times.Never());
+        mockFireMothContext.Verify(context => context.SaveChanges(), Times.Never());
     }
 
-    /// <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
-    /// access layer is passed, false is returned.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
+    /// access layer returns false.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var randomFingerprint = _fixture.Create<FileFingerprint>();
-
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);        
+        var itemToDelete = _fixture.Create<FileFingerprint>();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);         
+        
         // Act
-        var result = await sut.DeleteAsync(randomFingerprint);
+        var result = await sut.DeleteAsync(itemToDelete);
         
         // Assert
         result.Should().BeFalse();
     }
 #endregion
-
-#region DeleteAllAsync
-    /// <summary>DeleteAllAsync: Deletes all records from the data access layer.</summary>
-    [Fact]
-    public async void DeleteAllAsync_MethodCalled_DeletesAllRecords()
-    {
-        // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        await AddFileFingerprintsAsync(sut);
-            
-        // Act
-        await sut.DeleteAllAsync();
-        var result = await sut.GetAsync();
-
-        // Assert
-        result.Should().BeEmpty();
-    }
-
-    /// <summary>DeleteAllAsync: Returns the number of records that were deleted from the data
-    /// access layer.</summary>
-    [Fact]
-    public async void DeleteAllAsync_MethodCalled_ReturnsDeletedRecordCount()
-    {
-        // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var addedFileFingerprints = (await AddFileFingerprintsAsync(sut)).ToList();
-        var expected = addedFileFingerprints.Count;
-            
-        // Act
-        var result = await sut.DeleteAllAsync();
-
-        // Assert
-        result.Should().Be(expected);
-    }
-#endregion
-
-    private async Task<IEnumerable<FileFingerprint>> AddFileFingerprintsAsync(
-        SqliteDataAccessLayer dataAccessLayer)
-    {
-        var fileFingerprints = _fixture.CreateMany<FileFingerprint>(50);
-        var fileFingerprintList = fileFingerprints.ToList();
-        await dataAccessLayer.AddManyAsync(fileFingerprintList);
-        
-        return fileFingerprintList;
-    }
 
     private Mock<DbSet<FileFingerprint>> GetMockDbSet()
     {

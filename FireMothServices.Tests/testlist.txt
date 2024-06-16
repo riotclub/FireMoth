@@ -31,12 +31,6 @@ DeleteAllAsync
 - Returns the number of records that were deleted from the data access layer.
     
 ------------------------------------------------------------------------------------------------------------------------
-/DataAccess/Sqlite/FireMothContext
-------------------------------------------------------------------------------------------------------------------------
-OnModelCreating
-- Configures the FileFingerprint entity type.
-    
-------------------------------------------------------------------------------------------------------------------------
 /DataAccess/Sqlite/SqliteDataAccessLayer
 Note: Unit tests should utilize mocks to test class functionality; actual SQLite DB interactions are tested in the
       integration tests.
@@ -66,18 +60,14 @@ DeleteAsync
 - Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
 - Passing a FileFingerprint that does not match a record in the data access layer returns false.
     
-DeleteAllAsync
-- Deletes all records from the data access layer.
-- Returns the number of records that were deleted from the data access layer.
-    
 ------------------------------------------------------------------------------------------------------------------------
 /DataAnalysis/SHA256FileHasher
 ------------------------------------------------------------------------------------------------------------------------
 ComputeHashFromStream
 - If object is disposed, throws an ObjectDisposedException.
-- Null Stream throws ArgumentNullException.
-- Valid Stream containing data returns proper hash of the data.
-- Valid Stream containing no data returns ???
+- Passing a null Stream throws an ArgumentNullException.
+- Passing a Stream containing data returns a proper hash of the data.
+- Passing a Stream containing no data returns ???
     - What is it supposed to return? I suspect an empty byte array but test and
       find out.
         

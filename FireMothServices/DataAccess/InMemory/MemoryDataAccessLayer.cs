@@ -61,9 +61,8 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Adds the provided collection of <see cref="IFileFingerprint"/>s to the data access layer.
-    /// </summary>
+    /// <summary> Adds the provided collection of <see cref="IFileFingerprint"/>s to the data access
+    /// layer.</summary>
     /// <param name="fileFingerprints">An <see cref="IEnumerable{IFileFingerprint}"/> containing
     /// items to add.</param>
     /// <exception cref="ArgumentNullException">Thrown when provided collection is null.</exception>
@@ -100,7 +99,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
     public Task<int> DeleteAllAsync()
     {
         var recordCount = _fileFingerprints.Count;
-        _fileFingerprints = new List<FileFingerprint>();
+        _fileFingerprints = [];
 
         return Task.FromResult(recordCount);
     }
