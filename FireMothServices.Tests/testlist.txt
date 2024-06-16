@@ -52,7 +52,7 @@ AddAsync
 AddManyAsync
 - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
 - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
-    
+
 DeleteAsync
 - Passing a null FileFingerprint throws an ArgumentNullException.
 - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
@@ -145,7 +145,7 @@ GetScannedFiles (Property)
     - Returns ScannedFiles property.
     
 GetSkippedFiles (Property)
-    - Returns SkilledFiles property.
+    - Returns SkippedFiles property.
     
 GetErrors (Property)
     - Returns Errors property.
