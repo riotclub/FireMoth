@@ -8,11 +8,14 @@ namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.AutoMock;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
@@ -22,37 +25,34 @@ using Xunit;
 
 /// <summary>
 /// Ctor
-/// - If null ILogger is passed, an ArgumentNullException is thrown.
+/// - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
+/// - Passing a null FireMothContext throws an ArgumentNullException.
 ///
 /// GetAsync
-/// - If null filter and null orderBy expressions are passed, an unfiltered and unordered collection
-///   of records is returned.
-/// - If non-null filter and null orderBy expressions are passed, a filtered and unordered
-///   collection of records is returned.
-/// - If null filter and non-null orderBy expressions are passed, an unfiltered and ordered
-///   collection of records is returned.
-/// - If non-null filter and non-null orderBy expressions are passed, a filtered and ordered
-///   collection of records is returned.
+/// - Passing null filter and null orderBy expressions returns an unfiltered and unordered
+///   collection of records.
+/// - Passing non-null filter and null orderBy expressions returns a filtered and unordered
+///   collection of records.
+/// - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
+///   collection of records.
+/// - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
+///   collection of records.
 ///
 /// AddAsync
-/// - If null FileFingerprint is passed, an ArgumentNullException is thrown.
-/// - If non-null FileFingerprint is passed, a record is added to the data access layer.
+/// - Passing a null FileFingerprint throws an ArgumentNullException.
+/// - Passing a non-null FileFingerprint adds a record to the data access layer.
 ///
 /// AddManyAsync
-/// - If null IEnumerable{FileFingerprint} is passed, an ArgumentNullException is thrown.
-/// - If non-null IEnumerable{FileFingerprint} is passed, the records are added to the data access
-///   layer.
+/// - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
+/// - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
 ///
 /// DeleteAsync
-/// - If null FileFingerprint is passed, an ArgumentNullException is thrown.
-/// - If non-null FileFingerprint that matches a record in the data access layer is passed, the
-///   record is deleted.
-/// - If non-null FileFingerprint that matches a record in the data access layer is passed, true is
-///   returned.
-/// - If non-null FileFingerprint that does not match a record in the data access layer is passed,
-///   the data access layer's existing records are not modified.
-/// - If non-null FileFingerprint that does not match a record in the data access layer is passed,
-///   false is returned.
+/// - Passing a null FileFingerprint throws an ArgumentNullException.
+/// - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+/// - Passing a FileFingerprint that matches a record in the data access layer returns true.
+/// - Passing a FileFingerprint that does not match a record in the data access layer does not
+///   modify existing records.
+/// - Passing a FileFingerprint that does not match a record in the data access layer returns false.
 ///
 /// DeleteAllAsync
 /// - Deletes all records from the data access layer.
@@ -62,6 +62,8 @@ public class SqliteDataAccessLayerTests
 {
     private readonly AutoMocker _mocker = new();
     private readonly Fixture _fixture = new();
+    private readonly ILogger<SqliteDataAccessLayer> _nullLogger =
+        NullLogger<SqliteDataAccessLayer>.Instance;
     
     public SqliteDataAccessLayerTests()
     {
@@ -70,16 +72,31 @@ public class SqliteDataAccessLayerTests
     }
     
 #region Ctor
-    /// <summary>Ctor: If null ILogger is passed, an ArgumentNullException is thrown.</summary>
+    /// <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
+    /// ArgumentNullException.</summary>
     [Fact]
     public void Ctor_NullILogger_ThrowsArgumentNullException()
     {
         // Arrange, Act
-        // ReSharper disable once ObjectCreationAsStatement
         var mockFireMothContext = new Mock<FireMothContext>();
     #pragma warning disable CA1806
+        // ReSharper disable once ObjectCreationAsStatement
         Action ctorAction = () => new SqliteDataAccessLayer(null!, mockFireMothContext.Object);
     #pragma warning restore CA1806
+
+        // Assert
+        ctorAction.Should().ThrowExactly<ArgumentNullException>();
+    }
+
+    /// <summary>Ctor: Passing a null FireMothContext throws an ArgumentNullException.</summary>
+    [Fact]
+    public void Ctor_NullFireMothContext_ThrowsArgumentNullException()
+    {
+        // Arrange, Act
+#pragma warning disable CA1806
+        // ReSharper disable once ObjectCreationAsStatement
+        Action ctorAction = () => new SqliteDataAccessLayer(_nullLogger, null!);
+#pragma warning restore CA1806
 
         // Assert
         ctorAction.Should().ThrowExactly<ArgumentNullException>();
@@ -87,49 +104,37 @@ public class SqliteDataAccessLayerTests
 #endregion
 
 #region GetAsync
-    /// <summary>GetAsync: If null filter and null orderBy expressions are passed, an unfiltered and
-    /// unordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
+    /// and unordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection()
     {
         // Arrange
-        // ReSharper disable once ObjectCreationAsStatement
-        var mockDbSet = new Mock<DbSet<FileFingerprint>>();
         var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
         mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);
-        var mockLogger = new Mock<ILogger<SqliteDataAccessLayer>>();
-
-        var sut = new SqliteDataAccessLayer(mockLogger.Object, mockFireMothContext.Object);
+        var expected = mockDbSet.Object.ToList();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);
         
         // Act
         var result = await sut.GetAsync();
         
         // Assert
-        result.Should().NotBeNull();
-/*
- *             var mockSet = new Mock<DbSet<Blog>>();
-
-            var mockContext = new Mock<BloggingContext>();
-            mockContext.Setup(m => m.Blogs).Returns(mockSet.Object);
-
-            var service = new BlogService(mockContext.Object);
-            service.AddBlog("ADO.NET Blog", "http://blogs.msdn.com/adonet");
-
-            mockSet.Verify(m => m.Add(It.IsAny<Blog>()), Times.Once());
-            mockContext.Verify(m => m.SaveChanges(), Times.Once());
- */ 
+        result.Should().Equal(expected);
     }
 
-    /// <summary>GetAsync: If non-null filter and null orderBy expressions are passed, a filtered
-    /// and unordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
+    /// and unordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var fingerprints = await AddFileFingerprintsAsync(sut);
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);
         bool FilterFunction(IFileFingerprint fingerprint) => fingerprint.FileName.Contains('X');
-        var expected = fingerprints.Where(FilterFunction);
+        var expected = mockDbSet.Object.Where(FilterFunction).ToList();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);
         
         // Act
         var result = await sut.GetAsync(filter: FilterFunction);
@@ -138,16 +143,18 @@ public class SqliteDataAccessLayerTests
         result.Should().Equal(expected);
     }
     
-    /// <summary>GetAsync: If null filter and non-null orderBy expressions are passed, an unfiltered
-    /// and ordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
+    /// unfiltered and ordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var fingerprints = await AddFileFingerprintsAsync(sut);
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);        
         string OrderByFunction(IFileFingerprint fingerprint) => fingerprint.FileName;
-        var expected = fingerprints.OrderBy(OrderByFunction);
+        var expected = mockDbSet.Object.OrderBy(OrderByFunction).ToList();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);
         
         // Act
         var result = await sut.GetAsync(orderBy: OrderByFunction);
@@ -156,18 +163,19 @@ public class SqliteDataAccessLayerTests
         result.Should().Equal(expected);
     }
     
-    /// <summary>GetAsync: If non-null filter and non-null orderBy expressions are passed, a
-    /// filtered and ordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
+    /// filtered and ordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var fingerprints = await AddFileFingerprintsAsync(sut);
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var mockDbSet = GetMockDbSet();
+        mockFireMothContext.Setup(m => m.FileFingerprints).Returns(mockDbSet.Object);        
         bool FilterFunction(IFileFingerprint fingerprint) => fingerprint.FileName.Contains('X');        
-        var filtered = fingerprints.Where(FilterFunction);
         string OrderByFunction(IFileFingerprint fingerprint) => fingerprint.FileName;
-        var expected = filtered.OrderBy(OrderByFunction);
+        var expected = mockDbSet.Object.Where(FilterFunction).OrderBy(OrderByFunction).ToList();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);        
         
         // Act
         var result = await sut.GetAsync(FilterFunction, OrderByFunction);
@@ -178,111 +186,125 @@ public class SqliteDataAccessLayerTests
 #endregion
 
 #region AddAsync
-    /// <summary>AddAsync: If null FileFingerprint is passed, an ArgumentNullException is thrown.
-    /// </summary>
+    /// <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
     [Fact]
-    public void AddAsync_NullFileFingerprint_ThrowsArgumentNullException()
+    public async void AddAsync_NullFileFingerprint_ThrowsArgumentNullException()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
+        var mockFireMothContext = new Mock<FireMothContext>();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockFireMothContext.Object);
 
         // Act
-        Action addAsyncAction = () => sut.AddAsync(null!);
+        var addAsyncAction = async () => await sut.AddAsync(null!);
 
         // Assert
-        addAsyncAction.Should().ThrowExactly<ArgumentNullException>();
+        await addAsyncAction.Should().ThrowExactlyAsync<ArgumentNullException>();
     }
     
-    /// <summary>AddAsync: If non-null FileFingerprint is passed, a record is added to the data
-    /// access layer.</summary>
+    /// <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
+    /// layer.</summary>
     [Fact]
     public async Task AddAsync_NonNullFileFingerprint_AddsRecord()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        await AddFileFingerprintsAsync(sut);
+        var mockDbSet = new Mock<DbSet<FileFingerprint>>();
+        var mockContext = new Mock<FireMothContext>();
+        mockContext.Setup(context => context.FileFingerprints).Returns(mockDbSet.Object);
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockContext.Object);
         var testFileFingerprint = _fixture.Create<FileFingerprint>();
-        var expected = new List<FileFingerprint> { testFileFingerprint };
 
         // Act
         await sut.AddAsync(testFileFingerprint);
-        var result = await sut.GetAsync(fingerprint => fingerprint.Equals(testFileFingerprint));
 
         // Assert
-        result.Should().Equal(expected);
+        mockDbSet.Verify(set => set.Add(It.IsAny<FileFingerprint>()), Times.Once());
+        mockContext.Verify(context => context.SaveChanges(), Times.Once());
     }
 #endregion
     
 #region AddManyAsync
-    /// <summary>AddManyAsync: If null IEnumerable{FileFingerprint} is passed, an
-    /// ArgumentNullException is thrown.</summary>
+    /// <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
+    /// ArgumentNullException.</summary>
     [Fact]
-    public void AddManyAsync_NullIEnumerable_ThrowsArgumentNullException()
+    public async void AddManyAsync_NullIEnumerable_ThrowsArgumentNullException()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
+        var mockContext = new Mock<FireMothContext>();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockContext.Object);
 
         // Act
-        Action addManyAsyncAction = () => sut.AddManyAsync(null!);
+        var addManyAsyncAction = async () => await sut.AddManyAsync(null!);
 
         // Assert
-        addManyAsyncAction.Should().ThrowExactly<ArgumentNullException>();
+        await addManyAsyncAction.Should().ThrowExactlyAsync<ArgumentNullException>();
     }
 
-    /// <summary>If non-null IEnumerable{FileFingerprint} is passed, the records are added to the
-    /// data access layer.</summary>
+    /// <summary>AddManyAsync: Passing a non-null IEnumerable{FileFingerprint} adds the records to
+    /// the data access layer.</summary>
     [Fact]
     public async void AddManyAsync_NonNullIEnumerable_AddsRecords()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        await AddFileFingerprintsAsync(sut);
-        var existingFileFingerprints = (await sut.GetAsync()).ToList();
-        var testFileFingerprints = _fixture.CreateMany<FileFingerprint>(3).ToList();
-        var expected = existingFileFingerprints.Concat(testFileFingerprints).ToList();
-
+        var mockDbSet = new Mock<DbSet<FileFingerprint>>();
+        var mockContext = new Mock<FireMothContext>();
+        mockContext.Setup(context => context.FileFingerprints).Returns(mockDbSet.Object);
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockContext.Object);
+        
         // Act
-        await sut.AddManyAsync(testFileFingerprints);
+        await sut.AddManyAsync(_fixture.CreateMany<FileFingerprint>(2));
 
         // Assert
-        var result = await sut.GetAsync();
-        result.Should().Equal(expected);
+        mockDbSet.Verify(set =>
+            set.AddRange(It.IsAny<IEnumerable<FileFingerprint>>()), Times.Once());
+        mockContext.Verify(context => context.SaveChanges(), Times.Once());
     }
 #endregion
 
 #region DeleteAsync
-    /// <summary>DeleteAsync: If null FileFingerprint is passed, an ArgumentNullException is thrown.
+// DeleteAsync
+// - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+// - Passing a FileFingerprint that matches a record in the data access layer returns true.
+// - Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
+// - Passing a FileFingerprint that does not match a record in the data access layer returns false.
+
+    /// <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
     /// </summary>
     [Fact]
     public void DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
+        var mockContext = new Mock<FireMothContext>();
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockContext.Object);
 
         // Act
-        Action deleteAsyncAction = () => sut.DeleteAsync(null!);
+        Func<Task> deleteAsyncAction = async () => await sut.DeleteAsync(null!);
 
         // Assert
-        deleteAsyncAction.Should().ThrowExactly<ArgumentNullException>();
+        deleteAsyncAction.Should().ThrowExactlyAsync<ArgumentNullException>();
     }
 
-    /// <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
-    /// layer is passed, the record is deleted.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+    /// layer deletes the record.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted()
     {
         // Arrange
-        var sut = _mocker.CreateInstance<SqliteDataAccessLayer>();
-        var expected = (await AddFileFingerprintsAsync(sut)).ToList();
-        var itemToDelete = expected[10];
-        expected.Remove(itemToDelete);
+        var mockDbSet = new Mock<DbSet<FileFingerprint>>();
+        var mockContext = new Mock<FireMothContext>();
+        var testFileFingerprint = _fixture.Create<FileFingerprint>();
+        mockContext.Setup(context => context.FileFingerprints).Returns(mockDbSet.Object);
+        mockDbSet
+            .Setup(set => set.FirstOrDefault(It.IsAny<Expression<Func<FileFingerprint, bool>>>()))
+            .Returns(testFileFingerprint);
 
+        var sut = new SqliteDataAccessLayer(_nullLogger, mockContext.Object);
+        
         // Act
-        await sut.DeleteAsync(itemToDelete);
-
+        await sut.DeleteAsync(testFileFingerprint);
+        
         // Assert
-        var result = await sut.GetAsync();
-        result.Should().Equal(expected);
+        mockDbSet.Verify(set => set.Remove(It.IsAny<FileFingerprint>()), Times.Once());
+        mockContext.Verify(context => context.SaveChanges(), Times.Once());
     }
 
     /// <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
@@ -380,5 +402,26 @@ public class SqliteDataAccessLayerTests
         await dataAccessLayer.AddManyAsync(fileFingerprintList);
         
         return fileFingerprintList;
+    }
+
+    private Mock<DbSet<FileFingerprint>> GetMockDbSet()
+    {
+        var testFingerprints = _fixture.CreateMany<FileFingerprint>(50).AsQueryable();
+
+        var mockSet = new Mock<DbSet<FileFingerprint>>();
+        mockSet.As<IQueryable<FileFingerprint>>()
+               .Setup(m => m.Provider)
+               .Returns(testFingerprints.Provider);
+        mockSet.As<IQueryable<FileFingerprint>>()
+               .Setup(m => m.Expression)
+               .Returns(testFingerprints.Expression);
+        mockSet.As<IQueryable<FileFingerprint>>()
+               .Setup(m => m.ElementType)
+               .Returns(testFingerprints.ElementType);
+        mockSet.As<IQueryable<FileFingerprint>>()
+               .Setup(m => m.GetEnumerator())
+               .Returns(() => testFingerprints.GetEnumerator());
+
+        return mockSet;
     }
 }

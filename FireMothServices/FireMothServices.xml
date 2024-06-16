@@ -105,6 +105,12 @@
             <summary>
             Implementation of a data access layer that persists data to a SQLite database.
             </summary>
+            <remarks>
+            SQLite does not support asynchronous I/O. All database operations in this class run
+            synchronously. Methods return <see cref="T:System.Threading.Tasks.Task"/> objects as needed to properly implement
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
+            </remarks>
+            <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/async"/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.#ctor(Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer},RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext)">
             <summary>

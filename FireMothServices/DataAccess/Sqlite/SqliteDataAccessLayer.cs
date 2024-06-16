@@ -8,7 +8,6 @@ namespace RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
@@ -19,6 +18,12 @@ using RiotClub.FireMoth.Services.Repository;
 /// <summary>
 /// Implementation of a data access layer that persists data to a SQLite database.
 /// </summary>
+/// <remarks>
+/// SQLite does not support asynchronous I/O. All database operations in this class run
+/// synchronously. Methods return <see cref="Task"/> objects as needed to properly implement
+/// <see cref="IDataAccessLayer{TValue}"/>.
+/// </remarks>
+/// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/async"/>
 public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
 {
     private readonly ILogger<SqliteDataAccessLayer> _logger;
@@ -56,19 +61,21 @@ public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
     }
 
     /// <inheritdoc/>
-    public async Task AddAsync(FileFingerprint fileFingerprint)
+    public Task AddAsync(FileFingerprint fileFingerprint)
     {
         Guard.IsNotNull(fileFingerprint);
         _logger.LogDebug(
             "SqliteDataAccessLayer: Writing fingerprint {FileFingerprint}.", fileFingerprint);
         
         _fireMothContext.FileFingerprints.Add(fileFingerprint);
-        await _fireMothContext.SaveChangesAsync();
+        _fireMothContext.SaveChanges();
+        
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    public async Task AddManyAsync(IEnumerable<FileFingerprint> fileFingerprints)
+    public Task AddManyAsync(IEnumerable<FileFingerprint> fileFingerprints)
     {
         Guard.IsNotNull(fileFingerprints);
         var fileFingerprintList = fileFingerprints.ToList();
@@ -76,12 +83,14 @@ public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
             "SqliteDataAccessLayer: Writing {FileFingerprintCount} fingerprint(s).",
             fileFingerprintList.Count);
         
-        _fireMothContext.AddRange(fileFingerprintList);
-        await _fireMothContext.SaveChangesAsync();
+        _fireMothContext.FileFingerprints.AddRange(fileFingerprintList);
+        _fireMothContext.SaveChanges();
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public async Task<bool> DeleteAsync(FileFingerprint fileFingerprint)
+    public Task<bool> DeleteAsync(FileFingerprint fileFingerprint)
     {
         Guard.IsNotNull(fileFingerprint);
         _logger.LogDebug(
@@ -92,24 +101,23 @@ public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
         //       issues. However, EntityFramework translates the Equals call to a primary key
         //       comparison. Because of this, we're doing a memberwise comparison here as a
         //       workaround.
-        var fingerprintToDelete = await _fireMothContext.FileFingerprints
-            .FirstOrDefaultAsync(fp =>
+        var fingerprintToDelete = _fireMothContext.FileFingerprints.FirstOrDefault(fp =>
                 fp.FileName == fileFingerprint.FileName
                 && fp.DirectoryName == fileFingerprint.DirectoryName
                 && fp.FileSize == fileFingerprint.FileSize
                 && fp.Base64Hash == fileFingerprint.Base64Hash);
         if (fingerprintToDelete is null)
-            return false;
+            return Task.FromResult(false);
         
         _fireMothContext.Remove(fingerprintToDelete);
-        await _fireMothContext.SaveChangesAsync();
+        _fireMothContext.SaveChanges();
         
-        return true;
+        return Task.FromResult(true);
     }
 
     /// <inheritdoc/>
-    public async Task<int> DeleteAllAsync()
+    public Task<int> DeleteAllAsync()
     {
-        return await _fireMothContext.FileFingerprints.ExecuteDeleteAsync();
+        return Task.FromResult(_fireMothContext.FileFingerprints.ExecuteDelete());
     }
 }

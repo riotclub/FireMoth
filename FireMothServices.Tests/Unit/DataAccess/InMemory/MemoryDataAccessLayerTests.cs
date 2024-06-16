@@ -19,38 +19,34 @@ using Xunit;
 
 /// <summary>
 /// Ctor
-/// - If null ILogger is passed, an ArgumentNullException is thrown.
+/// - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
 ///
 /// GetAsync
-/// - If null filter and null orderBy expressions are passed, an unfiltered and unordered collection
-///   of records is returned.
-/// - If non-null filter and null orderBy expressions are passed, a filtered and unordered
-///   collection of records is returned.
-/// - If null filter and non-null orderBy expressions are passed, an unfiltered and ordered
-///   collection of records is returned.
-/// - If non-null filter and non-null orderBy expressions are passed, a filtered and ordered
-///   collection of records is returned.
+/// - Passing null filter and null orderBy expressions returns an unfiltered and unordered
+///   collection of records.
+/// - Passing non-null filter and null orderBy expressions returns a filtered and unordered
+///   collection of records.
+/// - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
+///   collection of records.
+/// - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
+///   collection of records.
 ///
 /// AddAsync
-/// - If null FileFingerprint is passed, an ArgumentNullException is thrown.
-/// - If non-null FileFingerprint is passed, a record is added to the data access layer.
-///
+/// - Passing a null FileFingerprint throws an ArgumentNullException.
+/// - Passing a non-null FileFingerprint adds a record to the data access layer.
+///     
 /// AddManyAsync
-/// - If null IEnumerable{FileFingerprint} is passed, an ArgumentNullException is thrown.
-/// - If non-null IEnumerable{FileFingerprint} is passed, the records are added to the data access
-///   layer.
-///
+/// - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
+/// - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
+///     
 /// DeleteAsync
-/// - If null FileFingerprint is passed, an ArgumentNullException is thrown.
-/// - If non-null FileFingerprint that matches a record in the data access layer is passed, the
-///   record is deleted.
-/// - If non-null FileFingerprint that matches a record in the data access layer is passed, true is
-///   returned.
-/// - If non-null FileFingerprint that does not match a record in the data access layer is passed,
-///   the data access layer's existing records are not modified.
-/// - If non-null FileFingerprint that does not match a record in the data access layer is passed,
-///   false is returned.
-///
+/// - Passing a null FileFingerprint throws an ArgumentNullException.
+/// - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
+/// - Passing a FileFingerprint that matches a record in the data access layer returns true.
+/// - Passing a FileFingerprint that does not match a record in the data access layer does not
+///   modify existing records.
+/// - Passing a FileFingerprint that does not match a record in the data access layer returns false.
+///     
 /// DeleteAllAsync
 /// - Deletes all records from the data access layer.
 /// - Returns the number of records that were deleted from the data access layer.
@@ -67,7 +63,8 @@ public class MemoryDataAccessLayerTests
     }
     
 #region Ctor
-    /// <summary>Ctor: If null ILogger is passed, an ArgumentNullException is thrown.</summary>
+    /// <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
+    /// ArgumentNullException.</summary>
     [Fact]
     public void Ctor_NullILogger_ThrowsArgumentNullException()
     {
@@ -83,8 +80,8 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region GetAsync
-    /// <summary>GetAsync: If null filter and null orderBy expressions are passed, an unfiltered and
-    /// unordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
+    /// and unordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection()
     {
@@ -99,8 +96,8 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
 
-    /// <summary>GetAsync: If non-null filter and null orderBy expressions are passed, a filtered
-    /// and unordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
+    /// and unordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection()
     {
@@ -117,8 +114,8 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
     
-    /// <summary>GetAsync: If null filter and non-null orderBy expressions are passed, an unfiltered
-    /// and ordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
+    /// unfiltered and ordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection()
     {
@@ -135,8 +132,8 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
     
-    /// <summary>GetAsync: If non-null filter and non-null orderBy expressions are passed, a
-    /// filtered and ordered collection of records is returned.</summary>
+    /// <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
+    /// filtered and ordered collection of records.</summary>
     [Fact]
     public async void GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection()
     {
@@ -157,8 +154,7 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region AddAsync
-    /// <summary>AddAsync: If null FileFingerprint is passed, an ArgumentNullException is thrown.
-    /// </summary>
+    /// <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
     [Fact]
     public void AddAsync_NullFileFingerprint_ThrowsArgumentNullException()
     {
@@ -172,8 +168,8 @@ public class MemoryDataAccessLayerTests
         addAsyncAction.Should().ThrowExactly<ArgumentNullException>();
     }
     
-    /// <summary>AddAsync: If non-null FileFingerprint is passed, a record is added to the data
-    /// access layer.</summary>
+    /// <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
+    /// layer.</summary>
     [Fact]
     public async Task AddAsync_NonNullFileFingerprint_AddsRecord()
     {
@@ -193,8 +189,8 @@ public class MemoryDataAccessLayerTests
 #endregion
     
 #region AddManyAsync
-    /// <summary>AddManyAsync: If null IEnumerable{FileFingerprint} is passed, an
-    /// ArgumentNullException is thrown.</summary>
+    /// <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
+    /// ArgumentNullException.</summary>
     [Fact]
     public void AddManyAsync_NullIEnumerable_ThrowsArgumentNullException()
     {
@@ -208,8 +204,8 @@ public class MemoryDataAccessLayerTests
         addManyAsyncAction.Should().ThrowExactly<ArgumentNullException>();
     }
 
-    /// <summary>If non-null IEnumerable{FileFingerprint} is passed, the records are added to the
-    /// data access layer.</summary>
+    /// <summary>Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access
+    /// layer.</summary>
     [Fact]
     public async void AddManyAsync_NonNullIEnumerable_AddsRecords()
     {
@@ -230,7 +226,7 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region DeleteAsync
-    /// <summary>DeleteAsync: If null FileFingerprint is passed, an ArgumentNullException is thrown.
+    /// <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
     /// </summary>
     [Fact]
     public void DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException()
@@ -245,8 +241,8 @@ public class MemoryDataAccessLayerTests
         deleteAsyncAction.Should().ThrowExactly<ArgumentNullException>();
     }
 
-    /// <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
-    /// layer is passed, the record is deleted.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+    /// layer deletes the record.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted()
     {
@@ -264,8 +260,8 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
 
-    /// <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
-    /// layer is passed, true is returned.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
+    /// layer returns true.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue()
     {
@@ -281,8 +277,8 @@ public class MemoryDataAccessLayerTests
         result.Should().BeTrue();
     }
     
-    /// <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
-    /// access layer is passed, the data access layer's existing records are not modified.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
+    /// access layer does not modify existing records.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade()
     {
@@ -299,8 +295,8 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
 
-    /// <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
-    /// access layer is passed, false is returned.</summary>
+    /// <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
+    /// access layer returns false.</summary>
     [Fact]
     public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse()
     {
