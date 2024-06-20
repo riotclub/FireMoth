@@ -7,9 +7,9 @@ namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using DataAnalysis;
 using Repository;
 using Xunit;
+using RiotClub.FireMoth.Services.DataAnalysis;
 
 /// <summary>
 /// <see cref="FileFingerprint"/> unit tests.

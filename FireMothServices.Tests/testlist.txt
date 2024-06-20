@@ -52,7 +52,7 @@ AddAsync
 AddManyAsync
 - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
 - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
-    
+
 DeleteAsync
 - Passing a null FileFingerprint throws an ArgumentNullException.
 - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
@@ -66,11 +66,10 @@ DeleteAsync
 ComputeHashFromStream
 - If object is disposed, throws an ObjectDisposedException.
 - Passing a null Stream throws an ArgumentNullException.
-- Passing a Stream containing data returns a proper hash of the data.
-- Passing a Stream containing no data returns ???
-    - What is it supposed to return? I suspect an empty byte array but test and
-      find out.
-        
+- Passing a Stream containing less data than the input buffer size returns a proper hash of the data.
+- Passing a Stream containing more data than the input buffer size returns a proper hash of the data.
+- Passing a Stream containing no data returns the proper hash for an empty data stream.
+
 Dispose
 - After call, object is disposed.
 
@@ -145,7 +144,7 @@ GetScannedFiles (Property)
     - Returns ScannedFiles property.
     
 GetSkippedFiles (Property)
-    - Returns SkilledFiles property.
+    - Returns SkippedFiles property.
     
 GetErrors (Property)
     - Returns Errors property.

@@ -8,8 +8,6 @@ namespace RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
@@ -60,7 +58,6 @@ using Xunit;
 /// </summary>
 public class SqliteDataAccessLayerTests
 {
-    private readonly AutoMocker _mocker = new();
     private readonly Fixture _fixture = new();
     private readonly ILogger<SqliteDataAccessLayer> _nullLogger =
         NullLogger<SqliteDataAccessLayer>.Instance;

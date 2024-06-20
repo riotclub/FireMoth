@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using RiotClub.FireMoth.Services.Tasks.Output;
+using CommunityToolkit.Diagnostics;
 
 /// <summary>Provides file hashing services using the SHA256 algorithm.</summary>
 // ReSharper disable once InconsistentNaming (following .NET's convention here [see SHA256])
@@ -16,7 +17,7 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
 {
     private readonly HashAlgorithm _hashAlgorithm;
     private bool _disposed;
-    private const int InputBufferLength = 2 << 20;  // 2 << 20 = 2 MB
+    internal const int InputBufferLength = 2 << 20;  // 2 << 20 = 2 MB
 
     /// <summary>Initializes a new instance of the <see cref="SHA256FileHasher"/> class.</summary>
     public SHA256FileHasher()
@@ -27,6 +28,9 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
     /// <inheritdoc/>
     public byte[] ComputeHashFromStream(Stream inputStream)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        Guard.IsNotNull(inputStream);
+        
         long inputOffset = 0;
         var inputBuffer = new byte[InputBufferLength];
         int bytesRead;
@@ -53,6 +57,8 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
     public void Dispose()
     {
         Dispose(true);
+        // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
+        // (This follows Visual Studio's auto-generated IDisposable implementation.)
         GC.SuppressFinalize(this);
     }
 
