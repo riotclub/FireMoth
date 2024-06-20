@@ -66,11 +66,10 @@ DeleteAsync
 ComputeHashFromStream
 - If object is disposed, throws an ObjectDisposedException.
 - Passing a null Stream throws an ArgumentNullException.
-- Passing a Stream containing data returns a proper hash of the data.
-- Passing a Stream containing no data returns ???
-    - What is it supposed to return? I suspect an empty byte array but test and
-      find out.
-        
+- Passing a Stream containing less data than the input buffer size returns a proper hash of the data.
+- Passing a Stream containing more data than the input buffer size returns a proper hash of the data.
+- Passing a Stream containing no data returns the proper hash for an empty data stream.
+
 Dispose
 - After call, object is disposed.
 

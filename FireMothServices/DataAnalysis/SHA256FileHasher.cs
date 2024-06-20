@@ -17,7 +17,7 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
 {
     private readonly HashAlgorithm _hashAlgorithm;
     private bool _disposed;
-    private const int InputBufferLength = 2 << 20;  // 2 << 20 = 2 MB
+    internal const int InputBufferLength = 2 << 20;  // 2 << 20 = 2 MB
 
     /// <summary>Initializes a new instance of the <see cref="SHA256FileHasher"/> class.</summary>
     public SHA256FileHasher()
@@ -57,6 +57,8 @@ public sealed class SHA256FileHasher : IFileHasher, IDisposable
     public void Dispose()
     {
         Dispose(true);
+        // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
+        // (This follows Visual Studio's auto-generated IDisposable implementation.)
         GC.SuppressFinalize(this);
     }
 
