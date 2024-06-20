@@ -91,7 +91,7 @@ public class SHA256FileHasherTests
     public void ComputeHashFromStream_StreamContainsMoreDataThanInputBufferSize_ReturnsCorrectHash()
     {
         // Arrange
-        var testData = new byte[SHA256FileHasher.InputBufferLength];
+        var testData = new byte[SHA256FileHasher.InputBufferLength + 1];
         Random.Shared.NextBytes(testData);
         var testStream = new MemoryStream(testData);
         string expected;
