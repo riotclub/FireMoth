@@ -15,7 +15,7 @@ using Xunit;
 
 /// <summary>
 /// ComputeHashFromStream
-/// - If object is disposed, throws an ObjectDisposedException.
+/// - Calling on a disposed object throws an ObjectDisposedException.
 /// - Passing a null Stream throws an ArgumentNullException.
 /// - Passing a Stream containing less data than the input buffer size returns a proper hash of the
 ///   data.
@@ -33,8 +33,8 @@ public class SHA256FileHasherTests
     private readonly AutoMocker _mocker = new();
     
 #region ComputeHashFromStream
-    /// <summary>ComputeHashFromStream: If object is disposed, throws an ObjectDisposedException.
-    /// </summary>
+    /// <summary>ComputeHashFromStream: Calling on a disposed object throws an
+    /// ObjectDisposedException.</summary>
     [Fact]
     public void ComputeHashFromStream_ObjectDisposed_ThrowsObjectDisposedException()
     {

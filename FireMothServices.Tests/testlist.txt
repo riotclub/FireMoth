@@ -6,10 +6,11 @@ Ctor
 - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
 
 GetAsync
-- Passing null filter and null orderBy expressions returns an unfiltered and unordered collection of records.
-- Passing non-null filter and null orderBy expressions returns a filtered and unordered collection of records.
-- Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection of records.
-- Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
+- Passing [filter, orderBy are both null] returns an unfiltered, unordered collection.
+- Passing [filter, orderBy are non-null, null] returns a filtered, unordered collection.
+- Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection.
+- Passing [filter, orderBy are null, non-null] returns an unfiltered, ordered collection.
+- Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection.
 
 AddAsync
 - Passing a null FileFingerprint throws an ArgumentNullException.
@@ -42,8 +43,10 @@ Ctor
 GetAsync
 - Passing null filter and null orderBy expressions returns an unfiltered and unordered collection of records.
 - Passing non-null filter and null orderBy expressions returns a filtered and unordered collection of records.
+- Passing [filter, orderBy are non-null, null] returns filtered and unordered collection of records.
 - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection of records.
 - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
+- Passing (filter, orderBy non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
 
 AddAsync
 - Passing a null FileFingerprint throws an ArgumentNullException.
@@ -64,7 +67,7 @@ DeleteAsync
 /DataAnalysis/SHA256FileHasher
 ------------------------------------------------------------------------------------------------------------------------
 ComputeHashFromStream
-- If object is disposed, throws an ObjectDisposedException.
+- Calling on a disposed object throws an ObjectDisposedException.
 - Passing a null Stream throws an ArgumentNullException.
 - Passing a Stream containing less data than the input buffer size returns a proper hash of the data.
 - Passing a Stream containing more data than the input buffer size returns a proper hash of the data.
@@ -90,49 +93,49 @@ IsBase64String
 /FileScanning/ScanError
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - If message is null, ArgumentNullException is thrown.
-    - If message is empty, ArgumentException is thrown.
-    - Valid parameters properly initializes object.
+- Passing a null message throws an ArgumentNullException.
+- Passing an empty message throws an ArgumentException.
+- Passing valid parameters properly initializes an object.
     
 GetPath (property)
-    - Returns the path property.
+- Returns the proper value of the path property.
     
 GetMessage (property)
-    - Returns the message property.
+- Returns the proper value of the message property.
     
 GetException (property)
-    - Returns the exception property.
-    
+- Returns the proper value of the exception property.
+
 OperatorEquality
-    - If left and right operand refer to the same object, returns true.
-    - If left and right operands are both null, returns true.
-    - If left operand is null and right operand is non-null, returns false.
-    - If left operand is non-null and right operand is null, returns false.
-    - If left and right operands contain equal property values, returns true.
-    
+- Passing [left, right operands refer to same object] returns true.
+- Passing [left, right operands both null] returns true.
+- Passing [left, right operands null, non-null] returns false.
+- Passing [left, right operands non-null, null] returns false.
+- Passing [left, right operands contain equal property values] returns true.
+
 OperatorInequality
-    - If left and right operand refer to the same object, returns false.
-    - If left and right operands are both null, returns false.
-    - If left operand is null and right operand is non-null, returns true.
-    - If left operand is non-null and right operand is null, returns true.
-    - If left and right operands contain equal property values, returns false.
+- If left and right operand refer to the same object, returns false.
+- If left and right operands are both null, returns false.
+- If left operand is null and right operand is non-null, returns true.
+- If left operand is non-null and right operand is null, returns true.
+- If left and right operands contain equal property values, returns false.
     
 EqualsObject
-    - If object is null, returns false.
-    - If object is not an instance of ScanError, returns false.
-    - If object is an instance of ScanError but does not contain equal property
-      values, returns false.
-    - If object is an instance of ScanError and contains equal property values,
-      returns true.
+- If object is null, returns false.
+- If object is not an instance of ScanError, returns false.
+- If object is an instance of ScanError but does not contain equal property
+  values, returns false.
+- If object is an instance of ScanError and contains equal property values,
+  returns true.
       
 EqualsScanError
-    - If ScanError is null, returns false.
-    - If ScanError does not contain equal property values, returns false.
-    - If ScanError contains equal property values, returns true.
+- If ScanError is null, returns false.
+- If ScanError does not contain equal property values, returns false.
+- If ScanError contains equal property values, returns true.
     
 GetHashCode
-    - Objects with different property values return different hash codes.
-    - Objects with equal property values return the same hash code.
+- Objects with different property values return different hash codes.
+- Objects with equal property values return the same hash code.
     
 ------------------------------------------------------------------------------------------------------------------------
 /FileScanning/ScanResult

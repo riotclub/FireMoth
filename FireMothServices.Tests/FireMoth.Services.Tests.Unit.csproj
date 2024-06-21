@@ -39,8 +39,4 @@
     <ProjectReference Include="..\FireMothServices\FireMoth.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Unit\FileScanning\" />
-  </ItemGroup>
-
 </Project>
