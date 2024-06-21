@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using CommunityToolkit.Diagnostics;
+
 namespace RiotClub.FireMoth.Services.FileScanning;
 
 using System;
@@ -21,11 +23,7 @@ public class ScanError : IEquatable<ScanError>
     /// <param name="exception">Any exception associated with this error.</param>
     public ScanError(string? path, string message, Exception? exception)
     {
-        if (string.IsNullOrEmpty(message))
-        {
-            throw new ArgumentNullException(nameof(message));
-        }
-
+        Guard.IsNotNullOrWhiteSpace(message);
         Path = path;
         Message = message;
         Exception = exception;
@@ -57,11 +55,6 @@ public class ScanError : IEquatable<ScanError>
     public static bool operator ==(ScanError? left, ScanError? right)
     {
         if (ReferenceEquals(left, right))
-        {
-            return true;
-        }
-
-        if (left is null && right is null)
         {
             return true;
         }
