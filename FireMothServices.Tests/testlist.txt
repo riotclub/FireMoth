@@ -108,25 +108,22 @@ GetException (property)
 /FileScanning/ScanResult
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - Initializes all collection properties.
+- Initializes all collection properties.
 
 GetScannedFiles (Property)
-    - Returns ScannedFiles property.
+- Returns the proper value of the ScannedFiles property.
     
 GetSkippedFiles (Property)
-    - Returns SkippedFiles property.
+- Returns the proper value of the SkippedFiles property.
     
 GetErrors (Property)
-    - Returns Errors property.
+- Returns the proper value of the Errors property.
     
-OperatorPlus
-    - If left and right operands are both null, throws ArgumentNullException.
-    - If left operand is null and right operand is non-null, returns new ScanResult 
-      with values from right operand.
-    - If left operand is non-null and right operand is null, returns new ScanResult
-      with values from left operand.
-    - If left and right operands are non-null, returns new ScanResult with combined
-      values from both operands.
+OperatorAddition
+- Passing [a: null, b: null] throws ArgumentNullException.
+- Passing [a: null, b: non-null] returns new ScanResult with values from b.
+- Passing [a: non-null, b: null] returns new ScanResult with values from a.
+- Passing [a: non-null, b: non-null] returns new ScanResult with combined values from both a and b.
       
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOptions
