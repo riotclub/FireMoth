@@ -9,7 +9,6 @@ using System;
 using RiotClub.FireMoth.Services.FileScanning;
 using AutoFixture;
 using FluentAssertions;
-using Moq.AutoMock;
 using Xunit;
 
 /// <summary>
@@ -17,6 +16,15 @@ using Xunit;
 /// - Passing [message: null] throws an ArgumentNullException.
 /// - Passing [message: empty or whitespace] throws an ArgumentException.
 /// - Passing [valid parameters] properly initializes an object.
+///
+/// GetPath (property)
+/// - Returns the proper value of the path property.
+///
+/// GetMessage (property)
+/// - Returns the proper value of the message property.
+/// 
+/// GetException (property)
+/// - Returns the proper value of the exception property.
 /// </summary>
 public class ScanErrorTests
 {
@@ -64,6 +72,58 @@ public class ScanErrorTests
         created.Path.Should().Be(expectedPath);
         created.Message.Should().Be(expectedMessage);
         created.Exception.Should().Be(expectedException);
-    }    
+    }
+#endregion
+
+#region GetPath
+    /// <summary>GetPath (property): Returns the proper value of the path property.</summary>
+    [Fact]
+    public void GetPath_MethodCalled_ReturnsCorrectValue()
+    {
+        // Arrange
+        var expected = _fixture.Create<string>();
+        var sut = new ScanError(expected, _fixture.Create<string>(), _fixture.Create<Exception>());
+        
+        // Act
+        var result = sut.Path;
+
+        // Assert
+        result.Should().Be(expected);
+    }
+#endregion
+
+#region GetMessage
+    /// <summary>GetMessage (property): Returns the proper value of the message property.</summary>
+    [Fact]
+    public void GetMessage_MethodCalled_ReturnsCorrectValue()
+    {
+        // Arrange
+        var expected = _fixture.Create<string>();
+        var sut = new ScanError(_fixture.Create<string>(), expected, _fixture.Create<Exception>());
+        
+        // Act
+        var result = sut.Message;
+
+        // Assert
+        result.Should().Be(expected);
+    }
+#endregion    
+    
+#region GetException
+    /// <summary>GetException (property): Returns the proper value of the exception property.
+    /// </summary>
+    [Fact]
+    public void GetException_MethodCalled_ReturnsCorrectValue()
+    {
+        // Arrange
+        var expected = _fixture.Create<Exception>();
+        var sut = new ScanError(_fixture.Create<string>(), _fixture.Create<string>(), expected);
+        
+        // Act
+        var result = sut.Exception;
+
+        // Assert
+        result.Should().Be(expected);
+    }
 #endregion
 }

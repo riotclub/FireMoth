@@ -3,11 +3,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using CommunityToolkit.Diagnostics;
-
 namespace RiotClub.FireMoth.Services.FileScanning;
 
 using System;
+using CommunityToolkit.Diagnostics;
 
 /// <summary>
 /// Represents an error that occured during a file scan.

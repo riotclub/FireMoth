@@ -95,35 +95,15 @@ Ctor
 - Passing [message: empty or whitespace] throws an ArgumentException.
 - Passing [valid parameters] properly initializes an object.
 
-OperatorEquality
-- Passing [left and right refer to same object] returns true.
-- Passing [left: null, right: null] returns true.
-- Passing [left: null, right: non-null] returns false.
-- Passing [left: non-null, right: null] returns false.
-- Passing [left and right contain equal property values] returns true.
-
-OperatorInequality
-- Passing [left and right refer to same object] returns false.
-- Passing [left: null, right: null] returns false.
-- Passing [left: null, right: non-null] returns true.
-- Passing [left: non-null, right: null] returns true.
-- Passing [left and right contain equal property values] returns false.
+GetPath (property)
+- Returns the proper value of the path property.
     
-EqualsObject
-- Passing [object: null] returns false.
-- Passing [object: not an instance of ScanError] returns false.
-- Passing [object: instance of ScanError but does not contain equal property values] returns false.
-- Passing [object: instance of ScanError and contains equal property values] returns true.
-      
-EqualsScanError
-- Passing [ScanError?: null] returns false.
-- Passing [ScanError?: does not contain equal property values] returns false.
-- Passing [ScanError?: contains equal property values] returns true.
+GetMessage (property)
+- Returns the proper value of the message property.
     
-GetHashCode
-- Calling on objects with different property values returns different hash codes.
-- Calling on objects with equal property values returns the same hash code.
-    
+GetException (property)
+- Returns the proper value of the exception property.
+   
 ------------------------------------------------------------------------------------------------------------------------
 /FileScanning/ScanResult
 ------------------------------------------------------------------------------------------------------------------------
