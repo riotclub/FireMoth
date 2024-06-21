@@ -5,6 +5,7 @@
 
 namespace RiotClub.FireMoth.Services.FileScanning;
 
+using System;
 using System.Collections.Generic;
 using Repository;
 
@@ -37,22 +38,30 @@ public class ScanResult
     /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>
     /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.
     /// </returns>
-    public static ScanResult operator +(ScanResult a, ScanResult b)
+    public static ScanResult operator +(ScanResult? a, ScanResult? b)
     {
-        var result = new ScanResult();
-        result.ScannedFiles.AddRange(a.ScannedFiles);
-        result.ScannedFiles.AddRange(b.ScannedFiles);
-        result.Errors.AddRange(a.Errors);
-        result.Errors.AddRange(b.Errors);
-
-        foreach (var pair in a.SkippedFiles)
+        if (a is null && b is null)
         {
-            result.SkippedFiles.TryAdd(pair.Key, pair.Value);
+            throw new ArgumentNullException(
+                string.Join(",", nameof(a), nameof(b)),
+                "Cannot combine two null ScanResult objects.");
+        }
+        
+        var result = new ScanResult();
+        if (a is not null)
+        {
+            result.ScannedFiles.AddRange(a.ScannedFiles);
+            result.Errors.AddRange(a.Errors);
+            foreach (var pair in a.SkippedFiles)
+                result.SkippedFiles.TryAdd(pair.Key, pair.Value);
         }
 
-        foreach (var pair in b.SkippedFiles)
+        if (b is not null)
         {
-            result.SkippedFiles.TryAdd(pair.Key, pair.Value);
+            result.ScannedFiles.AddRange(b.ScannedFiles);
+            result.Errors.AddRange(b.Errors);
+            foreach (var pair in b.SkippedFiles)
+                result.SkippedFiles.TryAdd(pair.Key, pair.Value);
         }
 
         return result;

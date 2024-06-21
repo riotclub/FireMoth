@@ -76,7 +76,7 @@ public class ScanErrorTests
 #endregion
 
 #region GetPath
-    /// <summary>GetPath (property): Returns the proper value of the path property.</summary>
+    /// <summary>GetPath: Returns the proper value of the path property.</summary>
     [Fact]
     public void GetPath_MethodCalled_ReturnsCorrectValue()
     {
@@ -93,7 +93,7 @@ public class ScanErrorTests
 #endregion
 
 #region GetMessage
-    /// <summary>GetMessage (property): Returns the proper value of the message property.</summary>
+    /// <summary>GetMessage: Returns the proper value of the message property.</summary>
     [Fact]
     public void GetMessage_MethodCalled_ReturnsCorrectValue()
     {
@@ -110,8 +110,7 @@ public class ScanErrorTests
 #endregion    
     
 #region GetException
-    /// <summary>GetException (property): Returns the proper value of the exception property.
-    /// </summary>
+    /// <summary>GetException: Returns the proper value of the exception property.</summary>
     [Fact]
     public void GetException_MethodCalled_ReturnsCorrectValue()
     {
