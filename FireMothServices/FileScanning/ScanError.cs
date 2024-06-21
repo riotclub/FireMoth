@@ -6,11 +6,12 @@
 namespace RiotClub.FireMoth.Services.FileScanning;
 
 using System;
+using CommunityToolkit.Diagnostics;
 
 /// <summary>
 /// Represents an error that occured during a file scan.
 /// </summary>
-public class ScanError : IEquatable<ScanError>
+public class ScanError
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanError"/> class.
@@ -21,11 +22,7 @@ public class ScanError : IEquatable<ScanError>
     /// <param name="exception">Any exception associated with this error.</param>
     public ScanError(string? path, string message, Exception? exception)
     {
-        if (string.IsNullOrEmpty(message))
-        {
-            throw new ArgumentNullException(nameof(message));
-        }
-
+        Guard.IsNotNullOrWhiteSpace(message);
         Path = path;
         Message = message;
         Exception = exception;
@@ -45,66 +42,4 @@ public class ScanError : IEquatable<ScanError>
     /// Gets the exception related to this error.
     /// </summary>
     public Exception? Exception { get; }
-
-    /// <summary>
-    /// Implements the equality operator.
-    /// </summary>
-    /// <param name="left">An instance of <see cref="ScanError"/> to test for equality.</param>
-    /// <param name="right">A second instance of <see cref="ScanError"/> to test for equality.
-    /// </param>
-    /// <returns><c>true</c> if the two <see cref="ScanError"/>s are equal; false otherwise.
-    /// </returns>
-    public static bool operator ==(ScanError? left, ScanError? right)
-    {
-        if (ReferenceEquals(left, right))
-        {
-            return true;
-        }
-
-        if (left is null && right is null)
-        {
-            return true;
-        }
-
-        if (left is null || right is null)
-        {
-            return false;
-        }
-
-        return left.Equals(right);
-    }
-
-    /// <summary>
-    /// Implements the inequality operator.
-    /// </summary>
-    /// <param name="left">An instance of <see cref="ScanError"/> to test for inequality.
-    /// </param>
-    /// <param name="right">A second instance of <see cref="ScanError"/> to test for inequality.
-    /// </param>
-    /// <returns><c>true</c> if the two <see cref="ScanError"/>s are not equal; false otherwise.
-    /// </returns>
-    public static bool operator !=(ScanError? left, ScanError? right)
-    {
-        return !(left == right);
-    }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        return this.Equals(obj as ScanError);
-    }
-
-    /// <inheritdoc/>
-    public bool Equals(ScanError? other)
-    {
-        return other != null
-               && Path == other.Path
-               && Message == other.Message;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Path, Message);
-    }
 }

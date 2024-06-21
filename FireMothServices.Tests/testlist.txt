@@ -3,28 +3,28 @@
 /DataAccess/InMemory/MemoryDataAccessLayer
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-- Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
+- Passing [ILogger{MemoryDataAccessLayer}: null] throws an ArgumentNullException.
 
 GetAsync
-- Passing null filter and null orderBy expressions returns an unfiltered and unordered collection of records.
-- Passing non-null filter and null orderBy expressions returns a filtered and unordered collection of records.
-- Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection of records.
-- Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
+- Passing [filter: null, orderBy: null] returns an unfiltered, unordered collection.
+- Passing [filter: non-null, orderBy: null] returns a filtered, unordered collection.
+- Passing [filter: null, orderBy: non-null] returns an unfiltered, ordered collection.
+- Passing [filter: non-null, orderBy: non-null] returns a filtered and ordered collection.
 
 AddAsync
-- Passing a null FileFingerprint throws an ArgumentNullException.
-- Passing a non-null FileFingerprint adds a record to the data access layer.
+- Passing [FileFingerprint: null] throws an ArgumentNullException.
+- Passing [FileFingerprint: non-null] adds a record to the data access layer.
     
 AddManyAsync
-- Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
-- Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
+- Passing [IEnumerable{FileFingerprint}: null] throws an ArgumentNullException.
+- Passing [IEnumerable{FileFingerprint}: non-null] adds the records to the data access layer.
     
 DeleteAsync
-- Passing a null FileFingerprint throws an ArgumentNullException.
-- Passing a FileFingerprint that matches a record in the data access layer deletes the record.
-- Passing a FileFingerprint that matches a record in the data access layer returns true.
-- Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
-- Passing a FileFingerprint that does not match a record in the data access layer returns false.
+- Passing [FileFingerprint: null] throws an ArgumentNullException.
+- Passing [FileFingerprint: matches a record in the data access layer] deletes the record.
+- Passing [FileFingerprint: matches a record in the data access layer] returns true.
+- Passing [FileFingerprint: does not match a record in the data access layer] does not modify existing records.
+- Passing [FileFingerprint: does not match a record in the data access layer] returns false.
     
 DeleteAllAsync
 - Deletes all records from the data access layer.
@@ -36,42 +36,43 @@ Note: Unit tests should utilize mocks to test class functionality; actual SQLite
       integration tests.
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-- Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
-- Passing a null FireMothContext throws an ArgumentNullException.
+- Passing [ILogger{MemoryDataAccessLayer}: null] throws an ArgumentNullException.
+- Passing [FireMothContext: null] throws an ArgumentNullException.
 
 GetAsync
-- Passing null filter and null orderBy expressions returns an unfiltered and unordered collection of records.
-- Passing non-null filter and null orderBy expressions returns a filtered and unordered collection of records.
-- Passing null filter and non-null orderBy expressions returns an unfiltered and ordered collection of records.
-- Passing non-null filter and non-null orderBy expressions returns a filtered and ordered collection of records.
+- Passing [filter: null, orderBy: null] returns an unfiltered, unordered collection.
+- Passing [filter: non-null, orderBy: null] returns a filtered, unordered collection.
+- Passing [filter: null, orderBy: non-null] returns an unfiltered, ordered collection.
+- Passing [filter: non-null, orderBy: non-null] returns a filtered, ordered collection.
 
 AddAsync
-- Passing a null FileFingerprint throws an ArgumentNullException.
-- Passing a non-null FileFingerprint adds a record to the data access layer.
+- Passing [FileFingerprint: null] throws an ArgumentNullException.
+- Passing [FileFingerprint: non-null] adds a record to the data access layer.
     
 AddManyAsync
-- Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
-- Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
+- Passing [IEnumerable{FileFingerprint}: null] throws an ArgumentNullException.
+- Passing [IEnumerable{FileFingerprint}: non-null] adds the records to the data access layer.
 
 DeleteAsync
-- Passing a null FileFingerprint throws an ArgumentNullException.
-- Passing a FileFingerprint that matches a record in the data access layer deletes the record.
-- Passing a FileFingerprint that matches a record in the data access layer returns true.
-- Passing a FileFingerprint that does not match a record in the data access layer does not modify existing records.
-- Passing a FileFingerprint that does not match a record in the data access layer returns false.
+- Passing [FileFingerprint: null] throws an ArgumentNullException.
+- Passing [FileFingerprint: matches a record in the data access layer] deletes the record.
+- Passing [FileFingerprint: matches a record in the data access layer] returns true.
+- Passing [FileFingerprint: does not match a record in the data access layer] does not modify existing records.
+- Passing [FileFingerprint: does not match a record in the data access layer] returns false.
     
 ------------------------------------------------------------------------------------------------------------------------
 /DataAnalysis/SHA256FileHasher
 ------------------------------------------------------------------------------------------------------------------------
 ComputeHashFromStream
-- If object is disposed, throws an ObjectDisposedException.
-- Passing a null Stream throws an ArgumentNullException.
-- Passing a Stream containing less data than the input buffer size returns a proper hash of the data.
-- Passing a Stream containing more data than the input buffer size returns a proper hash of the data.
-- Passing a Stream containing no data returns the proper hash for an empty data stream.
+- Calling on a disposed object throws an ObjectDisposedException.
+- Passing [Stream: null] throws an ArgumentNullException.
+- Passing [Stream: contains less data than the input buffer size] returns a proper hash of the data.
+- Passing [Stream: contains more data than the input buffer size] returns a proper hash of the data.
+- Passing [Stream: contains no data] returns the proper hash for an empty data stream.
 
 Dispose
-- After call, object is disposed.
+- Calling on a non-disposed object disposes the object.
+- Calling on a disposed object does not throw exceptions.
 
 ------------------------------------------------------------------------------------------------------------------------
 /Extensions/StringExtensions
@@ -90,73 +91,39 @@ IsBase64String
 /FileScanning/ScanError
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - If message is null, ArgumentNullException is thrown.
-    - If message is empty, ArgumentException is thrown.
-    - Valid parameters properly initializes object.
-    
+- Passing [message: null] throws an ArgumentNullException.
+- Passing [message: empty or whitespace] throws an ArgumentException.
+- Passing [valid parameters] properly initializes an object.
+
 GetPath (property)
-    - Returns the path property.
+- Returns the proper value of the path property.
     
 GetMessage (property)
-    - Returns the message property.
+- Returns the proper value of the message property.
     
 GetException (property)
-    - Returns the exception property.
-    
-OperatorEquality
-    - If left and right operand refer to the same object, returns true.
-    - If left and right operands are both null, returns true.
-    - If left operand is null and right operand is non-null, returns false.
-    - If left operand is non-null and right operand is null, returns false.
-    - If left and right operands contain equal property values, returns true.
-    
-OperatorInequality
-    - If left and right operand refer to the same object, returns false.
-    - If left and right operands are both null, returns false.
-    - If left operand is null and right operand is non-null, returns true.
-    - If left operand is non-null and right operand is null, returns true.
-    - If left and right operands contain equal property values, returns false.
-    
-EqualsObject
-    - If object is null, returns false.
-    - If object is not an instance of ScanError, returns false.
-    - If object is an instance of ScanError but does not contain equal property
-      values, returns false.
-    - If object is an instance of ScanError and contains equal property values,
-      returns true.
-      
-EqualsScanError
-    - If ScanError is null, returns false.
-    - If ScanError does not contain equal property values, returns false.
-    - If ScanError contains equal property values, returns true.
-    
-GetHashCode
-    - Objects with different property values return different hash codes.
-    - Objects with equal property values return the same hash code.
-    
+- Returns the proper value of the exception property.
+   
 ------------------------------------------------------------------------------------------------------------------------
 /FileScanning/ScanResult
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - Initializes all collection properties.
+- Initializes all collection properties.
 
 GetScannedFiles (Property)
-    - Returns ScannedFiles property.
+- Returns the proper value of the ScannedFiles property.
     
 GetSkippedFiles (Property)
-    - Returns SkippedFiles property.
+- Returns the proper value of the SkippedFiles property.
     
 GetErrors (Property)
-    - Returns Errors property.
+- Returns the proper value of the Errors property.
     
-OperatorPlus
-    - If left and right operands are both null, throws ArgumentNullException.
-    - If left operand is null and right operand is non-null, returns new ScanResult 
-      with values from right operand.
-    - If left operand is non-null and right operand is null, returns new ScanResult
-      with values from left operand.
-    - If left and right operands are non-null, returns new ScanResult with combined
-      values from both operands.
+OperatorAddition
+- Passing [a: null, b: null] throws ArgumentNullException.
+- Passing [a: null, b: non-null] returns new ScanResult with values from b.
+- Passing [a: non-null, b: null] returns new ScanResult with values from a.
+- Passing [a: non-null, b: non-null] returns new ScanResult with combined values from both a and b.
       
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOptions
