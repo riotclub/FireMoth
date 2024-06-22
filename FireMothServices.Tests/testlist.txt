@@ -115,42 +115,31 @@ OperatorAddition
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOptions
 ------------------------------------------------------------------------------------------------------------------------
-GetDirectory (Property)
-- Returns the correct value of the Directory property.
-    
-SetDirectory (Property)
+InitDirectory (Property)
 - Sets Directory property.
-    
-GetRecursive (property)
-- Returns Recursive property.
-    
-SetRecursive (property)
+
+InitRecursive (property)
 - Sets Recursive property.
 
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOrchestrator
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - If IFileScanOrchestrator is null, ArgumentNullException is thrown.
-    - If IOptions<DirectoryScanOptions> is null, ArgumentNullException is thrown.
-    - If IOptions.Value property is null, ArgumentException is thrown.
-    - If ILogger is null, ArgumentNullException is thrown.
-    
+- Passing [IFileScanOrchestrator:null] throws ArgumentNullException.
+- Passing [IOptions<DirectoryScanOptions>:null] throws ArgumentNullException.
+- Passing [IOptions<DirectoryScanOptions> with null Value property] throws ArgumentException.
+- Passing [IOptions<DirectoryScanOptions> with null Value.Directory property] throws ArgumentException.
+- Passing [ILogger<DirectoryScanOrchestrator>:null] throws ArgumentNullException.
+
 ScanDirectoryAsync
-    - If DirectoryScanOptions.Directory property is null, ArgumentException is
-      thrown.
-    - If options specify a recursive scan, the injected IFileScanOrchestrator's
-      ScanFilesAsync method is called with all available files from the scan
-      directory and its subdirectories, enumerated recursively.
-    - If options do not specify a recursive scan, the injected
-      IFileScanOrchestrator's ScanFilesAsync method is called with all available
-      files from the scan directory, ignoring any files in subdirectories of the
-      scan directory.
-    - If the scan directory does not contain any files, the injected
-      IFileScanOrchestrator's ScanFilesAsync method is not called, and the method
-      returns a new, empty ScanResult.
-    - The method outputs appropriate log information.
-    
+- When DirectoryScanOptions.Recursive is true, calls IFileScanOrchestrator.ScanFilesAsync with all
+  available files from the scan directory and its subdirectories, enumerated recursively. 
+- When DirectoryScanOptions.Recursive is false, calls IFileScanOrchestrator.ScanFilesAsync with all
+  available files from the scan directory, ignoring any files in subdirectories. 
+- When DirectoryScanOptions.Directory specifies an empty directory, IFileScanOrchestrator.ScanFilesAsync
+  is not called.
+- Relevant messages are logged.
+
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/FileScanOrchestrator
 ------------------------------------------------------------------------------------------------------------------------
