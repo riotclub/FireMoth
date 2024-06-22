@@ -3,37 +3,43 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+namespace RiotClub.FireMoth.Services.Tests.Unit.FileScanning;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
-
-namespace RiotClub.FireMoth.Services.Tests.Unit.FileScanning;
-
-using System;
 using RiotClub.FireMoth.Services.FileScanning;
 using AutoFixture;
 using FluentAssertions;
 using Xunit;
 
 /// <summary>
-/// Ctor
-/// - Initializes all collection properties.
-/// 
-/// GetScannedFiles (Property)
-/// - Returns the proper value of the ScannedFiles property.
-/// 
-/// GetSkippedFiles (Property)
-/// - Returns the proper value of the SkippedFiles property.
-/// 
-/// GetErrors (Property)
-/// - Returns the proper value of the Errors property.
-/// 
-/// OperatorAddition
-/// - Passing [a: null, b: null] throws ArgumentNullException.
-/// - Passing [a: null, b: non-null] returns new ScanResult with values from b.
-/// - Passing [a: non-null, b: null] returns new ScanResult with values from a.
-/// - Passing [a: non-null, b: non-null] returns new ScanResult with combined values from both a and b.
+/// <p>
+/// Ctor<br/>
+/// - Initializes all collection properties.<br/>
+/// </p>
+/// <p>
+/// GetScannedFiles (Property)<br/>
+/// - Returns the proper value of the ScannedFiles property.<br/>
+/// </p>
+/// <p>
+/// GetSkippedFiles (Property)<br/>
+/// - Returns the proper value of the SkippedFiles property.<br/>
+/// </p>
+/// <p>
+/// GetErrors (Property)<br/>
+/// - Returns the proper value of the Errors property.<br/>
+/// </p>
+/// <p>
+/// OperatorAddition<br/>
+/// - Passing [a:null, b:null] throws ArgumentNullException.<br/>
+/// - Passing [a:null, b:non-null] returns new ScanResult with values from b.<br/>
+/// - Passing [a:non-null, b:null] returns new ScanResult with values from a.<br/>
+/// - Passing [a:non-null, b:non-null] returns new ScanResult with combined values from both a and
+///   b.<br/>
+/// </p>
 /// </summary>
 public class ScanResultTests
 {
@@ -115,8 +121,7 @@ public class ScanResultTests
 #endregion
 
 #region OperatorAddition
-    /// <summary>OperatorAddition: Passing [a: null, b: null] throws ArgumentNullException.
-    /// </summary>
+    /// <summary>OperatorAddition: Passing [a:null, b:null] throws ArgumentNullException.</summary>
     [Fact]
     public void OperatorAddition_ANullBNull_ThrowsArgumentNullException()
     {
@@ -131,7 +136,7 @@ public class ScanResultTests
         additionFunc.Should().ThrowExactly<ArgumentNullException>();
     }
     
-    /// <summary>OperatorAddition: Passing [a: null, b: non-null] returns new ScanResult with values
+    /// <summary>OperatorAddition: Passing [a:null, b:non-null] returns new ScanResult with values
     /// from b.</summary>
     [Fact]
     public void OperatorAddition_ANullBNonNull_ReturnsCorrectScanResult()
@@ -157,7 +162,7 @@ public class ScanResultTests
         result.Errors.Should().Equal(expectedErrors);
     }
       
-    /// <summary>OperatorAddition: Passing [a: non-null, b: null] returns new ScanResult with values
+    /// <summary>OperatorAddition: Passing [a:non-null, b:null] returns new ScanResult with values
     /// from a.</summary>
     [Fact]
     public void OperatorAddition_ANonNullBNull_ReturnsCorrectScanResult()
@@ -184,7 +189,7 @@ public class ScanResultTests
         result.Errors.Should().Equal(expectedErrors);
     }
     
-    /// <summary>OperatorAddition: Passing [a: non-null, b: non-null] returns new ScanResult with
+    /// <summary>OperatorAddition: Passing [a:non-null, b:non-null] returns new ScanResult with
     /// combined values from both a and b.</summary>
     [Fact]
     public void OperatorAddition_ANonNullBNonNull_ReturnsCorrectScanResult()

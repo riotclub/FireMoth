@@ -18,38 +18,41 @@ using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
 using Xunit;
 
 /// <summary>
-/// Ctor
-/// - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
-///
-/// GetAsync
-/// - Passing null filter and null orderBy expressions returns an unfiltered and unordered
-///   collection of records.
-/// - Passing non-null filter and null orderBy expressions returns a filtered and unordered
-///   collection of records.
-/// - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
-///   collection of records.
-/// - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
-///   collection of records.
-///
-/// AddAsync
-/// - Passing a null FileFingerprint throws an ArgumentNullException.
-/// - Passing a non-null FileFingerprint adds a record to the data access layer.
-///     
-/// AddManyAsync
-/// - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
-/// - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
-///     
-/// DeleteAsync
-/// - Passing a null FileFingerprint throws an ArgumentNullException.
-/// - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
-/// - Passing a FileFingerprint that matches a record in the data access layer returns true.
-/// - Passing a FileFingerprint that does not match a record in the data access layer does not
-///   modify existing records.
-/// - Passing a FileFingerprint that does not match a record in the data access layer returns false.
-///     
-/// DeleteAllAsync
-/// - Deletes all records from the data access layer.
-/// - Returns the number of records that were deleted from the data access layer.
+/// <p>
+/// Ctor<br/>
+/// - Passing [ILogger{MemoryDataAccessLayer}:null] throws an ArgumentNullException.<br/>
+/// </p>
+/// <p>
+/// GetAsync<br/>
+/// - Passing [filter:null, orderBy:null] returns an unfiltered, unordered collection.<br/>
+/// - Passing [filter:non-null, orderBy:null] returns a filtered, unordered collection.<br/>
+/// - Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered collection.<br/>
+/// - Passing [filter:non-null, orderBy:non-null] returns a filtered and ordered collection.<br/>
+/// </p>
+/// <p>
+/// AddAsync<br/>
+/// - Passing [FileFingerprint:null] throws an ArgumentNullException.<br/>
+/// - Passing [FileFingerprint:non-null] adds a record to the data access layer.<br/>
+/// </p>
+/// <p>
+/// AddManyAsync<br/>
+/// - Passing [IEnumerable{FileFingerprint}:null] throws an ArgumentNullException.<br/>
+/// - Passing [IEnumerable{FileFingerprint}:non-null] adds the records to the data access layer.<br/>
+/// </p>
+/// <p>
+/// DeleteAsync<br/>
+/// - Passing [FileFingerprint:null] throws an ArgumentNullException.<br/>
+/// - Passing [FileFingerprint:matches a record in the data access layer] deletes the record.<br/>
+/// - Passing [FileFingerprint:matches a record in the data access layer] returns true.<br/>
+/// - Passing [FileFingerprint:does not match a record in the data access layer] does not modify
+///   existing records.<br/>
+/// - Passing [FileFingerprint:does not match a record in the data access layer] returns false.<br/>
+/// </p>
+/// <p>
+/// DeleteAllAsync<br/>
+/// - Deletes all records from the data access layer.<br/>
+/// - Returns the number of records that were deleted from the data access layer.<br/>
+/// </p>
 /// </summary>
 public class MemoryDataAccessLayerTests
 {
@@ -61,12 +64,12 @@ public class MemoryDataAccessLayerTests
         _fixture.Customizations.Add(new Base64HashSpecimenBuilder());
         _fixture.Customizations.Add(new FileNameSpecimenBuilder());
     }
-    
+
 #region Ctor
-    /// <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
+    /// <summary>Ctor:Passing [ILogger{MemoryDataAccessLayer}: null] throws an
     /// ArgumentNullException.</summary>
     [Fact]
-    public void Ctor_NullILogger_ThrowsArgumentNullException()
+    public void Ctor_ILoggerNull_ThrowsArgumentNullException()
     {
         // Arrange, Act
         // ReSharper disable once ObjectCreationAsStatement
@@ -80,10 +83,10 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region GetAsync
-    /// <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
-    /// and unordered collection of records.</summary>
+    /// <summary>GetAsync: Passing [filter:null, orderBy:null] returns an unfiltered, unordered
+    /// collection.</summary>
     [Fact]
-    public async void GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection()
+    public async void GetAsync_FilterNullOrderByNull_ReturnsUnfilteredUnorderedCollection()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -96,10 +99,10 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
 
-    /// <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
-    /// and unordered collection of records.</summary>
+    /// <summary>GetAsync: Passing [filter:non-null, orderBy:null] returns a filtered, unordered
+    /// collection.</summary>
     [Fact]
-    public async void GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection()
+    public async void GetAsync_FilterNonNullOrderByNull_ReturnsFilteredUnorderedCollection()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -114,10 +117,10 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
     
-    /// <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
-    /// unfiltered and ordered collection of records.</summary>
+    /// <summary>GetAsync: Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered
+    /// collection.</summary>
     [Fact]
-    public async void GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection()
+    public async void GetAsync_FilterNullOrderByNonNull_ReturnsUnfilteredOrderedCollection()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -132,10 +135,10 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
     
-    /// <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
-    /// filtered and ordered collection of records.</summary>
+    /// <summary>GetAsync: Passing [filter:non-null, orderBy:non-null] returns a filtered and
+    /// ordered collection.</summary>
     [Fact]
-    public async void GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection()
+    public async void GetAsync_FilterNonNullOrderByNonNull_ReturnsFilteredOrderedCollection()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -154,9 +157,9 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region AddAsync
-    /// <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
+    /// <summary>AddAsync: Passing [FileFingerprint:null] throws an ArgumentNullException.</summary>
     [Fact]
-    public void AddAsync_NullFileFingerprint_ThrowsArgumentNullException()
+    public void AddAsync_FileFingerprintNull_ThrowsArgumentNullException()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -168,10 +171,10 @@ public class MemoryDataAccessLayerTests
         addAsyncAction.Should().ThrowExactly<ArgumentNullException>();
     }
     
-    /// <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
+    /// <summary>AddAsync: Passing [FileFingerprint:non-null] adds a record to the data access
     /// layer.</summary>
     [Fact]
-    public async Task AddAsync_NonNullFileFingerprint_AddsRecord()
+    public async Task AddAsync_FileFingerprintNonNull_AddsRecord()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -189,10 +192,10 @@ public class MemoryDataAccessLayerTests
 #endregion
     
 #region AddManyAsync
-    /// <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
+    /// <summary>AddManyAsync: Passing [IEnumerable{FileFingerprint}:null] throws an
     /// ArgumentNullException.</summary>
     [Fact]
-    public void AddManyAsync_NullIEnumerable_ThrowsArgumentNullException()
+    public void AddManyAsync_IEnumerableNull_ThrowsArgumentNullException()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -204,10 +207,10 @@ public class MemoryDataAccessLayerTests
         addManyAsyncAction.Should().ThrowExactly<ArgumentNullException>();
     }
 
-    /// <summary>Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access
-    /// layer.</summary>
+    /// <summary>AddManyAsync: Passing [IEnumerable{FileFingerprint}:non-null] adds the records to
+    /// the data access layer.</summary>
     [Fact]
-    public async void AddManyAsync_NonNullIEnumerable_AddsRecords()
+    public async void AddManyAsync_IEnumerableNonNull_AddsRecords()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -226,10 +229,10 @@ public class MemoryDataAccessLayerTests
 #endregion
 
 #region DeleteAsync
-    /// <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
+    /// <summary>DeleteAsync: Passing [FileFingerprint:null] throws an ArgumentNullException.
     /// </summary>
     [Fact]
-    public void DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException()
+    public void DeleteAsync_FileFingerprintNull_ThrowsArgumentNullException()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -241,10 +244,10 @@ public class MemoryDataAccessLayerTests
         deleteAsyncAction.Should().ThrowExactly<ArgumentNullException>();
     }
 
-    /// <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
-    /// layer deletes the record.</summary>
+    /// <summary>DeleteAsync: Passing [FileFingerprint:matches a record in the data access layer]
+    /// deletes the record.</summary>
     [Fact]
-    public async void DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted()
+    public async void DeleteAsync_FileFingerprintMatchExists_MatchingValueIsDeleted()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -260,10 +263,10 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
 
-    /// <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
-    /// layer returns true.</summary>
+    /// <summary>DeleteAsync: Passing [FileFingerprint:matches a record in the data access layer]
+    /// returns true.</summary>
     [Fact]
-    public async void DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue()
+    public async void DeleteAsync_FileFingerprintMatchExists_ReturnsTrue()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -277,10 +280,10 @@ public class MemoryDataAccessLayerTests
         result.Should().BeTrue();
     }
     
-    /// <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
-    /// access layer does not modify existing records.</summary>
+    /// <summary>DeleteAsync: Passing [FileFingerprint:does not match a record in the data access
+    /// layer] does not modify existing records.</summary>
     [Fact]
-    public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade()
+    public async void DeleteAsync_FileFingerprintMatchDoesNotExist_NoChangesMade()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();
@@ -295,10 +298,10 @@ public class MemoryDataAccessLayerTests
         result.Should().Equal(expected);
     }
 
-    /// <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
-    /// access layer returns false.</summary>
+    /// <summary>DeleteAsync: Passing [FileFingerprint:does not match a record in the data access
+    /// layer] returns false.</summary>
     [Fact]
-    public async void DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse()
+    public async void DeleteAsync_FileFingerprintMatchDoesNotExist_ReturnsFalse()
     {
         // Arrange
         var sut = _mocker.CreateInstance<MemoryDataAccessLayer>();

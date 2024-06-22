@@ -12,26 +12,31 @@ using FluentAssertions;
 using Xunit;
 
 /// <summary>
-/// Ctor
-/// - Passing [message: null] throws an ArgumentNullException.
-/// - Passing [message: empty or whitespace] throws an ArgumentException.
-/// - Passing [valid parameters] properly initializes an object.
-///
-/// GetPath (property)
-/// - Returns the proper value of the path property.
-///
-/// GetMessage (property)
-/// - Returns the proper value of the message property.
-/// 
-/// GetException (property)
-/// - Returns the proper value of the exception property.
+/// <p>
+/// Ctor<br/>
+/// - Passing [message:null] throws an ArgumentNullException.<br/>
+/// - Passing [message:empty or whitespace] throws an ArgumentException.<br/>
+/// - Passing [valid parameters] properly initializes an object.<br/>
+/// </p>
+/// <p>
+/// GetPath (property)<br/>
+/// - Returns the proper value of the path property.<br/>
+/// </p>
+/// <p>
+/// GetMessage (property)<br/>
+/// - Returns the proper value of the message property.<br/>
+/// </p>
+/// <p>
+/// GetException (property)<br/>
+/// - Returns the proper value of the exception property.<br/>
+/// </p>
 /// </summary>
 public class ScanErrorTests
 {
     private readonly Fixture _fixture = new();
     
 #region Ctor
-    /// <summary>Ctor: Passing [message: null] throws an ArgumentNullException.</summary>
+    /// <summary>Ctor: Passing [message:null] throws an ArgumentNullException.</summary>
     [Fact]
     public void Ctor_MessageNull_ThrowsArgumentNullException()
     {
@@ -42,7 +47,7 @@ public class ScanErrorTests
         ctorFunc.Should().ThrowExactly<ArgumentNullException>();
     }
 
-    /// <summary>Ctor: Passing [message: empty or whitespace] throws an ArgumentException.</summary>
+    /// <summary>Ctor: Passing [message:empty or whitespace] throws an ArgumentException.</summary>
     [Theory]
     [InlineData("")]
     [InlineData("     ")]
