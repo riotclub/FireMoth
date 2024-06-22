@@ -8,6 +8,7 @@ namespace RiotClub.FireMoth.Console.Extensions;
 using System;
 using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using CsvHelper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
+        services.AddTransient<IFileSystem, FileSystem>();
         services.AddTransient<IDirectoryScanOrchestrator, DirectoryScanOrchestrator>();
         services.AddTransient<IFileScanOrchestrator, FileScanOrchestrator>();
         services.AddTransient<IFileHasher, SHA256FileHasher>();
