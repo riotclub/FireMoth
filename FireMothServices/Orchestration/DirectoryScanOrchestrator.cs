@@ -7,9 +7,9 @@ namespace RiotClub.FireMoth.Services.Orchestration;
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using System.IO.Abstractions;
 using DataAccess;
 using FileScanning;
 using Microsoft.Extensions.Options;
@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
 {
     private readonly IFileScanOrchestrator _fileScanOrchestrator;
+    private readonly IFileSystem _fileSystem;
     private readonly DirectoryScanOptions _directoryScanOptions;
     private readonly ILogger<FileScanOrchestrator> _logger;
 
@@ -31,17 +32,21 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
     /// </summary>
     /// <param name="fileScanOrchestrator">An <see cref="IFileScanOrchestrator"/> that manages
     /// scanning of files.</param>
+    /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
+    /// </param>
     /// <param name="directoryScanOptions">An <see cref="IOptions{DirectoryScanOptions}"/>
     /// containing the configured options for this directory scan orchestrator.</param>
     /// <param name="logger">An <see cref="ILogger{FileScanOrchestrator}"/> to which logging output
     /// will be written.</param>
     public DirectoryScanOrchestrator(
         IFileScanOrchestrator fileScanOrchestrator,
+        IFileSystem fileSystem,
         IOptions<DirectoryScanOptions> directoryScanOptions,
         ILogger<FileScanOrchestrator> logger)
     {
         _fileScanOrchestrator = fileScanOrchestrator
                                 ?? throw new ArgumentNullException(nameof(fileScanOrchestrator));
+        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         _directoryScanOptions = directoryScanOptions.Value;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -50,24 +55,17 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
     public async Task<ScanResult> ScanDirectoryAsync()
     {
         if (_directoryScanOptions.Directory is null)
-        {
             throw new ArgumentException("Scan directory cannot be null.");
-        }
 
         _logger.LogInformation(
             "Scanning directory '{ScanDirectory}' (recursive: {Recursive})",
             _directoryScanOptions.Directory,
             _directoryScanOptions.Recursive);
 
-        var fileList = Directory
-            .EnumerateFiles(
-                _directoryScanOptions.Directory.ToString(),
-                AllFilesSearchPattern,
-                new EnumerationOptions
-                {
-                    RecurseSubdirectories = _directoryScanOptions.Recursive
-                })
-            .ToList();
+        var fileList = _fileSystem.Directory.EnumerateFiles(
+            _directoryScanOptions.Directory,
+            AllFilesSearchPattern,
+            new EnumerationOptions { RecurseSubdirectories = _directoryScanOptions.Recursive });
         
         return await _fileScanOrchestrator.ScanFilesAsync(fileList);
     }
