@@ -8,6 +8,7 @@ namespace RiotClub.FireMoth.Services.Orchestration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -16,33 +17,35 @@ using DataAnalysis;
 using FileScanning;
 using Repository;
 
-/// <summary>
-/// File scanner implementation that scans a collection of files and writes file fingerprint data to an
-/// <see cref="IDataAccessLayer{TValue}"/>.
-/// </summary>
+/// <summary>File scanner implementation that scans a collection of files and writes file
+/// fingerprint data to an <see cref="IDataAccessLayer{TValue}"/>.</summary>
 public class FileScanOrchestrator : IFileScanOrchestrator
 {
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
     private readonly IFileHasher _fileHasher;
+    private readonly IFileSystem _fileSystem;
     private readonly ILogger<FileScanOrchestrator> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileScanOrchestrator"/> class.
+    /// <summary>Initializes a new instance of the <see cref="FileScanOrchestrator"/> class.
     /// </summary>
-    /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> that provides access to
-    /// the application backing store.</param>
-    /// <param name="fileHasher">An <see cref="IFileHasher"/> that is used to compute hash values for scanned files.
+    /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> that
+    /// provides access to the application backing store.</param>
+    /// <param name="fileHasher">An <see cref="IFileHasher"/> that is used to compute hash values
+    /// for scanned files.</param>
+    /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
     /// </param>
-    /// <param name="logger">An <see cref="ILogger{FileScanOrchestrator}"/> to which logging output will be written.
-    /// </param>
+    /// <param name="logger">An <see cref="ILogger{FileScanOrchestrator}"/> to which logging output
+    /// will be written.</param>
     public FileScanOrchestrator(
         IFileFingerprintRepository fileFingerprintRepository,
         IFileHasher fileHasher,
+        IFileSystem fileSystem,
         ILogger<FileScanOrchestrator> logger)
     {
         _fileFingerprintRepository = fileFingerprintRepository
             ?? throw new ArgumentNullException(nameof(fileFingerprintRepository));
         _fileHasher = fileHasher ?? throw new ArgumentNullException(nameof(fileHasher));
+        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -73,7 +76,7 @@ public class FileScanOrchestrator : IFileScanOrchestrator
         foreach (var file in files)
         {
             _logger.LogInformation("Scanning file '{FileName}'", file);
-            var fileInfo = new FileInfo(file);
+            var fileInfo = _fileSystem.FileInfo.New(file);
 
             try
             {

@@ -7,6 +7,7 @@ namespace RiotClub.FireMoth.Services.Tasks;
 
 using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -22,13 +23,16 @@ public class DuplicateFileHandler : ITaskHandler
 {
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
     private readonly DuplicateFileHandlingOptions _duplicateFileHandlingOptions;
+    private readonly IFileSystem _fileSystem;
     private readonly ILogger<DuplicateFileHandler> _logger;
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DuplicateFileHandler"/> class.
     /// </summary>
     /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> used to
     /// retrieve duplicate records for handling and modify or delete records after handling.
+    /// </param>
+    /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
     /// </param>
     /// <param name="duplicateFileHandlingOptions">An
     /// <see cref="IOptions{DuplicateFileHandlingOptions}"/> containing configured options for this
@@ -37,14 +41,17 @@ public class DuplicateFileHandler : ITaskHandler
     /// will be written.</param>
     public DuplicateFileHandler(
         IFileFingerprintRepository fileFingerprintRepository,
+        IFileSystem fileSystem,
         IOptions<DuplicateFileHandlingOptions> duplicateFileHandlingOptions,
         ILogger<DuplicateFileHandler> logger)
     {
         Guard.IsNotNull(fileFingerprintRepository);
+        Guard.IsNotNull(fileSystem);
         Guard.IsNotNull(logger);
         Guard.IsNotNull(duplicateFileHandlingOptions);
         _fileFingerprintRepository = fileFingerprintRepository;
         _duplicateFileHandlingOptions = duplicateFileHandlingOptions.Value;
+        _fileSystem = fileSystem;
         _logger = logger;
     }
     
@@ -103,7 +110,7 @@ public class DuplicateFileHandler : ITaskHandler
                     preservedFile.FullPath);
                 try
                 {
-                    File.Delete(fingerprint.FullPath);
+                    _fileSystem.File.Delete(fingerprint.FullPath);
                     deletedFilesCount++;
                     deletedFilesSize += fingerprint.FileSize;
                 }
