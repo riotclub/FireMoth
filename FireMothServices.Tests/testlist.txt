@@ -132,10 +132,10 @@ Ctor
 - Passing [ILogger<DirectoryScanOrchestrator>:null] throws ArgumentNullException.
 
 ScanDirectoryAsync
-- When DirectoryScanOptions.Recursive is true, calls IFileScanOrchestrator.ScanFilesAsync with all
-  available files from the scan directory and its subdirectories, enumerated recursively. 
-- When DirectoryScanOptions.Recursive is false, calls IFileScanOrchestrator.ScanFilesAsync with all
-  available files from the scan directory, ignoring any files in subdirectories. 
+- When DirectoryScanOptions.Recursive is true, calls IFileScanOrchestrator.ScanFilesAsync with all available files from
+  the scan directory and its subdirectories, enumerated recursively. 
+- When DirectoryScanOptions.Recursive is false, calls IFileScanOrchestrator.ScanFilesAsync with all available files from
+  the scan directory, ignoring any files in subdirectories. 
 - When DirectoryScanOptions.Directory specifies an empty directory, IFileScanOrchestrator.ScanFilesAsync
   is not called.
 - Relevant messages are logged.
