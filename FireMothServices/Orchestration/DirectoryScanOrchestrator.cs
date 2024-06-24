@@ -23,7 +23,7 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
     private readonly IFileScanOrchestrator _fileScanOrchestrator;
     private readonly IFileSystem _fileSystem;
     private readonly DirectoryScanOptions _directoryScanOptions;
-    private readonly ILogger<FileScanOrchestrator> _logger;
+    private readonly ILogger<DirectoryScanOrchestrator> _logger;
 
     private const string AllFilesSearchPattern = "*";
 
@@ -42,11 +42,18 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
         IFileScanOrchestrator fileScanOrchestrator,
         IFileSystem fileSystem,
         IOptions<DirectoryScanOptions> directoryScanOptions,
-        ILogger<FileScanOrchestrator> logger)
+        ILogger<DirectoryScanOrchestrator> logger)
     {
         _fileScanOrchestrator = fileScanOrchestrator
                                 ?? throw new ArgumentNullException(nameof(fileScanOrchestrator));
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(directoryScanOptions);
+        if (directoryScanOptions.Value.Directory is null)
+        {
+            throw new ArgumentException(
+                "IOptions<DirectoryScanOptions>.Value.Directory cannot be null",
+                nameof(directoryScanOptions));
+        }
         _directoryScanOptions = directoryScanOptions.Value;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }

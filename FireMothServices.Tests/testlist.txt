@@ -126,10 +126,11 @@ InitRecursive (property)
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
 - Passing [IFileScanOrchestrator:null] throws ArgumentNullException.
-- Passing [IOptions<DirectoryScanOptions>:null] throws ArgumentNullException.
-- Passing [IOptions<DirectoryScanOptions> with null Value property] throws ArgumentException.
-- Passing [IOptions<DirectoryScanOptions> with null Value.Directory property] throws ArgumentException.
-- Passing [ILogger<DirectoryScanOrchestrator>:null] throws ArgumentNullException.
+- Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.
+- Passing [IOptions{DirectoryScanOptions} with null Value property] throws ArgumentException.
+- Passing [IOptions{DirectoryScanOptions} with null Value.Directory property] throws ArgumentException.
+- Passing [ILogger{DirectoryScanOrchestrator}:null] throws ArgumentNullException.
+- Passing [valid parameters] creates a new object.
 
 ScanDirectoryAsync
 - When DirectoryScanOptions.Recursive is true, calls IFileScanOrchestrator.ScanFilesAsync with all available files from
