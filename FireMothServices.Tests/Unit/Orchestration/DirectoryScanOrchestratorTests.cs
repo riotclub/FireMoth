@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -154,8 +155,6 @@ public class DirectoryScanOrchestratorTests
 #region ScanDirectoryAsync
 
     /// ScanDirectoryAsync<br/>
-    /// - When DirectoryScanOptions.Recursive is false, calls IFileScanOrchestrator.ScanFilesAsync with
-    /// all available files from the scan directory, ignoring any files in subdirectories.<br/> 
     /// - When DirectoryScanOptions.Directory specifies an empty directory,
     /// IFileScanOrchestrator.ScanFilesAsync is not called.<br/>
     /// - Relevant messages are logged.<br/>
@@ -164,25 +163,58 @@ public class DirectoryScanOrchestratorTests
     /// IFileScanOrchestrator.ScanFilesAsync with all available files from the scan directory and
     /// its subdirectories, enumerated recursively.</summary>
     [Fact]
-    public void ScanDirectoryAsync_RecursiveScanOptionTrue_InitiatesRecursiveScan()
+    public async void ScanDirectoryAsync_RecursiveScanOptionTrue_InitiatesRecursiveScan()
     {
         // Arrange
         var mockFileScanOrchestrator = new Mock<IFileScanOrchestrator>();
+        IEnumerable<string> result = new List<string>();
+        mockFileScanOrchestrator
+            .Setup(orchestrator => orchestrator.ScanFilesAsync(It.IsAny<IEnumerable<string>>()))
+            .Callback<IEnumerable<string>>(fileList => result = fileList);
         var mockFileSystem = BuildMockFileSystem();
         var mockOptions = new Mock<IOptions<DirectoryScanOptions>>();
         var testDirectoryScanOptions = new DirectoryScanOptions 
             { Directory = "/", Recursive = true };
         mockOptions.Setup(options => options.Value).Returns(testDirectoryScanOptions);
-        var expected = mockFileSystem.Directory.EnumerateFileSystemEntries(
+        var expected = mockFileSystem.Directory.EnumerateFiles(
             "/", "*", new EnumerationOptions { RecurseSubdirectories = true });
         var sut = new DirectoryScanOrchestrator(
             mockFileScanOrchestrator.Object, mockFileSystem, mockOptions.Object, _nullLogger);
         
         // Act
-        var result = sut.ScanDirectoryAsync();
+        await sut.ScanDirectoryAsync();
 
         // Assert
+        result.Should().Equal(expected);
+    }
+    
+    /// <summary>ScanDirectoryAsync: When DirectoryScanOptions.Recursive is false, calls
+    /// IFileScanOrchestrator.ScanFilesAsync with all available files from the scan directory,
+    /// ignoring any files in subdirectories.</summary>
+    [Fact]
+    public async void ScanDirectoryAsync_RecursiveScanOptionFalse_InitiatesNonRecursiveScan()
+    {
+        // Arrange
+        var mockFileScanOrchestrator = new Mock<IFileScanOrchestrator>();
+        IEnumerable<string> result = new List<string>();
+        mockFileScanOrchestrator
+            .Setup(orchestrator => orchestrator.ScanFilesAsync(It.IsAny<IEnumerable<string>>()))
+            .Callback<IEnumerable<string>>(fileList => result = fileList);
+        var mockFileSystem = BuildMockFileSystem();
+        var mockOptions = new Mock<IOptions<DirectoryScanOptions>>();
+        var testDirectoryScanOptions = new DirectoryScanOptions 
+            { Directory = "/", Recursive = false };
+        mockOptions.Setup(options => options.Value).Returns(testDirectoryScanOptions);
+        var expected = mockFileSystem.Directory.EnumerateFiles(
+            "/", "*", new EnumerationOptions { RecurseSubdirectories = false });
+        var sut = new DirectoryScanOrchestrator(
+            mockFileScanOrchestrator.Object, mockFileSystem, mockOptions.Object, _nullLogger);
+        
+        // Act
+        await sut.ScanDirectoryAsync();
 
+        // Assert
+        result.Should().Equal(expected);
     }
 #endregion
 
@@ -190,6 +222,8 @@ public class DirectoryScanOrchestratorTests
     {
         var files = new Dictionary<string, MockFileData>
         {
+            { "/RootDirFile", new MockFileData("7") },
+            { "/RootDirFile2", new MockFileData("8") },
             { "/dirwithfiles/TestFile.txt", new MockFileData("0") },
             { "/dirwithfiles/AnotherFile.dat", new MockFileData("1") },
             { "/dirwithfiles/YetAnotherFile.xml", new MockFileData("2") },
@@ -203,8 +237,6 @@ public class DirectoryScanOrchestratorTests
         var mockFileSystem = new MockFileSystem(files);
         mockFileSystem.AddDirectory("/emptydir");
         mockFileSystem.AddDirectory("/dirwithfiles/emptysubdir");
-        var fileSystemEntries = mockFileSystem.Directory.EnumerateFileSystemEntries(
-            "/", "*", new EnumerationOptions { RecurseSubdirectories = true });
 
         return mockFileSystem;
     }

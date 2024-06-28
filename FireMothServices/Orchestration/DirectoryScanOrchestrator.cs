@@ -61,9 +61,6 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
     /// <inheritdoc/>
     public async Task<ScanResult> ScanDirectoryAsync()
     {
-        if (_directoryScanOptions.Directory is null)
-            throw new ArgumentException("Scan directory cannot be null.");
-
         _logger.LogInformation(
             "Scanning directory '{ScanDirectory}' (recursive: {Recursive})",
             _directoryScanOptions.Directory,
