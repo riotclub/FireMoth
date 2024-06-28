@@ -66,10 +66,15 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
             _directoryScanOptions.Directory,
             _directoryScanOptions.Recursive);
 
+        // TODO: Null forgiving op used here because the null check for
+        // DirectoryScanOptions.Directory was moved to the constructor. Need to consider/test for
+        // the possibility of options being modified between object construction and invocation of
+        // this method, which could result in a null reference exception being thrown.
         var fileList = _fileSystem.Directory.EnumerateFiles(
-            _directoryScanOptions.Directory,
+            _directoryScanOptions.Directory!,
             AllFilesSearchPattern,
             new EnumerationOptions { RecurseSubdirectories = _directoryScanOptions.Recursive });
+        
         
         return await _fileScanOrchestrator.ScanFilesAsync(fileList);
     }
