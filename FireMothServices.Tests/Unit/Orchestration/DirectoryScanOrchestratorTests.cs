@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,15 +17,14 @@ using Microsoft.Extensions.Options;
 using Services.Orchestration;
 using Xunit;
 using Moq;
-using Services.DataAccess.Sqlite;
+using RiotClub.FireMoth.Services.Tests.Unit.Extensions;
 
 /// <summary>
 /// <p> 
 /// Ctor<br/>
 /// - Passing [IFileScanOrchestrator:null] throws ArgumentNullException.<br/>
+/// - Passing [IFileSystem:null] throws ArgumentNullException.<br/>
 /// - Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.<br/>
-/// - Passing [IOptions{DirectoryScanOptions} with null Value property] throws ArgumentException.
-/// <br/>
 /// - Passing [IOptions{DirectoryScanOptions} with null Value.Directory property] throws
 /// ArgumentException.<br/>
 /// - Passing [ILogger{DirectoryScanOrchestrator}:null] throws ArgumentNullException.<br/>
@@ -66,6 +64,23 @@ public class DirectoryScanOrchestratorTests
         ctorFunc.Should().ThrowExactly<ArgumentNullException>();
     }
 
+    /// <summary>Ctor: Passing [IFileSystem:null] throws ArgumentNullException.</summary>
+    [Fact]
+    public void Ctor_IFileSystemNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var mockFileScanOrchestrator = new Mock<IFileScanOrchestrator>();
+        var mockOptions = new Mock<IOptions<DirectoryScanOptions>>();
+
+        // Act
+        var ctorFunc = () =>
+            new DirectoryScanOrchestrator(
+                mockFileScanOrchestrator.Object, null!, mockOptions.Object, _nullLogger);
+
+        // Assert
+        ctorFunc.Should().ThrowExactly<ArgumentNullException>();
+    }
+    
     /// <summary>Ctor: Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.
     /// </summary>
     [Fact]
@@ -153,12 +168,6 @@ public class DirectoryScanOrchestratorTests
 #endregion
 
 #region ScanDirectoryAsync
-
-    /// ScanDirectoryAsync<br/>
-    /// - When DirectoryScanOptions.Directory specifies an empty directory,
-    /// IFileScanOrchestrator.ScanFilesAsync is not called.<br/>
-    /// - Relevant messages are logged.<br/>
-
     /// <summary>ScanDirectoryAsync: When DirectoryScanOptions.Recursive is true, calls
     /// IFileScanOrchestrator.ScanFilesAsync with all available files from the scan directory and
     /// its subdirectories, enumerated recursively.</summary>
@@ -215,6 +224,54 @@ public class DirectoryScanOrchestratorTests
 
         // Assert
         result.Should().Equal(expected);
+    }
+
+    /// <summary>ScanDirectoryAsync: When DirectoryScanOptions.Directory specifies an empty
+    /// directory, IFileScanOrchestrator.ScanFilesAsync is not called.</summary>
+    [Fact]
+    public async void ScanDirectoryAsync_EmptyDirectory_DoesNotInitiateScan()
+    {
+        // Arrange
+        var mockFileScanOrchestrator = new Mock<IFileScanOrchestrator>();
+        var mockFileSystem = BuildMockFileSystem();
+        var mockOptions = new Mock<IOptions<DirectoryScanOptions>>();
+        var testDirectoryScanOptions = new DirectoryScanOptions 
+            { Directory = "/emptydir", Recursive = false };
+        mockOptions.Setup(options => options.Value).Returns(testDirectoryScanOptions);
+        var sut = new DirectoryScanOrchestrator(
+            mockFileScanOrchestrator.Object, mockFileSystem, mockOptions.Object, _nullLogger);
+        
+        // Act
+        await sut.ScanDirectoryAsync();
+
+        // Assert
+        mockFileScanOrchestrator.Verify(
+            o => o.ScanFilesAsync(It.IsAny<IEnumerable<string>>()), Times.Never);
+    }
+
+    /// <summary>ScanDirectoryAsync: Relevant messages are logged.</summary>
+    [Fact]
+    public async void ScanDirectoryAsync_MethodCalled_LogsExpectedMessages()
+    {
+        // Arrange
+        var mockLogger = new Mock<ILogger<DirectoryScanOrchestrator>>();
+        var mockFileScanOrchestrator = new Mock<IFileScanOrchestrator>();
+        var mockFileSystem = BuildMockFileSystem();
+        var mockOptions = new Mock<IOptions<DirectoryScanOptions>>();
+        const string scanDirectory = "/emptydir";
+        const bool recursive = false;
+        var testDirectoryScanOptions = new DirectoryScanOptions 
+            { Directory = scanDirectory, Recursive = recursive };
+        mockOptions.Setup(options => options.Value).Returns(testDirectoryScanOptions);
+        var sut = new DirectoryScanOrchestrator(
+            mockFileScanOrchestrator.Object, mockFileSystem, mockOptions.Object, mockLogger.Object);
+        var expected = $"Scanning directory '{scanDirectory}' (recursive: {recursive})";
+        
+        // Act
+        await sut.ScanDirectoryAsync();
+        
+        // Assert
+        mockLogger.VerifyLogCalled(expected, LogLevel.Information);
     }
 #endregion
 

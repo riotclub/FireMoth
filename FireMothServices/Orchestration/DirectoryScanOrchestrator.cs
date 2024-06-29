@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.IO.Abstractions;
+using System.Linq;
 using DataAccess;
 using FileScanning;
 using Microsoft.Extensions.Options;
@@ -70,12 +71,15 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
         // DirectoryScanOptions.Directory was moved to the constructor. Need to consider/test for
         // the possibility of options being modified between object construction and invocation of
         // this method, which could result in a null reference exception being thrown.
-        var fileList = _fileSystem.Directory.EnumerateFiles(
-            _directoryScanOptions.Directory!,
-            AllFilesSearchPattern,
-            new EnumerationOptions { RecurseSubdirectories = _directoryScanOptions.Recursive });
-        
-        
-        return await _fileScanOrchestrator.ScanFilesAsync(fileList);
+        var fileList = _fileSystem.Directory
+            .EnumerateFiles(
+                _directoryScanOptions.Directory!,
+                AllFilesSearchPattern,
+                new EnumerationOptions { RecurseSubdirectories = _directoryScanOptions.Recursive })
+            .ToList();
+
+        return fileList.Count > 0
+            ? await _fileScanOrchestrator.ScanFilesAsync(fileList)
+            : new ScanResult();
     }
 }

@@ -126,8 +126,8 @@ InitRecursive (property)
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
 - Passing [IFileScanOrchestrator:null] throws ArgumentNullException.
+- Passing [IFileSystem:null] throws ArgumentNullException.<br/>
 - Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.
-- Passing [IOptions{DirectoryScanOptions} with null Value property] throws ArgumentException.
 - Passing [IOptions{DirectoryScanOptions} with null Value.Directory property] throws ArgumentException.
 - Passing [ILogger{DirectoryScanOrchestrator}:null] throws ArgumentNullException.
 - Passing [valid parameters] creates a new object.
@@ -145,18 +145,18 @@ ScanDirectoryAsync
 /Orchestration/FileScanOrchestrator
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - If IFileFingerprintRepository is null, ArgumentNullException is thrown.
-    - If IFileHasher is null, ArgumentNullException is thrown.
-    - If ILogger is null, ArgumentNullException is thrown.
+- Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
+- Passing [IFileHasher:null] throws ArgumentNullException.
+- Passing [ILogger{FileScanOrchestrator}:null] thrown ArgumentNullException.
     
 ScanFilesAsync
-    - If IEnumerable<string> is null, ArgumentNullException is thrown.
-    - For each file in the provided collection of files:
-        - The IFileHasher's ComputeHashFromStream method is called.
-        - The IFileFingerprintRepository's AddAsync method is called.
-    - If IEnumerable<string> contains a valid collection of files, a ScanResult
-      containing the correct results of the scan is returned.
-    - The method outputs appropriate log information.
+- If IEnumerable<string> is null, ArgumentNullException is thrown.
+- For each file in the provided collection of files:
+    - The IFileHasher's ComputeHashFromStream method is called.
+    - The IFileFingerprintRepository's AddAsync method is called.
+- If IEnumerable<string> contains a valid collection of files, a ScanResult
+  containing the correct results of the scan is returned.
+- The method outputs appropriate log information.
 
 ------------------------------------------------------------------------------------------------------------------------
 /Repository/FileFingerprint
