@@ -147,16 +147,24 @@ ScanDirectoryAsync
 Ctor
 - Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
 - Passing [IFileHasher:null] throws ArgumentNullException.
-- Passing [ILogger{FileScanOrchestrator}:null] thrown ArgumentNullException.
+- Passing [IFileSystem:null] throws ArgumentNullException.
+- Passing [ILogger{FileScanOrchestrator}:null] throws ArgumentNullException.
+- Passing [valid parameters] creates a new object.
     
 ScanFilesAsync
-- If IEnumerable<string> is null, ArgumentNullException is thrown.
-- For each file in the provided collection of files:
-    - The IFileHasher's ComputeHashFromStream method is called.
-    - The IFileFingerprintRepository's AddAsync method is called.
-- If IEnumerable<string> contains a valid collection of files, a ScanResult
-  containing the correct results of the scan is returned.
-- The method outputs appropriate log information.
+- Passing [IEnumerable{string}:null] throws ArgumentNullException.
+- Passing [IEnumerable{string}:containing set of file paths] calls IFileHasher.ComputeHashFromStream and
+  IFileFingerprintRepository.AddAsync for each file in the collection.
+- Passing [IEnumerable{string}:containing set of file paths] returns a ScanResult containing the correct results of the
+  scan.
+- Passing [IEnumerable{string}:containing files that throw IOException or UnauthorizedAccessException during scanning]
+  skips the errored files and adds them to the ScanResult.SkippedFiles collection.
+- Passing [IEnumerable{string}:containing files that throw IOException or UnauthorizedAccessException during scanning]
+  skips the errored files and adds an error to the ScanResult.Errors collection.
+- Passing [IEnumerable{string}:containing files that throw IOException or UnauthorizedAccessException during scanning]
+  writes a properly formatted error message to the log.  
+- Completing the scan writes a properly formatted information message to the log.
+- The method writes properly formatted information messages to the log for each file scanned. 
 
 ------------------------------------------------------------------------------------------------------------------------
 /Repository/FileFingerprint
