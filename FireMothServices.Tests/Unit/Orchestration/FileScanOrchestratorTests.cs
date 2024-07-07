@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Services.Orchestration;
 using Xunit;
 using Moq;
+using Moq.AutoMock;
 using Repository;
 using RiotClub.FireMoth.Services.Tests.Unit.Extensions;
 using Services.DataAnalysis;
@@ -60,6 +61,8 @@ public class FileScanOrchestratorTests
     private readonly Mock<IFileFingerprintRepository> _mockRepository = new();
     private readonly Mock<IFileHasher> _mockFileHasher = new();
     private MockFileSystem _mockFileSystem = new();
+    
+    private readonly AutoMocker _mocker = new();
     
 #region Ctor
     /// <summary>Ctor: Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
@@ -165,13 +168,18 @@ public class FileScanOrchestratorTests
     /// IFileHasher.ComputeHashFromStream and IFileFingerprintRepository.AddAsync for each file in
     /// the collection.</summary>
     [Fact]
-    public void ScanFilesAsync_CollectionContainsFilePaths_CallsCorrectServiceMethods()
+    public async void ScanFilesAsync_CollectionContainsFilePaths_CallsCorrectServiceMethods()
     {
         // Arrange
         _mockFileSystem = BuildMockFileSystem();
+        var savedStreamData = new List<byte[]>();
+        var testFileHasher = new SHA256FileHasher();
+        
         _mockFileHasher
             .Setup(hasher => hasher.ComputeHashFromStream(It.IsAny<Stream>()))
-            .Returns([0]);
+            .Callback<Stream>(stream => SaveStreamDataAndResetPosition(stream, savedStreamData))
+            .Returns<byte[]>(hashBytes =>
+                testFileHasher.ComputeHashFromStream(new MemoryStream(hashBytes)));
         var testFiles = _mockFileSystem.Directory
             .EnumerateFiles("/", "*", new EnumerationOptions { RecurseSubdirectories = true })
             .ToList();
@@ -179,46 +187,75 @@ public class FileScanOrchestratorTests
             _mockRepository.Object, _mockFileHasher.Object, _mockFileSystem, _nullLogger);
 
         // Act
-        var result = sut.ScanFilesAsync(testFiles);
+        await sut.ScanFilesAsync(testFiles);
 
         // Assert
-        result.Should().NotBeNull();
         foreach (var file in testFiles)
         {
+            // Validate ComputeHashFromSteam
             var fileInfo = _mockFileSystem.FileInfo.New(file);
             var fileStream = fileInfo.OpenRead();
-            _mockFileHasher.Verify(hasher =>
-                hasher.ComputeHashFromStream(It.Is<Stream>(stream =>
-                    IsStreamDataEqual(stream, fileStream))));
+            var fileData = new byte[fileStream.Length];
+            var bytesRead = fileStream.Read(fileData, 0, fileData.Length);
+            if (bytesRead != fileStream.Length)
+                throw new ArgumentException("Unable to read all stream data.");
+
+            savedStreamData.Should().Contain(
+                streamData => streamData.SequenceEqual(fileData),
+                "the collection containing stream data used in calls to ComputeHashFromStream "
+                    + "should contain data matching one of the files in the MockFileSystem.");
+            
+            // Validate AddAsync
+            fileStream.Position = 0;
+            var hash = Convert.ToBase64String(testFileHasher.ComputeHashFromStream(fileStream));
+            var fingerprint = new FileFingerprint(
+                fileInfo.Name, fileInfo.DirectoryName ?? string.Empty, fileInfo.Length, hash);
+            _mockRepository.Verify(repo =>
+                repo.AddAsync(It.Is<FileFingerprint>(fp =>
+                    fp.Equals(fingerprint))));
         }
+        
+        
     }
 
 #endregion
 
-    private static bool IsStreamDataEqual(Stream a, Stream b)
+    private static void SaveStreamDataAndResetPosition(
+        Stream stream, List<byte[]> dataList)
     {
-        var inputBufferA = new byte[a.Length];
-        var bytesReadA = a.Read(inputBufferA, 0, inputBufferA.Length);
-        var inputBufferB = new byte[b.Length];
-        var bytesReadB = b.Read(inputBufferB, 0, inputBufferB.Length);
+        var inputBuffer = new byte[stream.Length];
+        var bytesRead = stream.Read(inputBuffer, 0, inputBuffer.Length);
+        if (bytesRead != stream.Length)
+            throw new ArgumentException("Unable to read all stream data.");
+        
+        stream.Position = 0;
+        dataList.Add(inputBuffer);
+    }
 
-        return inputBufferA.SequenceEqual(inputBufferB);
+    private static bool IsStreamDataEqual(Stream stream, byte[] data)
+    {
+        var inputBuffer = new byte[stream.Length];
+        var bytesRead = stream.Read(inputBuffer, 0, inputBuffer.Length);
+        if (bytesRead != stream.Length)
+            throw new ArgumentException("Unable to read all stream data.");
+        
+        return inputBuffer.SequenceEqual(data);
     }
 
     private static MockFileSystem BuildMockFileSystem()
     {
         var files = new Dictionary<string, MockFileData>
         {
-            { "/RootDirFile", new MockFileData("7") },
-            { "/RootDirFile2", new MockFileData("8") },
-            { "/dirwithfiles/TestFile.txt", new MockFileData("0") },
-            { "/dirwithfiles/AnotherFile.dat", new MockFileData("1") },
-            { "/dirwithfiles/YetAnotherFile.xml", new MockFileData("2") },
-            { "/dirwithfiles/beep", new MockFileData("3") },
-            { "/dirwithfiles/meep.ext", new MockFileData("2") },
-            { "/dirwithfiles/subdirwithfiles/SubdirFileA.1", new MockFileData("3") },
-            { "/dirwithfiles/subdirwithfiles/SubdirFileB.2", new MockFileData("4") },
-            { "/dirwithfiles/subdirwithfiles/Creep.ext", new MockFileData("5") },
+            { "/RootDirFile", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/RootDirFile2", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/TestFile.txt", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/AnotherFile.dat", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/YetAnotherFile.xml", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/beep", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/meep.ext", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/subdirwithfiles/SubdirFileA.1", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/subdirwithfiles/SubdirFileB.2", new MockFileData(Guid.NewGuid().ToString()) },
+            { "/dirwithfiles/subdirwithfiles/Creep.ext", new MockFileData(Guid.NewGuid().ToString()) },
         };
         
         var mockFileSystem = new MockFileSystem(files);
