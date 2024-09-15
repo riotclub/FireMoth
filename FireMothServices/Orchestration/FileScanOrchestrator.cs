@@ -11,14 +11,14 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
-using DataAccess;
 using DataAnalysis;
 using FileScanning;
 using Repository;
 
 /// <summary>File scanner implementation that scans a collection of files and writes file
-/// fingerprint data to an <see cref="IDataAccessLayer{TValue}"/>.</summary>
+/// fingerprint data to an <see cref="IFileFingerprintRepository"/>.</summary>
 public class FileScanOrchestrator : IFileScanOrchestrator
 {
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
@@ -52,7 +52,11 @@ public class FileScanOrchestrator : IFileScanOrchestrator
     /// <inheritdoc/>
     public async Task<ScanResult> ScanFilesAsync(IEnumerable<string> files)
     {
+        // ReSharper disable PossibleMultipleEnumeration
+        // (Guard.IsNotNull does not enumerate the IEnumerable.)
+        Guard.IsNotNull(files);
         var fileList = files.ToList();
+        // ReSharper restore PossibleMultipleEnumeration
         _logger.LogInformation("Scanning {FileCount} files...", fileList.Count);
         var scanResult = new ScanResult();
         await ProcessFiles(fileList, scanResult);

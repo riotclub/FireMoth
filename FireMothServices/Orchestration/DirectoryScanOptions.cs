@@ -16,8 +16,8 @@ public class DirectoryScanOptions
     public string? Directory { get; init; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether subdirectories of <see cref="Directory"/> will
-    /// be recursively scanned.
+    /// Gets or sets a value indicating whether subdirectories of <see cref="Directory"/> will be
+    /// recursively scanned.
     /// </summary>
     public bool Recursive { get; init; }
 }

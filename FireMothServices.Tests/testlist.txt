@@ -3,28 +3,28 @@
 /DataAccess/InMemory/MemoryDataAccessLayer
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-- Passing [ILogger{MemoryDataAccessLayer}: null] throws an ArgumentNullException.
+- Passing [ILogger{MemoryDataAccessLayer}:null] throws an ArgumentNullException.
 
 GetAsync
-- Passing [filter: null, orderBy: null] returns an unfiltered, unordered collection.
-- Passing [filter: non-null, orderBy: null] returns a filtered, unordered collection.
-- Passing [filter: null, orderBy: non-null] returns an unfiltered, ordered collection.
-- Passing [filter: non-null, orderBy: non-null] returns a filtered and ordered collection.
+- Passing [filter:null, orderBy:null] returns an unfiltered, unordered collection.
+- Passing [filter:non-null, orderBy:null] returns a filtered, unordered collection.
+- Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered collection.
+- Passing [filter:non-null, orderBy:non-null] returns a filtered and ordered collection.
 
 AddAsync
-- Passing [FileFingerprint: null] throws an ArgumentNullException.
-- Passing [FileFingerprint: non-null] adds a record to the data access layer.
+- Passing [FileFingerprint:null] throws an ArgumentNullException.
+- Passing [FileFingerprint:non-null] adds a record to the data access layer.
     
 AddManyAsync
-- Passing [IEnumerable{FileFingerprint}: null] throws an ArgumentNullException.
-- Passing [IEnumerable{FileFingerprint}: non-null] adds the records to the data access layer.
+- Passing [IEnumerable{FileFingerprint}:null] throws an ArgumentNullException.
+- Passing [IEnumerable{FileFingerprint}:non-null] adds the records to the data access layer.
     
 DeleteAsync
-- Passing [FileFingerprint: null] throws an ArgumentNullException.
-- Passing [FileFingerprint: matches a record in the data access layer] deletes the record.
-- Passing [FileFingerprint: matches a record in the data access layer] returns true.
-- Passing [FileFingerprint: does not match a record in the data access layer] does not modify existing records.
-- Passing [FileFingerprint: does not match a record in the data access layer] returns false.
+- Passing [FileFingerprint:null] throws an ArgumentNullException.
+- Passing [FileFingerprint:matches a record in the data access layer] deletes the record.
+- Passing [FileFingerprint:matches a record in the data access layer] returns true.
+- Passing [FileFingerprint:does not match a record in the data access layer] does not modify existing records.
+- Passing [FileFingerprint:does not match a record in the data access layer] returns false.
     
 DeleteAllAsync
 - Deletes all records from the data access layer.
@@ -36,63 +36,50 @@ Note: Unit tests should utilize mocks to test class functionality; actual SQLite
       integration tests.
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-- Passing [ILogger{MemoryDataAccessLayer}: null] throws an ArgumentNullException.
-- Passing [FireMothContext: null] throws an ArgumentNullException.
+- Passing [ILogger{MemoryDataAccessLayer}:null] throws an ArgumentNullException.
+- Passing [FireMothContext:null] throws an ArgumentNullException.
 
 GetAsync
-- Passing [filter: null, orderBy: null] returns an unfiltered, unordered collection.
-- Passing [filter: non-null, orderBy: null] returns a filtered, unordered collection.
-- Passing [filter: null, orderBy: non-null] returns an unfiltered, ordered collection.
-- Passing [filter: non-null, orderBy: non-null] returns a filtered, ordered collection.
+- Passing [filter:null, orderBy:null] returns an unfiltered, unordered collection.
+- Passing [filter:non-null, orderBy:null] returns a filtered, unordered collection.
+- Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered collection.
+- Passing [filter:non-null, orderBy:non-null] returns a filtered, ordered collection.
 
 AddAsync
-- Passing [FileFingerprint: null] throws an ArgumentNullException.
-- Passing [FileFingerprint: non-null] adds a record to the data access layer.
+- Passing [FileFingerprint:null] throws an ArgumentNullException.
+- Passing [FileFingerprint:non-null] adds a record to the data access layer.
     
 AddManyAsync
-- Passing [IEnumerable{FileFingerprint}: null] throws an ArgumentNullException.
-- Passing [IEnumerable{FileFingerprint}: non-null] adds the records to the data access layer.
+- Passing [IEnumerable{FileFingerprint}:null] throws an ArgumentNullException.
+- Passing [IEnumerable{FileFingerprint}:non-null] adds the records to the data access layer.
 
 DeleteAsync
-- Passing [FileFingerprint: null] throws an ArgumentNullException.
-- Passing [FileFingerprint: matches a record in the data access layer] deletes the record.
-- Passing [FileFingerprint: matches a record in the data access layer] returns true.
-- Passing [FileFingerprint: does not match a record in the data access layer] does not modify existing records.
-- Passing [FileFingerprint: does not match a record in the data access layer] returns false.
+- Passing [FileFingerprint:null] throws an ArgumentNullException.
+- Passing [FileFingerprint:matches a record in the data access layer] deletes the record.
+- Passing [FileFingerprint:matches a record in the data access layer] returns true.
+- Passing [FileFingerprint:does not match a record in the data access layer] does not modify existing records.
+- Passing [FileFingerprint:does not match a record in the data access layer] returns false.
     
 ------------------------------------------------------------------------------------------------------------------------
 /DataAnalysis/SHA256FileHasher
 ------------------------------------------------------------------------------------------------------------------------
 ComputeHashFromStream
 - Calling on a disposed object throws an ObjectDisposedException.
-- Passing [Stream: null] throws an ArgumentNullException.
-- Passing [Stream: contains less data than the input buffer size] returns a proper hash of the data.
-- Passing [Stream: contains more data than the input buffer size] returns a proper hash of the data.
-- Passing [Stream: contains no data] returns the proper hash for an empty data stream.
+- Passing [Stream:null] throws an ArgumentNullException.
+- Passing [Stream:contains less data than the input buffer size] returns a proper hash of the data.
+- Passing [Stream:contains more data than the input buffer size] returns a proper hash of the data.
+- Passing [Stream:contains no data] returns the proper hash for an empty data stream.
 
 Dispose
 - Calling on a non-disposed object disposes the object.
 - Calling on a disposed object does not throw exceptions.
 
 ------------------------------------------------------------------------------------------------------------------------
-/Extensions/StringExtensions
-------------------------------------------------------------------------------------------------------------------------
-IsEmptyOrWhiteSpace
-    - Null strings return true.
-    - Empty or whitespace strings return true.
-    - Non-empty strings return false.
-    
-IsBase64String
-    - Null string returns false.
-    - Non-base64 string returns false.
-    - Valid base64 string returns true.
-
-------------------------------------------------------------------------------------------------------------------------
 /FileScanning/ScanError
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-- Passing [message: null] throws an ArgumentNullException.
-- Passing [message: empty or whitespace] throws an ArgumentException.
+- Passing [message:null] throws an ArgumentNullException.
+- Passing [message:empty or whitespace] throws an ArgumentException.
 - Passing [valid parameters] properly initializes an object.
 
 GetPath (property)
@@ -120,66 +107,64 @@ GetErrors (Property)
 - Returns the proper value of the Errors property.
     
 OperatorAddition
-- Passing [a: null, b: null] throws ArgumentNullException.
-- Passing [a: null, b: non-null] returns new ScanResult with values from b.
-- Passing [a: non-null, b: null] returns new ScanResult with values from a.
-- Passing [a: non-null, b: non-null] returns new ScanResult with combined values from both a and b.
+- Passing [a:null, b:null] throws ArgumentNullException.
+- Passing [a:null, b:non-null] returns new ScanResult with values from b.
+- Passing [a:non-null, b:null] returns new ScanResult with values from a.
+- Passing [a:non-null, b:non-null] returns new ScanResult with combined values from both a and b.
       
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOptions
 ------------------------------------------------------------------------------------------------------------------------
-GetDirectory (Property)
-    - Returns Directory property.
-    
-SetDirectory (Property)
-    - Sets Directory property.
-    
-GetRecursive (property)
-    - Returns Recursive property.
-    
-SetRecursive (property)
-    - Sets Recursive property.
+InitDirectory (Property)
+- Sets Directory property.
+
+InitRecursive (property)
+- Sets Recursive property.
 
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/DirectoryScanOrchestrator
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - If IFileScanOrchestrator is null, ArgumentNullException is thrown.
-    - If IOptions<DirectoryScanOptions> is null, ArgumentNullException is thrown.
-    - If IOptions.Value property is null, ArgumentException is thrown.
-    - If ILogger is null, ArgumentNullException is thrown.
-    
+- Passing [IFileScanOrchestrator:null] throws ArgumentNullException.
+- Passing [IFileSystem:null] throws ArgumentNullException.<br/>
+- Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.
+- Passing [IOptions{DirectoryScanOptions} with null Value.Directory property] throws ArgumentException.
+- Passing [ILogger{DirectoryScanOrchestrator}:null] throws ArgumentNullException.
+- Passing [valid parameters] creates a new object.
+
 ScanDirectoryAsync
-    - If DirectoryScanOptions.Directory property is null, ArgumentException is
-      thrown.
-    - If options specify a recursive scan, the injected IFileScanOrchestrator's
-      ScanFilesAsync method is called with all available files from the scan
-      directory and its subdirectories, enumerated recursively.
-    - If options do not specify a recursive scan, the injected
-      IFileScanOrchestrator's ScanFilesAsync method is called with all available
-      files from the scan directory, ignoring any files in subdirectories of the
-      scan directory.
-    - If the scan directory does not contain any files, the injected
-      IFileScanOrchestrator's ScanFilesAsync method is not called, and the method
-      returns a new, empty ScanResult.
-    - The method outputs appropriate log information.
-    
+- When DirectoryScanOptions.Recursive is true, calls IFileScanOrchestrator.ScanFilesAsync with all available files from
+  the scan directory and its subdirectories, enumerated recursively. 
+- When DirectoryScanOptions.Recursive is false, calls IFileScanOrchestrator.ScanFilesAsync with all available files from
+  the scan directory, ignoring any files in subdirectories. 
+- When DirectoryScanOptions.Directory specifies an empty directory, IFileScanOrchestrator.ScanFilesAsync
+  is not called.
+- Relevant messages are logged.
+
 ------------------------------------------------------------------------------------------------------------------------
 /Orchestration/FileScanOrchestrator
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - If IFileFingerprintRepository is null, ArgumentNullException is thrown.
-    - If IFileHasher is null, ArgumentNullException is thrown.
-    - If ILogger is null, ArgumentNullException is thrown.
+- Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
+- Passing [IFileHasher:null] throws ArgumentNullException.
+- Passing [IFileSystem:null] throws ArgumentNullException.
+- Passing [ILogger{FileScanOrchestrator}:null] throws ArgumentNullException.
+- Passing [valid parameters] creates a new object.
     
 ScanFilesAsync
-    - If IEnumerable<string> is null, ArgumentNullException is thrown.
-    - For each file in the provided collection of files:
-        - The IFileHasher's ComputeHashFromStream method is called.
-        - The IFileFingerprintRepository's AddAsync method is called.
-    - If IEnumerable<string> contains a valid collection of files, a ScanResult
-      containing the correct results of the scan is returned.
-    - The method outputs appropriate log information.
+- Passing [IEnumerable{string}:null] throws ArgumentNullException.
+- Passing [IEnumerable{string}:containing set of file paths] calls IFileHasher.ComputeHashFromStream and
+  IFileFingerprintRepository.AddAsync for each file in the collection.
+- Passing [IEnumerable{string}:containing set of file paths] returns a ScanResult containing the correct results of the
+  scan.
+- Passing [IEnumerable{string}:containing files that throw IOException or UnauthorizedAccessException during scanning]
+  skips the errored files and adds them to the ScanResult.SkippedFiles collection.
+- Passing [IEnumerable{string}:containing files that throw IOException or UnauthorizedAccessException during scanning]
+  skips the errored files and adds an error to the ScanResult.Errors collection.
+- Passing [IEnumerable{string}:containing files that throw IOException or UnauthorizedAccessException during scanning]
+  writes a properly formatted error message to the log.  
+- Completing the scan writes a properly formatted information message to the log.
+- The method writes properly formatted information messages to the log for each file scanned. 
 
 ------------------------------------------------------------------------------------------------------------------------
 /Repository/FileFingerprint
@@ -322,3 +307,16 @@ GetMoveDuplicateFilesToDirectory
     
 SetMoveDuplicateFilesToDirectory
     - Sets the MoveDuplicateFilesToDirectory
+
+------------------------------------------------------------------------------------------------------------------------
+/Extensions/StringExtensions
+------------------------------------------------------------------------------------------------------------------------
+IsEmptyOrWhiteSpace
+    - Null strings return true.
+    - Empty or whitespace strings return true.
+    - Non-empty strings return false.
+    
+IsBase64String
+    - Null string returns false.
+    - Non-base64 string returns false.
+    - Valid base64 string returns true.

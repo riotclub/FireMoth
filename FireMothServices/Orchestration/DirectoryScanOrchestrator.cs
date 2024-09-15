@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.IO.Abstractions;
+using System.Linq;
 using DataAccess;
 using FileScanning;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,7 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
     private readonly IFileScanOrchestrator _fileScanOrchestrator;
     private readonly IFileSystem _fileSystem;
     private readonly DirectoryScanOptions _directoryScanOptions;
-    private readonly ILogger<FileScanOrchestrator> _logger;
+    private readonly ILogger<DirectoryScanOrchestrator> _logger;
 
     private const string AllFilesSearchPattern = "*";
 
@@ -42,11 +43,18 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
         IFileScanOrchestrator fileScanOrchestrator,
         IFileSystem fileSystem,
         IOptions<DirectoryScanOptions> directoryScanOptions,
-        ILogger<FileScanOrchestrator> logger)
+        ILogger<DirectoryScanOrchestrator> logger)
     {
         _fileScanOrchestrator = fileScanOrchestrator
                                 ?? throw new ArgumentNullException(nameof(fileScanOrchestrator));
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(directoryScanOptions);
+        if (directoryScanOptions.Value.Directory is null)
+        {
+            throw new ArgumentException(
+                "IOptions<DirectoryScanOptions>.Value.Directory cannot be null",
+                nameof(directoryScanOptions));
+        }
         _directoryScanOptions = directoryScanOptions.Value;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -54,19 +62,24 @@ public class DirectoryScanOrchestrator : IDirectoryScanOrchestrator
     /// <inheritdoc/>
     public async Task<ScanResult> ScanDirectoryAsync()
     {
-        if (_directoryScanOptions.Directory is null)
-            throw new ArgumentException("Scan directory cannot be null.");
-
         _logger.LogInformation(
             "Scanning directory '{ScanDirectory}' (recursive: {Recursive})",
             _directoryScanOptions.Directory,
             _directoryScanOptions.Recursive);
 
-        var fileList = _fileSystem.Directory.EnumerateFiles(
-            _directoryScanOptions.Directory,
-            AllFilesSearchPattern,
-            new EnumerationOptions { RecurseSubdirectories = _directoryScanOptions.Recursive });
-        
-        return await _fileScanOrchestrator.ScanFilesAsync(fileList);
+        // TODO: Null forgiving op used here because the null check for
+        // DirectoryScanOptions.Directory was moved to the constructor. Need to consider/test for
+        // the possibility of options being modified between object construction and invocation of
+        // this method, which could result in a null reference exception being thrown.
+        var fileList = _fileSystem.Directory
+            .EnumerateFiles(
+                _directoryScanOptions.Directory!,
+                AllFilesSearchPattern,
+                new EnumerationOptions { RecurseSubdirectories = _directoryScanOptions.Recursive })
+            .ToList();
+
+        return fileList.Count > 0
+            ? await _fileScanOrchestrator.ScanFilesAsync(fileList)
+            : new ScanResult();
     }
 }

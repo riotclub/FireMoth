@@ -14,18 +14,21 @@ using Moq.AutoMock;
 using Xunit;
 
 /// <summary>
-/// ComputeHashFromStream
-/// - Calling on a disposed object throws an ObjectDisposedException.
-/// - Passing a null Stream throws an ArgumentNullException.
-/// - Passing a Stream containing less data than the input buffer size returns a proper hash of the
-///   data.
-/// - Passing a Stream containing more data than the input buffer size returns a proper hash of the
-///   data.
-/// - Passing a Stream containing no data returns the proper hash for an empty data stream.
-///
-/// Dispose
-/// - Calling on a non-disposed object disposes the object.
-/// - Calling on a disposed object does not throw exceptions.
+/// <p>
+/// ComputeHashFromStream<br/>
+/// - Calling on a disposed object throws an ObjectDisposedException.<br/>
+/// - Passing [Stream:null] throws an ArgumentNullException.<br/>
+/// - Passing [Stream:contains less data than the input buffer size] returns a proper hash of the
+///   data.<br/>
+/// - Passing [Stream:contains more data than the input buffer size] returns a proper hash of the
+///   data.<br/>
+/// - Passing [Stream:contains no data] returns the proper hash for an empty data stream.<br/>
+/// </p>
+/// <p>
+/// Dispose<br/>
+/// - Calling on a non-disposed object disposes the object.<br/>
+/// - Calling on a disposed object does not throw exceptions.<br/>
+/// </p>
 /// </summary>
 // ReSharper disable once InconsistentNaming (following .NET's convention here [see SHA256])
 public class SHA256FileHasherTests
@@ -48,10 +51,10 @@ public class SHA256FileHasherTests
         action.Should().ThrowExactly<ObjectDisposedException>();
     }
 
-    /// <summary>ComputeHashFromStream: Passing a null Stream throws an ArgumentNullException.
+    /// <summary>ComputeHashFromStream: Passing [Stream:null] throws an ArgumentNullException.
     /// </summary>
     [Fact]
-    public void ComputeHashFromStream_NullStream_ThrowsArgumentNullException()
+    public void ComputeHashFromStream_StreamNull_ThrowsArgumentNullException()
     {
         // Arrange
         var sut = _mocker.CreateInstance<SHA256FileHasher>();
@@ -61,13 +64,13 @@ public class SHA256FileHasherTests
         action.Should().ThrowExactly<ArgumentNullException>();
     }
 
-    /// <summary>ComputeHashFromStream: Passing a Stream containing less data than the input buffer
-    /// size returns a proper hash of the data.</summary>
+    /// <summary>ComputeHashFromStream: Passing [Stream:contains less data than the input buffer
+    /// size] returns a proper hash of the data.</summary>
     [Fact]
     public void ComputeHashFromStream_StreamContainsLessDataThanInputBufferSize_ReturnsCorrectHash()
     {
         // Arrange
-        var testData = new byte[64];
+        var testData = new byte[SHA256FileHasher.InputBufferLength - 1];
         Random.Shared.NextBytes(testData);
         var testStream = new MemoryStream(testData);
         string expected;
@@ -85,8 +88,8 @@ public class SHA256FileHasherTests
         result.Should().Be(expected);
     }
     
-    /// <summary>ComputeHashFromStream: Passing a Stream containing more data than the input buffer
-    /// size returns a proper hash of the data.</summary>
+    /// <summary>ComputeHashFromStream: Passing [Stream:contains more data than the input buffer
+    /// size] returns a proper hash of the data.</summary>
     [Fact]
     public void ComputeHashFromStream_StreamContainsMoreDataThanInputBufferSize_ReturnsCorrectHash()
     {
@@ -109,7 +112,7 @@ public class SHA256FileHasherTests
         result.Should().Be(expected);
     }
 
-    /// <summary>ComputeHashFromStream: Passing a Stream containing no data returns the proper hash
+    /// <summary>ComputeHashFromStream: Passing [Stream:contains no data] returns the proper hash
     /// for an empty data stream.</summary>
     [Fact]
     public void ComputeHashFromStream_StreamContainsNoData_ReturnsSomething()
