@@ -1,6 +1,6 @@
 // <copyright file="DirectoryScanOrchestrator.cs" company="Riot Club">
 // Copyright (c) Riot Club. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// Licensed under the GNU GPLv3 license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
 
 namespace RiotClub.FireMoth.Services.Orchestration;
