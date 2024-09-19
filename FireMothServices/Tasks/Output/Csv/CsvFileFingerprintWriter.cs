@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 using CsvHelper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RiotClub.FireMoth.Services.Tasks.Output;
 using RiotClub.FireMoth.Services.Repository;
+using RiotClub.FireMoth.Services.Tasks.Output;
 using Serilog;
 
 /// <summary>

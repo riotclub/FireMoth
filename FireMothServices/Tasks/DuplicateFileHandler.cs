@@ -9,7 +9,7 @@ using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -19,7 +19,7 @@ using RiotClub.FireMoth.Services.Repository;
 /// <summary>
 /// A task handler that performs operations on files containing duplicate hash values.
 /// </summary>
-public class DuplicateFileHandler : ITaskHandler
+public abstract class DuplicateFileHandler : ITaskHandler
 {
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
     private readonly DuplicateFileHandlingOptions _duplicateFileHandlingOptions;
@@ -65,6 +65,11 @@ public class DuplicateFileHandler : ITaskHandler
     {
         _logger.LogDebug("Running task for DuplicateFileHandler.");
 
+        // Implement factory pattern here if this becomes unwieldy (if we need more duplicate file
+        // handling methods).
+        var handler = DuplicateFileHandlerFactory.GetHandler(
+            _duplicateFileHandlingOptions.DuplicateFileHandlingMethod);
+        
         switch (_duplicateFileHandlingOptions.DuplicateFileHandlingMethod)
         {
             case DuplicateFileHandlingMethod.Delete:
@@ -73,51 +78,65 @@ public class DuplicateFileHandler : ITaskHandler
                 break;
             case DuplicateFileHandlingMethod.Move:
                 _logger.LogDebug("Performing move operation for duplicate files.");
-                throw new NotImplementedException(
-                    "Move method for duplicate files not yet implemented.");
+                await MoveDuplicateFiles();
+                break;
             case DuplicateFileHandlingMethod.NoAction:
                 _logger.LogDebug("Performing no action for duplicate files.");
                 break;
             default:
                 _logger.LogError(
-                    "Unexpected value {DuplicateFileHandlingMethod} encountered while running " +
-                        "DuplicateFileHandler task.",
+                    "Unexpected DuplicateFileHandlingMethod \"{DuplicateFileHandlingMethod}\" " +
+                        "encountered while running DuplicateFileHandler task.",
                     _duplicateFileHandlingOptions.DuplicateFileHandlingMethod);
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("Unexpected DuplicateFileHandlingMethod " +
+                    $"\"{_duplicateFileHandlingOptions.DuplicateFileHandlingMethod}\" " +
+                    "encountered while running DuplicateFileHandler task.");
         }
         
         return true;
     }
+    
+    public abstract Task HandleDuplicateFilesAsync();
 
     private async Task DeleteDuplicateFiles()
     {
+        var processingVerb = 
+            _duplicateFileHandlingOptions.DuplicateFileHandlingMethod == DuplicateFileHandlingMethod.Delete
+                ? "DELETE" : "MOVE";
+        var textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
+        
         var duplicateRecords = 
             await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
 
-        var deletedFilesCount = 0;
-        long deletedFilesSize = 0;
+        var processedFilesCount = 0;
+        long processedFilesSize = 0;
         
         foreach (var grouping in duplicateRecords)
         {
-            _logger.LogDebug("Deleting duplicate records with hash {GroupHash}.", grouping.Key);
+            _logger.LogDebug(
+                "{ProcessingVerb} duplicate records with hash {GroupHash}.",
+                textInfo.ToTitleCase(processingVerb),
+                grouping.Key);
             var preservedFile = grouping.First();
-            var duplicatesToDelete = grouping.TakeLast(grouping.Count() - 1);
-            foreach (var fingerprint in duplicatesToDelete)
+            var filesToProcess = grouping.TakeLast(grouping.Count() - 1);
+            foreach (var fingerprint in filesToProcess)
             {
                 _logger.LogInformation(
-                    "Deleting file '{DeletingDuplicateFile}'; duplicate of '{DuplicateFile}'.",
+                    "{ProcessingVerb} file '{DuplicateFile}'; duplicate of {PreservedFile}'.",
+                    processingVerb,
                     fingerprint.FullPath,
                     preservedFile.FullPath);
                 try
                 {
                     _fileSystem.File.Delete(fingerprint.FullPath);
-                    deletedFilesCount++;
-                    deletedFilesSize += fingerprint.FileSize;
+                    processedFilesCount++;
+                    processedFilesSize += fingerprint.FileSize;
                 }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                 {
                     _logger.LogError(
-                        "Unable to delete file '{FileFullPath}: {ExceptionMessage}'",
+                        "Unable to {ProcessingVerb} file '{FileFullPath}: {ExceptionMessage}'",
+                        processingVerb,
                         fingerprint.FullPath,
                         e.Message);
                 }
@@ -125,8 +144,25 @@ public class DuplicateFileHandler : ITaskHandler
         }
         
         _logger.LogInformation(
-            "Deleted {DeletedFilesCount} files ({DeletedFilesSize} bytes).",
-            deletedFilesCount,
-            deletedFilesSize);
+            "{ProcessingVerb}ed {DeletedFilesCount} files ({DeletedFilesSize} bytes).",
+            processingVerb,
+            processedFilesCount,
+            processedFilesSize);
+    }
+    
+    
+
+    private async Task MoveDuplicateFiles()
+    {
+        var duplicateRecords =
+            await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
+
+        var movedFilesCount = 0;
+        long movedFilesSize = 0;
+
+        foreach (var grouping in duplicateRecords)
+        {
+            _logger.LogDebug();
+        }
     }
 }

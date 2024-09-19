@@ -68,11 +68,21 @@ public static class ServiceCollectionExtensions
         services.Configure<DuplicateFileHandlingOptions>(config.GetSection("CommandLine"));
         var serviceProvider = services.BuildServiceProvider();
         var duplicateOptions = serviceProvider
-            .GetRequiredService<IOptions<DuplicateFileHandlingOptions>>();
-        if (duplicateOptions.Value.DuplicateFileHandlingMethod
-            is DuplicateFileHandlingMethod.Delete or DuplicateFileHandlingMethod.Move)
+            .GetRequiredService<IOptions<DuplicateFileHandlingOptions>>().Value;
+        switch (duplicateOptions.DuplicateFileHandlingMethod)
         {
-            services.AddTransient<ITaskHandler, DuplicateFileHandler>();
+            case DuplicateFileHandlingMethod.Delete:
+                services.AddTransient<ITaskHandler, DuplicateFileDeleteHandler>();
+                break;
+            case DuplicateFileHandlingMethod.Move:
+                services.AddTransient<ITaskHandler, DuplicateFileMoveHandler>();
+                break;
+            case DuplicateFileHandlingMethod.NoAction:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(
+                    "Unrecognized DuplicateFileHandlingMethod option " +
+                        $"'{duplicateOptions.DuplicateFileHandlingMethod}'.");
         }
         
         services.AddTransient<ITaskHandler, CsvFileFingerprintWriter>();
