@@ -16,8 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Services.Repository;
 
-/// <summary>
-/// A task handler that performs operations on files containing duplicate hash values.
+/// <summary>A task handler that performs operations on files containing duplicate hash values.
 /// </summary>
 public abstract class DuplicateFileHandler : ITaskHandler
 {
@@ -26,8 +25,7 @@ public abstract class DuplicateFileHandler : ITaskHandler
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<DuplicateFileHandler> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DuplicateFileHandler"/> class.
+    /// <summary>Initializes a new instance of the <see cref="DuplicateFileHandler"/> class.
     /// </summary>
     /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> used to
     /// retrieve duplicate records for handling and modify or delete records after handling.
@@ -55,21 +53,13 @@ public abstract class DuplicateFileHandler : ITaskHandler
         _logger = logger;
     }
     
-    /// <summary>
-    /// Runs the duplicate file handler task by either deleting or moving files with duplicate
-    /// hashes in the <see cref="IFileFingerprintRepository"/> depending on the provided
-    /// <see cref="_duplicateFileHandlingOptions"/>.
-    /// </summary>
-    /// <returns><c>true</c></returns>
-    public async Task<bool> RunTaskAsync()
+    /// <summary> Runs the duplicate file handler task by either deleting or moving files with
+    /// duplicate hashes in the <see cref="IFileFingerprintRepository"/> depending on the provided
+    /// <see cref="_duplicateFileHandlingOptions"/>.</summary>
+    public async Task RunTaskAsync()
     {
         _logger.LogDebug("Running task for DuplicateFileHandler.");
 
-        // Implement factory pattern here if this becomes unwieldy (if we need more duplicate file
-        // handling methods).
-        var handler = DuplicateFileHandlerFactory.GetHandler(
-            _duplicateFileHandlingOptions.DuplicateFileHandlingMethod);
-        
         switch (_duplicateFileHandlingOptions.DuplicateFileHandlingMethod)
         {
             case DuplicateFileHandlingMethod.Delete:
@@ -92,12 +82,8 @@ public abstract class DuplicateFileHandler : ITaskHandler
                     $"\"{_duplicateFileHandlingOptions.DuplicateFileHandlingMethod}\" " +
                     "encountered while running DuplicateFileHandler task.");
         }
-        
-        return true;
     }
     
-    public abstract Task HandleDuplicateFilesAsync();
-
     private async Task DeleteDuplicateFiles()
     {
         var processingVerb = 

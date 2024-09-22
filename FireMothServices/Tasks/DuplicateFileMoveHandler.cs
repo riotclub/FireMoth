@@ -12,7 +12,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<DuplicateFileHandler> _logger;
     
-    public Task<bool> RunTaskAsync()
+    public Task RunTaskAsync()
     {
         throw new System.NotImplementedException();
     }

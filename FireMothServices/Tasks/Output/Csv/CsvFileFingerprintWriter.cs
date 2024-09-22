@@ -63,7 +63,7 @@ public class CsvFileFingerprintWriter : ITaskHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    public async Task<bool> RunTaskAsync()    
+    public async Task RunTaskAsync()    
     {
         if (_disposed)
         {
@@ -86,8 +86,6 @@ public class CsvFileFingerprintWriter : ITaskHandler, IDisposable
         _logger.LogDebug(
             "Writing {FileFingerprintCount} fingerprints to stream.", fingerprintsToOutput.Count);
         await _csvWriter.WriteRecordsAsync(fingerprintsToOutput);
-
-        return true;
     }
 
     /// <inheritdoc/>

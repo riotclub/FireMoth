@@ -54,12 +54,9 @@ public class DuplicateFileDeleteHandler : ITaskHandler
         _logger = logger;
     }
 
-    /// <summary>
-    /// Runs the duplicate file handler task by deleting files with duplicate hashes in the
-    /// <see cref="IFileFingerprintRepository"/>.
-    /// </summary>
-    /// <returns><c>true</c></returns>
-    public async Task<bool> RunTaskAsync()
+    /// <summary> Runs the duplicate file handler task by deleting files with duplicate hashes in
+    /// the <see cref="IFileFingerprintRepository"/>.</summary>
+    public async Task RunTaskAsync()
     {
         var duplicateRecords = 
             await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
@@ -98,7 +95,5 @@ public class DuplicateFileDeleteHandler : ITaskHandler
             "Deleted {DeletedFilesCount} files ({DeletedFilesSize} bytes).",
             deletedFilesCount,
             deletedFilesSize);
-
-        return true;
     }
 }
