@@ -10,7 +10,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
     private readonly DuplicateFileHandlingOptions _duplicateFileHandlingOptions;
     private readonly IFileSystem _fileSystem;
-    private readonly ILogger<DuplicateFileHandler> _logger;
+    private readonly ILogger<DuplicateFileMoveHandler> _logger;
     
     public Task RunTaskAsync()
     {

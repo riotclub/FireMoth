@@ -12,50 +12,39 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Services.Repository;
 
-/// <summary>
-/// A task handler that performs file delete operations on files containing duplicate hash values.
-/// </summary>
+/// <summary>A task handler that performs file delete operations on files containing duplicate hash
+/// values.</summary>
 public class DuplicateFileDeleteHandler : ITaskHandler
 {
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
-    private readonly DuplicateFileHandlingOptions _duplicateFileHandlingOptions;
     private readonly IFileSystem _fileSystem;
-    private readonly ILogger<DuplicateFileHandler> _logger;
+    private readonly ILogger<DuplicateFileMoveHandler> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DuplicateFileDeleteHandler"/> class.
+    /// <summary>Initializes a new instance of the <see cref="DuplicateFileDeleteHandler"/> class.
     /// </summary>
     /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> used to
-    /// retrieve duplicate records for handling and modify or delete records after handling.
-    /// </param>
+    /// retrieve duplicate records for handling and modify or delete records after handling.</param>
     /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
     /// </param>
-    /// <param name="duplicateFileHandlingOptions">An
-    /// <see cref="IOptions{DuplicateFileHandlingOptions}"/> containing configured options for this
-    /// task handler.</param>
     /// <param name="logger">An <see cref="ILogger{DuplicateFileHandler}"/> to which logging output
     /// will be written.</param>
     public DuplicateFileDeleteHandler(
         IFileFingerprintRepository fileFingerprintRepository,
         IFileSystem fileSystem,
-        IOptions<DuplicateFileHandlingOptions> duplicateFileHandlingOptions,
-        ILogger<DuplicateFileHandler> logger)
+        ILogger<DuplicateFileMoveHandler> logger)
     {
         Guard.IsNotNull(fileFingerprintRepository);
         Guard.IsNotNull(fileSystem);
         Guard.IsNotNull(logger);
-        Guard.IsNotNull(duplicateFileHandlingOptions);
         _fileFingerprintRepository = fileFingerprintRepository;
-        _duplicateFileHandlingOptions = duplicateFileHandlingOptions.Value;
         _fileSystem = fileSystem;
         _logger = logger;
     }
 
-    /// <summary> Runs the duplicate file handler task by deleting files with duplicate hashes in
-    /// the <see cref="IFileFingerprintRepository"/>.</summary>
+    /// <summary>Runs the duplicate file handler task by deleting files with duplicate hashes in the
+    /// <see cref="IFileFingerprintRepository"/>.</summary>
     public async Task RunTaskAsync()
     {
         var duplicateRecords = 
@@ -68,8 +57,8 @@ public class DuplicateFileDeleteHandler : ITaskHandler
         {
             _logger.LogDebug("Deleting duplicate records with hash {GroupHash}.", grouping.Key);
             var preservedFile = grouping.First();
-            var filesToProcess = grouping.TakeLast(grouping.Count() - 1);
-            foreach (var fingerprint in filesToProcess)
+            var filesToDelete = grouping.TakeLast(grouping.Count() - 1);
+            foreach (var fingerprint in filesToDelete)
             {
                 _logger.LogInformation(
                     "Deleting file '{DuplicateFile}'; duplicate of {PreservedFile}'.",
