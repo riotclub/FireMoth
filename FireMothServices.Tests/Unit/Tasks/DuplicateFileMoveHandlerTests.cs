@@ -268,28 +268,45 @@ public class DuplicateFileMoveHandlerTests
     public async Task RunTaskAsync_MoveDirectoryContainsFilesWithNameConflicts_MovedFilesRenamed()
     {
         // Arrange
-        var allFiles = _mockFileSystem.AllFiles.ToList();
-        string[] duplicateFiles = [ allFiles[0], allFiles[3], allFiles[7] ];
-        const string moveDirectory = "/emptydir";
-        _mockFileSystem.AddFile(
-            Path.Combine(moveDirectory, Path.GetFileName(duplicateFiles[0])),
-            new MockFileData(Guid.NewGuid().ToString()));
-        _mockFileSystem.AddFile(
-            Path.Combine(moveDirectory, Path.GetFileName(duplicateFiles[1])),
-            new MockFileData(Guid.NewGuid().ToString()));
-        _mockFileSystem.AddFile(
-            Path.Combine(moveDirectory, Path.GetFileName(duplicateFiles[1]) + "_(1)"),
-            new MockFileData(Guid.NewGuid().ToString()));
-        var expectedFilesAfterMove = _mockFileSystem.AllFiles;
-        for (var index = 1; index < duplicateFiles.Length; index++)
-        {
-            var currentFile = duplicateFiles[index];
-            expectedFilesAfterMove = expectedFilesAfterMove.Where(
-                fileName => fileName != currentFile);
-            expectedFilesAfterMove = expectedFilesAfterMove.Append(
-                Path.Combine(moveDirectory, Path.GetFileName(currentFile)));
-        }
         
+        /*
+         ORIGINAL FILES
+           "/RootDirFile"
+           "/RootDirFile2"
+           "/dirwithfiles/TestFile.txt"
+           "/dirwithfiles/AnotherFile.dat"
+           "/dirwithfiles/YetAnotherFile.xml"
+           "/dirwithfiles/beep"
+           "/dirwithfiles/meep.ext"
+           "/dirwithfiles/subdirwithfiles/SubdirFileA.1"
+           "/dirwithfiles/subdirwithfiles/SubdirFileB.2"
+           "/dirwithfiles/subdirwithfiles/Creep.ext"
+           "/emptydir/AnotherFile.dat",
+           "/emptydir/SubdirFileA.1",
+           "/emptydir/SubdirFileA_(1).1"
+
+         EXPECTED FILES AFTER MOVE
+           "/RootDirFile"
+           "/RootDirFile2"
+           "/dirwithfiles/TestFile.txt"
+           "/dirwithfiles/YetAnotherFile.xml"
+           "/dirwithfiles/beep"
+           "/dirwithfiles/meep.ext"
+           "/dirwithfiles/subdirwithfiles/SubdirFileB.2"
+           "/dirwithfiles/subdirwithfiles/Creep.ext"
+           "/emptydir/AnotherFile.dat",
+           "/emptydir/SubdirFileA.1",
+           "/emptydir/SubdirFileA_(1).1"
+           "/emptydir/AnotherFile_(1).dat"
+           "/emptydir/SubdirFileA_(2).1"
+        */
+        
+        string[] duplicateFiles =
+        [
+            "/RootDirFile",
+            "/dirwithfiles/AnotherFile.dat",
+            "/dirwithfiles/subdirwithfiles/SubdirFileA.1"
+        ];
         var duplicateFileFingerprints = 
             duplicateFiles
                 .Select(duplicateFile =>
@@ -304,6 +321,41 @@ public class DuplicateFileMoveHandlerTests
             .ReturnsAsync(
                 duplicateFileFingerprints.GroupBy(fileFingerprint => fileFingerprint.Base64Hash));
 
+        // Add name-conflicting files to the mock file system in the move directory
+        const string moveDirectory = "/emptydir";
+        string[] nameConflictingFiles =
+        [
+            Path.Combine(moveDirectory, "AnotherFile.dat"),
+            Path.Combine(moveDirectory, "SubdirFileA.1"),
+            Path.Combine(moveDirectory, "SubdirFileA_(1).1")
+        ];
+        foreach (var nameConflictingFile in nameConflictingFiles)
+        {
+            _mockFileSystem.AddFile(
+                nameConflictingFile, new MockFileData(Guid.NewGuid().ToString()));
+        }
+        
+        // Add duplicate files with non-conflicting names to expected files
+        var expectedFilesAfterMove = _mockFileSystem.AllFiles;
+        var filesToMove = _mockFileSystem.AllFiles.Skip(1).ToList();
+        expectedFilesAfterMove = expectedFilesAfterMove
+            .Where(fileName => !duplicateFiles.Contains(fileName))
+            .ToList();
+        expectedFilesAfterMove = expectedFilesAfterMove
+            .Append(Path.Combine(moveDirectory, "AnotherFile_(1).dat"))
+            .Append(Path.Combine(moveDirectory, "SubdirFileA_(2).1"));
+
+        // for (var index = 1; index < duplicateFiles.Length; index++)
+        // {
+        //     var currentFile = duplicateFiles[index];
+        //     // Remove original file
+        //     expectedFilesAfterMove = expectedFilesAfterMove.Where(
+        //         fileName => fileName != currentFile);
+        //     // Add moved file with updated name
+        //     expectedFilesAfterMove = expectedFilesAfterMove.Append(
+        //         Path.Combine(moveDirectory, Path.GetFileName(currentFile)));
+        // }
+        
         var duplicateFileHandlingOptions = BuildDuplicateFileHandlingOptions(
             moveDuplicateFilesToDirectory: moveDirectory);
         _mockOptions.Setup(options => options.Value).Returns(duplicateFileHandlingOptions);
@@ -315,7 +367,10 @@ public class DuplicateFileMoveHandlerTests
 
         // Assert
         var filesAfterMove = _mockFileSystem.AllFiles.ToList();
-        filesAfterMove.Should().BeEquivalentTo(allFiles);
+        filesAfterMove.Should().BeEquivalentTo(expectedFilesAfterMove);
+
+        // var filesAfterMove = _mockFileSystem.AllFiles.ToList();
+        // filesAfterMove.Should().BeEquivalentTo(allFiles);
     }
     
     private static DuplicateFileHandlingOptions BuildDuplicateFileHandlingOptions(
