@@ -44,8 +44,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
     {
         Guard.IsNotNull(fileFingerprintRepository);        
         Guard.IsNotNull(fileSystem);
-        Guard.IsNotNull(duplicateFileHandlingOptions);
-        Guard.IsNotNull(duplicateFileHandlingOptions.Value);
+        Guard.IsNotNull(duplicateFileHandlingOptions?.Value);
         Guard.IsNotNull(logger);
         _fileFingerprintRepository = fileFingerprintRepository;
         _fileSystem = fileSystem;
@@ -85,13 +84,12 @@ public class DuplicateFileMoveHandler : ITaskHandler
                     "Moving file '{DuplicateFile}'; duplicate of {PreservedFile}'.",
                     fingerprint.FullPath,
                     preservedFile.FullPath);
-                try
+                try                   
+
                 {
-                    var destinationFullPath = _fileSystem.Path.Combine(
+                    var destinationFullPath = GetUniqueFileName(
                         destinationDirectory.FullName,
-                        _fileSystem.Path.GetFileName(fingerprint.FullPath)); 
-                    // TODO: Add code to check if file exists before moving; if it exists, rename
-                    // destinationFullPath to use [destinationFullPath] + "(x)" where x is incremented until a non-duplicate filename is found.
+                        _fileSystem.Path.GetFileName(fingerprint.FullPath));
                     _fileSystem.File.Move(fingerprint.FullPath, destinationFullPath);
                     movedFilesCount++;
                     movedFilesSize += fingerprint.FileSize;
@@ -147,7 +145,12 @@ public class DuplicateFileMoveHandler : ITaskHandler
         {
             moveToDirectory.Create();
         }
-        catch (IOException ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         NotSupportedException)
         {
             _logger.LogError(
                 "Unable to create duplicate file directory '{MoveDuplicateFilesToDirectory}':" +
@@ -160,4 +163,21 @@ public class DuplicateFileMoveHandler : ITaskHandler
         return true;
     }
     
+    // Given a directory and filename, determines if the file already exists, and if so, adds an
+    // integer value to the filename and checks again until a unique filename is found and returned.
+    private string GetUniqueFileName(string directory, string originalFileName)
+    {
+        var destinationPath = _fileSystem.Path.Combine(directory, originalFileName);
+        var index = 1;
+
+        while (_fileSystem.File.Exists(destinationPath))
+        {
+            var newFileName = _fileSystem.Path.GetFileNameWithoutExtension(originalFileName) +
+                              $"_({index++})" +
+                              _fileSystem.Path.GetExtension(originalFileName);
+            destinationPath = _fileSystem.Path.Combine(directory, newFileName);
+        }
+        
+        return destinationPath;
+    }
 }

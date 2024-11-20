@@ -309,6 +309,8 @@ RunTaskAsync
 - If invoked with option DuplicateFileHandlingOptions.Move and
   DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is a valid directory, duplicate files
   in the repository are moved to the specified directory.
+- If DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory contains files with the same name as
+  duplicate files being moved, the duplicate files are given unique names before being moved.
 - Relevant messages are logged.
 
 ------------------------------------------------------------------------------------------------------------------------
