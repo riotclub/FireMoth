@@ -24,23 +24,22 @@ using RiotClub.FireMoth.Services.Tasks.Output.Csv;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tasks;
 
-/// <summary>
-/// Extensions to support service configuration.
-/// </summary>
+/// <summary>Extensions to support service configuration.</summary>
 public static class ServiceCollectionExtensions
 {
     private const string DefaultFilePrefix = "FireMoth_";
     private const string DefaultFileExtension = "csv";
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
     
-    /// <summary>
-    /// Adds services required to perform directory scanning via the FireMoth API.
+    private static readonly FileSystem FileSystem = new FileSystem();
+    
+    /// <summary>Adds services required to perform directory scanning via the FireMoth API.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to which services are added.
     /// </param>
     /// <param name="config">An <see cref="IConfiguration"/> containing program runtime
     /// configuration.</param>
-    /// <returns></returns>
+    /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
@@ -112,12 +111,12 @@ public static class ServiceCollectionExtensions
         }
 
         dbFullPath = dbFullPath + Path.DirectorySeparatorChar + dbDirectory;
-        if (!Directory.Exists(dbFullPath))
-            Directory.CreateDirectory(dbFullPath);
+        if (!FileSystem.Directory.Exists(dbFullPath))
+            FileSystem.Directory.CreateDirectory(dbFullPath);
         
         var sqliteConnectionStringBuilder = new SqliteConnectionStringBuilder
         {
-            DataSource = Path.Join(dbFullPath, dbFileName)
+            DataSource = FileSystem.Path.Join(dbFullPath, dbFileName)
         };
         
         return sqliteConnectionStringBuilder.ConnectionString;
@@ -130,13 +129,13 @@ public static class ServiceCollectionExtensions
         {
             var outputFilePath = string.IsNullOrWhiteSpace(outputFile) 
                 ? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) 
-                : Path.GetDirectoryName(outputFile);
+                : FileSystem.Path.GetDirectoryName(outputFile);
             return outputFilePath + Path.DirectorySeparatorChar + DefaultFilePrefix
                    + Program.ProgramStartDateTime.ToString(
                        DefaultFileDateTimeFormat, CultureInfo.InvariantCulture)                   
                    + '.' + DefaultFileExtension;
         }
 
-        return Path.GetFullPath(outputFile);
+        return FileSystem.Path.GetFullPath(outputFile);
     }
 }
