@@ -99,8 +99,8 @@ public class DuplicateFileMoveHandler : ITaskHandler
                                                  UnauthorizedAccessException or
                                                  NotSupportedException)
                 {
-                    _logger.LogError(
-                        "Unable to move file '{FileFullPath}: {ExceptionMessage}'",
+                    _logger.LogWarning(
+                        "Unable to move file '{FileFullPath}': {ExceptionMessage}",
                         fingerprint.FullPath,
                         ex.Message);
                 }
@@ -111,7 +111,6 @@ public class DuplicateFileMoveHandler : ITaskHandler
             "Moved {MovedFilesCount} duplicate files in total ({MovedFilesSize} bytes).",
             movedFilesCount,
             movedFilesSize);
-        
     }
     
     // Validate and create move directory

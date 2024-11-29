@@ -29,28 +29,26 @@ using RiotClub.FireMoth.Services.Tests.Unit.Helpers;
 /// <summary>
 /// <p>
 /// Ctor<br/>
-/// - Passing [IFileFingerprintRepository:null] throws ArgumentNullException.<br/>
-/// - Passing [IFileSystem:null] throws ArgumentNullException.<br/>
-/// - Passing [IOptions{DuplicateFileHandlingOptions}:null] throws ArgumentNullException.<br/>
-/// - Passing [ILogger{DuplicateFileHandler}:null] throws ArgumentNullException.<br/>
-/// - Passing [valid parameters] properly initializes an object.<br/>
+/// * Passing [IFileFingerprintRepository:null] throws ArgumentNullException.<br/>
+/// * Passing [IFileSystem:null] throws ArgumentNullException.<br/>
+/// * Passing [IOptions{DuplicateFileHandlingOptions}:null] throws ArgumentNullException.<br/>
+/// * Passing [ILogger{DuplicateFileHandler}:null] throws ArgumentNullException.<br/>
+/// * Passing [valid parameters] properly initializes an object.<br/>
 /// </p>
 /// <p>
 /// RunTaskAsync<br/>
-/// - If option DuplicateFileHandlingOptions.DuplicateFileHandlingMethod is not
+/// * If option DuplicateFileHandlingOptions.DuplicateFileHandlingMethod is not
 ///   DuplicateFileHandlingMethod.Move, return without moving files.<br/>
-/// - If option DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is not a valid directory,
+/// * If option DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is not a valid directory,
 ///   return without moving files.<br/>
-/// - If invoked with option DuplicateFileHandlingOptions.Move and
-///   DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is a valid directory that already
-///   exists, duplicate files in the repository are moved to the specified directory.<br/>
-/// - If invoked with option DuplicateFileHandlingOptions.Move and
-///   DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is a valid directory that does not
-///   exist, the directory is created and duplicate files in the repository are moved to the
-///   specified directory.<br/>  
-/// - If DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory contains files with the same
+/// * If invoked with option DuplicateFileHandlingOptions.Move and
+///   DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is a valid directory,
+///   duplicate files in the repository are moved to the specified directory.<br/>
+/// * If DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory contains files with the same
 ///   name as duplicate files being moved, the duplicate files are given unique names before being
 ///   moved.<br/>
+/// - If an exception occurs while attempting to move a file, processing continues with any
+///   remaining files.
 /// - Relevant messages are logged.<br/>
 /// </p>
 /// </summary>
@@ -62,8 +60,6 @@ public class DuplicateFileMoveHandlerTests
     private readonly Mock<IOptions<DuplicateFileHandlingOptions>> _mockOptions = new();
     private readonly MockFileSystem _mockFileSystem = FileSystemTestHelpers.BuildMockFileSystem();
     
-    private readonly AutoMocker _mocker = new();
-
     public DuplicateFileMoveHandlerTests()
     {
         _mockOptions
@@ -71,6 +67,7 @@ public class DuplicateFileMoveHandlerTests
             .Returns(BuildDuplicateFileHandlingOptions());
     }
     
+#region Ctor
     /// <summary>Ctor: Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
     /// </summary> 
     [Fact]
@@ -136,13 +133,11 @@ public class DuplicateFileMoveHandlerTests
         // Assert
         result.Should().NotBeNull();
     }   
-    
-    /// RunTaskAsync<br/>
+#endregion
 
-    /// - Relevant messages are logged.<br/>
-    
+#region RunTaskAsync
     /// <summary>RunTaskAsync: If option DuplicateFileHandlingOptions.DuplicateFileHandlingMethod is
-    /// not DuplicateFileHandlingMethod.Move, exit without moving files.</summary>
+    /// not DuplicateFileHandlingMethod.Move, return without moving files.</summary>
     [Fact]
     public async Task RunTaskAsync_MethodNotMove_ReturnsWithoutMovingFiles()
     {
@@ -161,6 +156,55 @@ public class DuplicateFileMoveHandlerTests
         
         // Assert
         result.Should().BeEquivalentTo(expected);
+    }
+    
+    /// <summary>RunTaskAsync: If option DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory
+    /// is not a valid directory, return without moving files.</summary>
+    [Theory]
+    [InlineData("***")]
+    [InlineData("///")]
+    public async Task RunTaskAsync_MoveDirectoryInvalid_ReturnsWithoutMovingFiles(
+        string moveDirectory)
+    {
+        // Arrange
+        var allFiles = _mockFileSystem.AllFiles.ToList();
+        string[] duplicateFiles = [ allFiles[0], allFiles[3], allFiles[7] ];
+        var expectedFilesAfterMove = _mockFileSystem.AllFiles;
+        for (var index = 1; index < duplicateFiles.Length; index++)
+        {
+            var currentFile = duplicateFiles[index];
+            expectedFilesAfterMove = expectedFilesAfterMove.Where(
+                fileName => fileName != currentFile);
+            expectedFilesAfterMove = expectedFilesAfterMove.Append(
+                Path.Combine(moveDirectory, Path.GetFileName(currentFile)));
+        }
+        
+        var duplicateFileFingerprints = 
+            duplicateFiles
+                .Select(duplicateFile =>
+                    new FileFingerprint(
+                        Path.GetFileName(duplicateFile),
+                        Path.GetDirectoryName(duplicateFile)!,
+                        1,
+                        "000="))
+                .ToList();
+        _mockRepository
+            .Setup(mockRepo => mockRepo.GetGroupingsWithDuplicateHashesAsync())
+            .ReturnsAsync(
+                duplicateFileFingerprints.GroupBy(fileFingerprint => fileFingerprint.Base64Hash));
+
+        var duplicateFileHandlingOptions = BuildDuplicateFileHandlingOptions(
+            moveDuplicateFilesToDirectory: moveDirectory);
+        _mockOptions.Setup(options => options.Value).Returns(duplicateFileHandlingOptions);
+        var sut = new DuplicateFileMoveHandler(
+            _mockRepository.Object, _mockFileSystem, _mockOptions.Object, _nullLogger);
+        
+        // Act
+        await sut.RunTaskAsync();
+
+        // Assert
+        var filesAfterMove = _mockFileSystem.AllFiles.ToList();
+        filesAfterMove.Should().BeEquivalentTo(allFiles);
     }
     
     /// <summary>RunTaskAsync: If invoked with option DuplicateFileHandlingOptions.Move and
@@ -212,55 +256,6 @@ public class DuplicateFileMoveHandlerTests
         filesAfterMove.Should().BeEquivalentTo(expectedFilesAfterMove);
     }
 
-    /// <summary>RunTaskAsync: If option DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory
-    /// is not a valid directory, return without moving files.</summary>
-    [Theory]
-    [InlineData("***")]
-    [InlineData("///")]
-    public async Task RunTaskAsync_MoveDirectoryInvalid_ReturnsWithoutMovingFiles(
-        string moveDirectory)
-    {
-        // Arrange
-        var allFiles = _mockFileSystem.AllFiles.ToList();
-        string[] duplicateFiles = [ allFiles[0], allFiles[3], allFiles[7] ];
-        var expectedFilesAfterMove = _mockFileSystem.AllFiles;
-        for (var index = 1; index < duplicateFiles.Length; index++)
-        {
-            var currentFile = duplicateFiles[index];
-            expectedFilesAfterMove = expectedFilesAfterMove.Where(
-                fileName => fileName != currentFile);
-            expectedFilesAfterMove = expectedFilesAfterMove.Append(
-                Path.Combine(moveDirectory, Path.GetFileName(currentFile)));
-        }
-        
-        var duplicateFileFingerprints = 
-            duplicateFiles
-                .Select(duplicateFile =>
-                    new FileFingerprint(
-                        Path.GetFileName(duplicateFile),
-                        Path.GetDirectoryName(duplicateFile)!,
-                        1,
-                        "000="))
-                .ToList();
-        _mockRepository
-            .Setup(mockRepo => mockRepo.GetGroupingsWithDuplicateHashesAsync())
-            .ReturnsAsync(
-                duplicateFileFingerprints.GroupBy(fileFingerprint => fileFingerprint.Base64Hash));
-
-        var duplicateFileHandlingOptions = BuildDuplicateFileHandlingOptions(
-            moveDuplicateFilesToDirectory: moveDirectory);
-        _mockOptions.Setup(options => options.Value).Returns(duplicateFileHandlingOptions);
-        var sut = new DuplicateFileMoveHandler(
-            _mockRepository.Object, _mockFileSystem, _mockOptions.Object, _nullLogger);
-        
-        // Act
-        await sut.RunTaskAsync();
-
-        // Assert
-        var filesAfterMove = _mockFileSystem.AllFiles.ToList();
-        filesAfterMove.Should().BeEquivalentTo(allFiles);
-    }
-    
     /// <summary>RunTaskAsync: If DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory
     /// contains files with the same name as duplicate files being moved, the duplicate files are
     /// given unique names before being moved.</summary>
@@ -268,8 +263,12 @@ public class DuplicateFileMoveHandlerTests
     public async Task RunTaskAsync_MoveDirectoryContainsFilesWithNameConflicts_MovedFilesRenamed()
     {
         // Arrange
-        
         /*
+         DUPLICATES
+           "/RootDirFile",
+           "/dirwithfiles/AnotherFile.dat",
+           "/dirwithfiles/subdirwithfiles/SubdirFileA.1"
+         
          ORIGINAL FILES
            "/RootDirFile"
            "/RootDirFile2"
@@ -307,6 +306,8 @@ public class DuplicateFileMoveHandlerTests
             "/dirwithfiles/AnotherFile.dat",
             "/dirwithfiles/subdirwithfiles/SubdirFileA.1"
         ];
+        
+        // Add file fingerprints representing duplicates to the mock repository
         var duplicateFileFingerprints = 
             duplicateFiles
                 .Select(duplicateFile =>
@@ -335,27 +336,16 @@ public class DuplicateFileMoveHandlerTests
                 nameConflictingFile, new MockFileData(Guid.NewGuid().ToString()));
         }
         
-        // Add duplicate files with non-conflicting names to expected files
+        // Add duplicate files with modified, non-conflicting names to expected files
         var expectedFilesAfterMove = _mockFileSystem.AllFiles;
-        var filesToMove = _mockFileSystem.AllFiles.Skip(1).ToList();
+        var filesToMove = duplicateFiles.Skip(1).ToList();
         expectedFilesAfterMove = expectedFilesAfterMove
-            .Where(fileName => !duplicateFiles.Contains(fileName))
+            .Where(fileName => !filesToMove.Contains(fileName))
             .ToList();
         expectedFilesAfterMove = expectedFilesAfterMove
             .Append(Path.Combine(moveDirectory, "AnotherFile_(1).dat"))
             .Append(Path.Combine(moveDirectory, "SubdirFileA_(2).1"));
 
-        // for (var index = 1; index < duplicateFiles.Length; index++)
-        // {
-        //     var currentFile = duplicateFiles[index];
-        //     // Remove original file
-        //     expectedFilesAfterMove = expectedFilesAfterMove.Where(
-        //         fileName => fileName != currentFile);
-        //     // Add moved file with updated name
-        //     expectedFilesAfterMove = expectedFilesAfterMove.Append(
-        //         Path.Combine(moveDirectory, Path.GetFileName(currentFile)));
-        // }
-        
         var duplicateFileHandlingOptions = BuildDuplicateFileHandlingOptions(
             moveDuplicateFilesToDirectory: moveDirectory);
         _mockOptions.Setup(options => options.Value).Returns(duplicateFileHandlingOptions);
@@ -369,10 +359,9 @@ public class DuplicateFileMoveHandlerTests
         var filesAfterMove = _mockFileSystem.AllFiles.ToList();
         filesAfterMove.Should().BeEquivalentTo(expectedFilesAfterMove);
 
-        // var filesAfterMove = _mockFileSystem.AllFiles.ToList();
-        // filesAfterMove.Should().BeEquivalentTo(allFiles);
     }
-    
+#endregion
+
     private static DuplicateFileHandlingOptions BuildDuplicateFileHandlingOptions(
         bool interactive = false,
         DuplicateFileHandlingMethod duplicateFileHandlingMethod = DuplicateFileHandlingMethod.Move,

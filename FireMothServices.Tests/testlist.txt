@@ -311,6 +311,8 @@ RunTaskAsync
   in the repository are moved to the specified directory.
 - If DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory contains files with the same name as
   duplicate files being moved, the duplicate files are given unique names before being moved.
+- If an exception occurs while attempting to move a file, processing continues with any remaining
+  files.
 - Relevant messages are logged.
 
 ------------------------------------------------------------------------------------------------------------------------
