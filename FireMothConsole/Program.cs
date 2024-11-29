@@ -14,6 +14,7 @@ using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +40,8 @@ public static class Program
     private const uint BootstrapLogFileSizeLimit = 1024 * 1024 * 32; // 32 MB
 
     internal static DateTime ProgramStartDateTime;
+    
+    private static readonly FileSystem FileSystem = new();
 
     /// <summary>
     /// Class and application entry point. Validates command-line arguments, performs startup
@@ -76,7 +79,8 @@ public static class Program
         scanDirectoryOption.AddValidator(result =>
         {
             var scanDirectory = result.GetValueForOption(scanDirectoryOption);
-            if (string.IsNullOrWhiteSpace(scanDirectory) || !Directory.Exists(scanDirectory))
+            if (string.IsNullOrWhiteSpace(scanDirectory) ||
+                !FileSystem.Directory.Exists(scanDirectory))
             {
                 Log.Fatal("Scan directory '{ScanDirectory}' does not exist.", scanDirectory);
                 result.ErrorMessage = $"Scan directory '{scanDirectory}' does not exist.";
@@ -97,13 +101,13 @@ public static class Program
             if (string.IsNullOrWhiteSpace(outputOptionValue))
                 return;
 
-            var outputFilePath = Path.GetFullPath(outputOptionValue);
+            var outputFilePath = FileSystem.Path.GetFullPath(outputOptionValue);
             string? errorText = null;
-            if (Directory.Exists(outputFilePath))
+            if (FileSystem.Directory.Exists(outputFilePath))
             {
                 errorText = "Specified output path is an existing directory";
             } 
-            else if (File.Exists(outputFilePath))
+            else if (FileSystem.File.Exists(outputFilePath))
             {
                 errorText = "Output file already exists";
             }
@@ -111,11 +115,11 @@ public static class Program
             {
                 try
                 {
-                    var outputFileName = Path.GetFileName(outputFilePath);
-                    var outputFileDirectory = Path.GetDirectoryName(outputFilePath);
-                    if (outputFileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+                    var outputFileName = FileSystem.Path.GetFileName(outputFilePath);
+                    var outputFileDirectory = FileSystem.Path.GetDirectoryName(outputFilePath);
+                    if (outputFileName.IndexOfAny(FileSystem.Path.GetInvalidFileNameChars()) >= 0
                         || (outputFileDirectory is not null 
-                            && outputFileDirectory.IndexOfAny(Path.GetInvalidPathChars()) >= 0))
+                            && outputFileDirectory.IndexOfAny(FileSystem.Path.GetInvalidPathChars()) >= 0))
                     {
                         errorText = "Invalid output file";
                     }

@@ -107,10 +107,12 @@ public class FileScanOrchestrator : IFileScanOrchestrator
             {
                 scanResult.SkippedFiles.Add(
                     fileInfo.FullName,
-                    $"Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.");
+                    $"Could not add record for file '{fileInfo.FullName}': {ex.Message}; " +
+                        $"skipping file.");
                 _logger.LogError(
                     ex,
-                    "Could not add record for file '{FileName}': {ExceptionMessage}; skipping file.",
+                    "Could not add record for file '{FileName}': {ExceptionMessage}; skipping " +
+                        "file.",
                     fileInfo.FullName,
                     ex.Message);
                 scanResult.Errors.Add(

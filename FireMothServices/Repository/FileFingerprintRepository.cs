@@ -11,15 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// A repository that provides access to <see cref="IFileFingerprint"/>s.
-/// </summary>
+/// <summary>A repository that provides access to <see cref="IFileFingerprint"/>s.</summary>
 public class FileFingerprintRepository : IFileFingerprintRepository
 {
     private readonly IDataAccessLayer<FileFingerprint> _dataAccessLayer;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileFingerprintRepository"/> class.
+    /// <summary>Initializes a new instance of the <see cref="FileFingerprintRepository"/> class.
     /// </summary>
     /// <param name="dataAccessLayer">A <see cref="IDataAccessLayer{IFileFingerprint}"/>
     /// implementation used to persist data.</param>

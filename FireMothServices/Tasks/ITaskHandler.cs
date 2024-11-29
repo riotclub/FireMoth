@@ -7,15 +7,9 @@ namespace RiotClub.FireMoth.Services.Tasks;
 
 using System.Threading.Tasks;
 
-/// <summary>
-/// Defines the public interface for a class that runs a task.
-/// </summary>
+/// <summary>Defines the public interface for a class that runs a task.</summary>
 public interface ITaskHandler
 {
-    /// <summary>
-    /// Performs the task for this task handler.
-    /// </summary>
-    /// <returns>An asynchronous <see cref="Task"/> with a <see cref="bool"/> result indicating
-    /// whether the task completed successfully (<c>true</c>) or failed (<c>false</c>).</returns>
-    public Task<bool> RunTaskAsync();
+    /// <summary>Performs the task for this task handler.</summary>
+    public Task RunTaskAsync();
 }

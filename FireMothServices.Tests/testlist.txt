@@ -278,20 +278,42 @@ SetOutputDuplicateInfoOnly (property)
     - Sets OutputDuplicateInfoOnly property.
 
 ------------------------------------------------------------------------------------------------------------------------
-/Tasks/DuplicateFileHandler
+/Tasks/DuplicateFileDeleteHandler
 ------------------------------------------------------------------------------------------------------------------------
 Ctor
-    - Null IFileFingerprintRepository throws ArgumentNullException
-    - Null IOptions<DuplicateFileHandlingOptions> throws ArgumentNullException
-    - Null ILogger<DuplicateFileHandler> throws ArgumentNullException
+    - Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
+    - Passing [IFileSystem:null] throws ArgumentNullException.
+    - Passing [ILogger{DuplicateFileHandler}] throws ArgumentNullException.
 
-RunAsync
-    - If invoked with option DuplicateFileHandlingOptions.Delete, duplicate files
-      in the repository are deleted.
-    - If invoked with option DuplicateFileHandlingOptions.Move, duplicate files
-      in the repository are moved to the directory specified in options.
-    - If invoked with option DuplicateFileHandlingOptions.NoAction, no files are
-      deleted or moved.
+RunTaskAsync
+    - Duplicate files in the repository are deleted.
+    - If duplicate file from repository does not exist, warning is reported and processing
+      continues.
+    - Relevant messages are logged.
+
+------------------------------------------------------------------------------------------------------------------------
+/Tasks/DuplicateFileMoveHandler
+------------------------------------------------------------------------------------------------------------------------
+Ctor
+- Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
+- Passing [IFileSystem:null] throws ArgumentNullException.
+- Passing [IOptions{DuplicateFileHandlingOptions}:null] throws ArgumentNullException.
+- Passing [ILogger{DuplicateFileHandler}:null] throws ArgumentNullException.
+- Passing [valid parameters] properly initializes an object.
+
+RunTaskAsync
+- If option DuplicateFileHandlingOptions.DuplicateFileHandlingMethod is not
+  DuplicateFileHandlingMethod.Move, return without moving files.
+- If option DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is not a valid directory,
+  return without moving files.      
+- If invoked with option DuplicateFileHandlingOptions.Move and
+  DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory is a valid directory, duplicate files
+  in the repository are moved to the specified directory.
+- If DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory contains files with the same name as
+  duplicate files being moved, the duplicate files are given unique names before being moved.
+- If an exception occurs while attempting to move a file, processing continues with any remaining
+  files.
+- Relevant messages are logged.
 
 ------------------------------------------------------------------------------------------------------------------------
 /Tasks/DuplicateFileHandlingOptions
