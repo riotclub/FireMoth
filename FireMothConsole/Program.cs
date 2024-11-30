@@ -23,7 +23,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Console.Extensions;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
-using RiotClub.FireMoth.Services.FileScanning;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Tasks.Output;
 using RiotClub.FireMoth.Services.Repository;

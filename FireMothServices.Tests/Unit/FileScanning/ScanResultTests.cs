@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Tests.Common.AutoFixture.SpecimenBuilders;
-using RiotClub.FireMoth.Services.FileScanning;
 using AutoFixture;
 using FluentAssertions;
+using Services.Orchestration;
 using Xunit;
 
 /// <summary>

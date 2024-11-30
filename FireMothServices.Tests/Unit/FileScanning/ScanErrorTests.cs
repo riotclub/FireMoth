@@ -6,9 +6,9 @@
 namespace RiotClub.FireMoth.Services.Tests.Unit.FileScanning;
 
 using System;
-using RiotClub.FireMoth.Services.FileScanning;
 using AutoFixture;
 using FluentAssertions;
+using Services.Orchestration;
 using Xunit;
 
 /// <summary>

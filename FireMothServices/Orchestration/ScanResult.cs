@@ -3,41 +3,32 @@
 // Licensed under the GNU GPLv3 license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
 
-namespace RiotClub.FireMoth.Services.FileScanning;
+namespace RiotClub.FireMoth.Services.Orchestration;
 
 using System;
 using System.Collections.Generic;
-using Repository;
+using RiotClub.FireMoth.Services.Repository;
 
-/// <summary>
-/// Specifies the result of a file scan operation.
-/// </summary>
+/// <summary>Specifies the result of a file scan operation.</summary>
 public class ScanResult
 {
-    /// <summary>
-    /// Gets a list of <see cref="FileFingerprint"/>s for files that have been successfully scanned.
-    /// </summary>
+    /// <summary>Gets a list of <see cref="FileFingerprint"/>s for files that have been successfully
+    /// scanned.</summary>
     public List<FileFingerprint> ScannedFiles { get; } = [];
 
-    /// <summary>
-    /// Gets a key-value list of files that were skipped and the reason for the skip.
+    /// <summary>Gets a key-value list of files that were skipped and the reason for the skip.
     /// </summary>
     public Dictionary<string, string> SkippedFiles { get; } = new();
 
-    /// <summary>
-    /// Gets a list of errors that occurred.
-    /// </summary>
+    /// <summary>Gets a list of errors that occurred.</summary>
     public List<ScanError> Errors { get; } = [];
 
-    /// <summary>
-    /// Combines two <see cref="ScanResult"/> objects by combining their
+    /// <summary>Combines two <see cref="ScanResult"/> objects by combining their
     /// <see cref="ScannedFiles"/>, <see cref="SkippedFiles"/>, and <see cref="Errors"/>
-    /// collections.
-    /// </summary>
+    /// collections.</summary>
     /// <param name="a">The first of two <see cref="ScanResult"/> operands to sum.</param>
     /// <param name="b">The second of two <see cref="ScanResult"/> operands to sum.</param>
-    /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.
-    /// </returns>
+    /// <returns>A new <see cref="ScanResult"/> containing the sum of the two operands.</returns>
     public static ScanResult operator +(ScanResult? a, ScanResult? b)
     {
         if (a is null && b is null)
