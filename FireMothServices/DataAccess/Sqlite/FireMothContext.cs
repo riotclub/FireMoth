@@ -10,17 +10,24 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using RiotClub.FireMoth.Services.Repository;
 
+/// <summary>An implementation of <see cref="DbContext"/> that represents a session with the
+/// FireMoth database backing store.</summary>
+/// <remarks>Generally, this class should not be used for direct database access. Instead, use a
+/// repository abstraction that implements <see cref="IFileFingerprintRepository"/>.</remarks>
+/// <seealso cref="FileFingerprintRepository"/>
 public class FireMothContext : DbContext
 {
+    /// <summary>A <see cref="DbSet{FileFingerprint}"/> used to query the available set of
+    /// <see cref="FileFingerprint"/>s in the database.</summary>
     public virtual DbSet<FileFingerprint> FileFingerprints { get; set; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FireMothContext"/> class.
-    /// </summary>
+    /// <summary>Initializes a new instance of the <see cref="FireMothContext"/> class.</summary>
+    /// <param name="options">A <see cref="DbContextOptions{FireMothContext}"/> containing
+    /// <see cref="DbContext"/> options for this context.</param>
     public FireMothContext(DbContextOptions<FireMothContext> options) : base(options)
-    {
-    }
+    { }
     
+    /// <summary>Initializes a new instance of the <see cref="FireMothContext"/> class.</summary>
     public FireMothContext()
     { }
 

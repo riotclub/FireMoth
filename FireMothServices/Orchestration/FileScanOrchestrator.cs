@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
 using DataAnalysis;
-using FileScanning;
 using Repository;
 
 /// <summary>File scanner implementation that scans a collection of files and writes file

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using System.IO.Abstractions;
 using System.Linq;
 using DataAccess;
-using FileScanning;
 using Microsoft.Extensions.Options;
 
 /// <summary>

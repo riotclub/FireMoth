@@ -7,7 +7,6 @@ namespace RiotClub.FireMoth.Services.Orchestration;
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FileScanning;
 
 /// <summary>
 /// Defines the public interface for a class that implements a file scan orchestrator. A file scan orchestrator is

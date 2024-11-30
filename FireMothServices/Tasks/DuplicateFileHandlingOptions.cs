@@ -6,7 +6,7 @@
 namespace RiotClub.FireMoth.Services.Tasks;
 
 /// <summary>Contains options pertaining to how duplicate files are handled by
-/// <see cref="DuplicateFileHandler"/>s.</summary>
+/// <see cref="ITaskHandler"/> impementations.</summary>
 public class DuplicateFileHandlingOptions
 {
     /// <summary>A <see cref="DuplicateFileHandlingMethod"/> used to indicate how duplicate files

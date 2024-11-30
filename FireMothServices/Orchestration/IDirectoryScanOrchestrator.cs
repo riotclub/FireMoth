@@ -7,7 +7,6 @@ namespace RiotClub.FireMoth.Services.Orchestration;
 
 using System.Threading.Tasks;
 using DataAccess;
-using FileScanning;
 
 /// <summary>
 /// Defines the interface for a class that implements a directory scanner that reads the files in
