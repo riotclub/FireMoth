@@ -35,7 +35,7 @@ public class ScanResult
         {
             throw new ArgumentNullException(
                 string.Join(",", nameof(a), nameof(b)),
-                "Cannot combine two null ScanResult objects.");
+                "Cannot combine null ScanResult objects.");
         }
         
         var result = new ScanResult();
