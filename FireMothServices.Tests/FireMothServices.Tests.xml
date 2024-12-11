@@ -52,95 +52,98 @@
              </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests">
-             <summary>
-             Ctor
-             - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
-            
-             GetAsync
-             - Passing null filter and null orderBy expressions returns an unfiltered and unordered
-               collection of records.
-             - Passing non-null filter and null orderBy expressions returns a filtered and unordered
-               collection of records.
-             - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
-               collection of records.
-             - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
-               collection of records.
-            
-             AddAsync
-             - Passing a null FileFingerprint throws an ArgumentNullException.
-             - Passing a non-null FileFingerprint adds a record to the data access layer.
-                 
-             AddManyAsync
-             - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
-             - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
-                 
-             DeleteAsync
-             - Passing a null FileFingerprint throws an ArgumentNullException.
-             - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
-             - Passing a FileFingerprint that matches a record in the data access layer returns true.
-             - Passing a FileFingerprint that does not match a record in the data access layer does not
-               modify existing records.
-             - Passing a FileFingerprint that does not match a record in the data access layer returns false.
-                 
-             DeleteAllAsync
-             - Deletes all records from the data access layer.
-             - Returns the number of records that were deleted from the data access layer.
-             </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.Ctor_NullILogger_ThrowsArgumentNullException">
-            <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
-            ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection">
-            <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
-            and unordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection">
-            <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
-            and unordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection">
-            <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
-            unfiltered and ordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection">
-            <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
-            filtered and ordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_NullFileFingerprint_ThrowsArgumentNullException">
-            <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_NonNullFileFingerprint_AddsRecord">
-            <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
-            layer.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_NullIEnumerable_ThrowsArgumentNullException">
-            <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
-            ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_NonNullIEnumerable_AddsRecords">
-            <summary>Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access
-            layer.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException">
-            <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
+            <summary>
+            <p>
+            Ctor<br/>
+            - Passing [ILogger{MemoryDataAccessLayer}:null] throws an ArgumentNullException.<br/>
+            </p>
+            <p>
+            GetAsync<br/>
+            - Passing [filter:null, orderBy:null] returns an unfiltered, unordered collection.<br/>
+            - Passing [filter:non-null, orderBy:null] returns a filtered, unordered collection.<br/>
+            - Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered collection.<br/>
+            - Passing [filter:non-null, orderBy:non-null] returns a filtered and ordered collection.<br/>
+            </p>
+            <p>
+            AddAsync<br/>
+            - Passing [FileFingerprint:null] throws an ArgumentNullException.<br/>
+            - Passing [FileFingerprint:non-null] adds a record to the data access layer.<br/>
+            </p>
+            <p>
+            AddManyAsync<br/>
+            - Passing [IEnumerable{FileFingerprint}:null] throws an ArgumentNullException.<br/>
+            - Passing [IEnumerable{FileFingerprint}:non-null] adds the records to the data access layer.<br/>
+            </p>
+            <p>
+            DeleteAsync<br/>
+            - Passing [FileFingerprint:null] throws an ArgumentNullException.<br/>
+            - Passing [FileFingerprint:matches a record in the data access layer] deletes the record.<br/>
+            - Passing [FileFingerprint:matches a record in the data access layer] returns true.<br/>
+            - Passing [FileFingerprint:does not match a record in the data access layer] does not modify
+              existing records.<br/>
+            - Passing [FileFingerprint:does not match a record in the data access layer] returns false.<br/>
+            </p>
+            <p>
+            DeleteAllAsync<br/>
+            - Deletes all records from the data access layer.<br/>
+            - Returns the number of records that were deleted from the data access layer.<br/>
+            </p>
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted">
-            <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
-            layer deletes the record.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.Ctor_ILoggerNull_ThrowsArgumentNullException">
+            <summary>Ctor:Passing [ILogger{MemoryDataAccessLayer}: null] throws an
+            ArgumentNullException.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue">
-            <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
-            layer returns true.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_FilterNullOrderByNull_ReturnsUnfilteredUnorderedCollection">
+            <summary>GetAsync: Passing [filter:null, orderBy:null] returns an unfiltered, unordered
+            collection.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade">
-            <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
-            access layer does not modify existing records.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_FilterNonNullOrderByNull_ReturnsFilteredUnorderedCollection">
+            <summary>GetAsync: Passing [filter:non-null, orderBy:null] returns a filtered, unordered
+            collection.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse">
-            <summary>DeleteAsync: Passing a FileFingerprint that does not match a record in the data
-            access layer returns false.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_FilterNullOrderByNonNull_ReturnsUnfilteredOrderedCollection">
+            <summary>GetAsync: Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered
+            collection.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.GetAsync_FilterNonNullOrderByNonNull_ReturnsFilteredOrderedCollection">
+            <summary>GetAsync: Passing [filter:non-null, orderBy:non-null] returns a filtered and
+            ordered collection.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_FileFingerprintNull_ThrowsArgumentNullException">
+            <summary>AddAsync: Passing [FileFingerprint:null] throws an ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddAsync_FileFingerprintNonNull_AddsRecord">
+            <summary>AddAsync: Passing [FileFingerprint:non-null] adds a record to the data access
+            layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_IEnumerableNull_ThrowsArgumentNullException">
+            <summary>AddManyAsync: Passing [IEnumerable{FileFingerprint}:null] throws an
+            ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.AddManyAsync_IEnumerableNonNull_AddsRecords">
+            <summary>AddManyAsync: Passing [IEnumerable{FileFingerprint}:non-null] adds the records to
+            the data access layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_FileFingerprintNull_ThrowsArgumentNullException">
+            <summary>DeleteAsync: Passing [FileFingerprint:null] throws an ArgumentNullException.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_FileFingerprintMatchExists_MatchingValueIsDeleted">
+            <summary>DeleteAsync: Passing [FileFingerprint:matches a record in the data access layer]
+            deletes the record.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_FileFingerprintMatchExists_ReturnsTrue">
+            <summary>DeleteAsync: Passing [FileFingerprint:matches a record in the data access layer]
+            returns true.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_FileFingerprintMatchDoesNotExist_NoChangesMade">
+            <summary>DeleteAsync: Passing [FileFingerprint:does not match a record in the data access
+            layer] does not modify existing records.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAsync_FileFingerprintMatchDoesNotExist_ReturnsFalse">
+            <summary>DeleteAsync: Passing [FileFingerprint:does not match a record in the data access
+            layer] returns false.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.InMemory.MemoryDataAccessLayerTests.DeleteAllAsync_MethodCalled_DeletesAllRecords">
             <summary>DeleteAllAsync: Deletes all records from the data access layer.</summary>
@@ -150,106 +153,143 @@
             access layer.</summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests">
-             <summary>
-             Ctor
-             - Passing a null ILogger{MemoryDataAccessLayer} throws an ArgumentNullException.
-             - Passing a null FireMothContext throws an ArgumentNullException.
-            
-             GetAsync
-             - Passing null filter and null orderBy expressions returns an unfiltered and unordered
-               collection of records.
-             - Passing non-null filter and null orderBy expressions returns a filtered and unordered
-               collection of records.
-             - Passing null filter and non-null orderBy expressions returns an unfiltered and ordered
-               collection of records.
-             - Passing non-null filter and non-null orderBy expressions returns a filtered and ordered
-               collection of records.
-            
-             AddAsync
-             - Passing a null FileFingerprint throws an ArgumentNullException.
-             - Passing a non-null FileFingerprint adds a record to the data access layer.
-            
-             AddManyAsync
-             - Passing a null IEnumerable{FileFingerprint} throws an ArgumentNullException.
-             - Passing a non-null IEnumerable{FileFingerprint} adds the records to the data access layer.
-            
-             DeleteAsync
-             - Passing a null FileFingerprint throws an ArgumentNullException.
-             - Passing a FileFingerprint that matches a record in the data access layer deletes the record.
-             - Passing a FileFingerprint that matches a record in the data access layer returns true.
-             - Passing a FileFingerprint that does not match a record in the data access layer does not
-               modify existing records.
-             - Passing a FileFingerprint that does not match a record in the data access layer returns false.
-            
-             DeleteAllAsync
-             - Deletes all records from the data access layer.
-             - Returns the number of records that were deleted from the data access layer.
-             </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_NullILogger_ThrowsArgumentNullException">
-            <summary>Ctor: Passing a null ILogger{MemoryDataAccessLayer} throws an
-            ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_NullFireMothContext_ThrowsArgumentNullException">
-            <summary>Ctor: Passing a null FireMothContext throws an ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NullFilterNullOrderBy_ReturnsUnfilteredUnorderedCollection">
-            <summary>GetAsync: Passing null filter and null orderBy expressions returns an unfiltered
-            and unordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NonNullFilterNullOrderBy_ReturnsFilteredUnorderedCollection">
-            <summary>GetAsync: Passing non-null filter and null orderBy expressions returns a filtered
-            and unordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NullFilterNonNullOrderBy_ReturnsUnfilteredOrderedCollection">
-            <summary>GetAsync: Passing null filter and non-null orderBy expressions returns an
-            unfiltered and ordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_NonNullFilterNonNullOrderBy_ReturnsFilteredOrderedCollection">
-            <summary>GetAsync: Passing non-null filter and non-null orderBy expressions returns a
-            filtered and ordered collection of records.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddAsync_NullFileFingerprint_ThrowsArgumentNullException">
-            <summary>AddAsync: Passing a null FileFingerprint throws an ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddAsync_NonNullFileFingerprint_AddsRecord">
-            <summary>AddAsync: Passing a non-null FileFingerprint adds a record to the data access
-            layer.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddManyAsync_NullIEnumerable_ThrowsArgumentNullException">
-            <summary>AddManyAsync: Passing a null IEnumerable{FileFingerprint} throws an
-            ArgumentNullException.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddManyAsync_NonNullIEnumerable_AddsRecords">
-            <summary>AddManyAsync: Passing a non-null IEnumerable{FileFingerprint} adds the records to
-            the data access layer.</summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_NullFileFingerprint_ThrowsArgumentNullException">
-            <summary>DeleteAsync: Passing a null FileFingerprint throws an ArgumentNullException.
+            <summary>
+            <p>
+            Ctor<br/>
+            - Passing [ILogger{MemoryDataAccessLayer}:null] throws an ArgumentNullException.<br/>
+            - Passing [FireMothContext:null] throws an ArgumentNullException.<br/>
+            </p>
+            <p>
+            GetAsync<br/>
+            - Passing [filter:null, orderBy:null] returns an unfiltered, unordered collection.<br/>
+            - Passing [filter:non-null, orderBy:null] returns a filtered, unordered collection.<br/>
+            - Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered collection.<br/>
+            - Passing [filter:non-null, orderBy:non-null] returns a filtered, ordered collection.<br/>
+            </p>
+            <p>
+            AddAsync<br/>
+            - Passing [FileFingerprint:null] throws an ArgumentNullException.<br/>
+            - Passing [FileFingerprint:non-null] adds a record to the data access layer.<br/>
+            </p>
+            <p>
+            AddManyAsync<br/>
+            - Passing [IEnumerable{FileFingerprint}:null] throws an ArgumentNullException.<br/>
+            - Passing [IEnumerable{FileFingerprint}:non-null] adds the records to the data access layer.
+            <br/>
+            </p>
+            <p>
+            DeleteAsync<br/>
+            - Passing [FileFingerprint:null] throws an ArgumentNullException.<br/>
+            - Passing [FileFingerprint:matches a record in the data access layer] deletes the record.<br/>
+            - Passing [FileFingerprint:matches a record in the data access layer] returns true.<br/>
+            - Passing [FileFingerprint:does not match a record in the data access layer] does not modify
+              existing records.<br/>
+            - Passing [FileFingerprint:does not match a record in the data access layer] returns false.<br/>
+            </p>
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_MatchingValueIsDeleted">
-            <summary>DeleteAsync: Passing a FileFingerprint that matches a record in the data access
-            layer deletes the record.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_ILoggerNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [ILogger{MemoryDataAccessLayer}:null] throws an
+            ArgumentNullException.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintExists_ReturnsTrue">
-            <summary>DeleteAsync: If non-null FileFingerprint that matches a record in the data access
-            layer is passed, true is returned.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.Ctor_FireMothContextNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [FireMothContext:null] throws an ArgumentNullException.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_NoChangesMade">
-            <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
-            access layer is passed, the data access layer's existing records are not modified.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_FilterNullOrderByNull_ReturnsUnfilteredUnorderedCollection">
+            <summary>GetAsync: Passing [filter:null, orderBy:null] returns an unfiltered, unordered
+            collection.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_MatchingFileFingerprintDoesNotExist_ReturnsFalse">
-            <summary>DeleteAsync: If non-null FileFingerprint that does not match a record in the data
-            access layer is passed, false is returned.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_FilterNonNullOrderByNull_ReturnsFilteredUnorderedCollection">
+            <summary>GetAsync: Passing [filter:non-null, orderBy:null] returns a filtered, unordered
+            collection.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAllAsync_MethodCalled_DeletesAllRecords">
-            <summary>DeleteAllAsync: Deletes all records from the data access layer.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_FilterNullOrderByNonNull_ReturnsUnfilteredOrderedCollection">
+            <summary>GetAsync: Passing [filter:null, orderBy:non-null] returns an unfiltered, ordered
+            collection.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAllAsync_MethodCalled_ReturnsDeletedRecordCount">
-            <summary>DeleteAllAsync: Returns the number of records that were deleted from the data
-            access layer.</summary>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.GetAsync_FilterNonNullOrderByNonNull_ReturnsFilteredOrderedCollection">
+            <summary>GetAsync: Passing [filter:non-null, orderBy:non-null] returns a filtered, ordered
+            collection.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddAsync_FileFingerprintNull_ThrowsArgumentNullException">
+            <summary>AddAsync: Passing [FileFingerprint:null] throws an ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddAsync_FileFingerprintNonNull_AddsRecord">
+            <summary>AddAsync: Passing [FileFingerprint:non-null] adds a record to the data access
+            layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddManyAsync_IEnumerableNull_ThrowsArgumentNullException">
+            <summary>AddManyAsync: Passing [IEnumerable{FileFingerprint}:null] throws an
+            ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.AddManyAsync_IEnumerableNonNull_AddsRecords">
+            <summary>AddManyAsync: Passing [IEnumerable{FileFingerprint}:non-null] adds the records to
+            the data access layer.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_FileFingerprintNull_ThrowsArgumentNullException">
+            <summary>DeleteAsync: Passing [FileFingerprint:null] throws an ArgumentNullException.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_FileFingerprintMatchExists_MatchingValueIsDeleted">
+            <summary>DeleteAsync: Passing [FileFingerprint:matches a record in the data access layer]
+            deletes the record.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_FileFingerprintMatchExists_ReturnsTrue">
+            <summary>DeleteAsync: Passing [FileFingerprint:matches a record in the data access layer]
+            returns true.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_FileFingerprintMatchDoesNotExist_NoChangesMade">
+            <summary>DeleteAsync: Passing [FileFingerprint:does not match a record in the data access
+            layer] does not modify existing records.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAccess.Sqlite.SqliteDataAccessLayerTests.DeleteAsync_FileFingerprintMatchDoesNotExist_ReturnsFalse">
+            <summary>DeleteAsync: Passing [FileFingerprint:does not match a record in the data access
+            layer] returns false.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests">
+            <summary>
+            <p>
+            ComputeHashFromStream<br/>
+            - Calling on a disposed object throws an ObjectDisposedException.<br/>
+            - Passing [Stream:null] throws an ArgumentNullException.<br/>
+            - Passing [Stream:contains less data than the input buffer size] returns a proper hash of the
+              data.<br/>
+            - Passing [Stream:contains more data than the input buffer size] returns a proper hash of the
+              data.<br/>
+            - Passing [Stream:contains no data] returns the proper hash for an empty data stream.<br/>
+            </p>
+            <p>
+            Dispose<br/>
+            - Calling on a non-disposed object disposes the object.<br/>
+            - Calling on a disposed object does not throw exceptions.<br/>
+            </p>
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.ComputeHashFromStream_ObjectDisposed_ThrowsObjectDisposedException">
+            <summary>ComputeHashFromStream: Calling on a disposed object throws an
+            ObjectDisposedException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.ComputeHashFromStream_StreamNull_ThrowsArgumentNullException">
+            <summary>ComputeHashFromStream: Passing [Stream:null] throws an ArgumentNullException.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.ComputeHashFromStream_StreamContainsLessDataThanInputBufferSize_ReturnsCorrectHash">
+            <summary>ComputeHashFromStream: Passing [Stream:contains less data than the input buffer
+            size] returns a proper hash of the data.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.ComputeHashFromStream_StreamContainsMoreDataThanInputBufferSize_ReturnsCorrectHash">
+            <summary>ComputeHashFromStream: Passing [Stream:contains more data than the input buffer
+            size] returns a proper hash of the data.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.ComputeHashFromStream_StreamContainsNoData_ReturnsSomething">
+            <summary>ComputeHashFromStream: Passing [Stream:contains no data] returns the proper hash
+            for an empty data stream.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.Dispose_CalledOnNonDisposedObject_DisposesObject">
+            <summary>Dispose: Calling on a non-disposed object disposes the object.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.DataAnalysis.SHA256FileHasherTests.Dispose_CalledOnDisposedObject_DoesNotThrow">
+            <summary>Dispose: Calling on a disposed object does not throw exceptions.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Extensions.MockExtensions.VerifyLogCalled``1(Moq.Mock{Microsoft.Extensions.Logging.ILogger{``0}},System.String,Microsoft.Extensions.Logging.LogLevel)">
             <summary>
@@ -264,6 +304,263 @@
             <param name="logLevel">The expected log level to verify an invocation of
             <see cref="M:Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(Microsoft.Extensions.Logging.ILogger,System.String,System.Object[])"/> with.</param>
             <returns>The <see cref="T:Moq.Mock`1"/> on which this method was called.</returns>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests">
+            <summary>
+            <p>
+            Ctor<br/>
+            - Passing [message:null] throws an ArgumentNullException.<br/>
+            - Passing [message:empty or whitespace] throws an ArgumentException.<br/>
+            - Passing [valid parameters] properly initializes an object.<br/>
+            </p>
+            <p>
+            GetPath (property)<br/>
+            - Returns the proper value of the path property.<br/>
+            </p>
+            <p>
+            GetMessage (property)<br/>
+            - Returns the proper value of the message property.<br/>
+            </p>
+            <p>
+            GetException (property)<br/>
+            - Returns the proper value of the exception property.<br/>
+            </p>
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests.Ctor_MessageNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [message:null] throws an ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests.Ctor_MessageEmptyOrWhitespace_ThrowsArgumentException(System.String)">
+            <summary>Ctor: Passing [message:empty or whitespace] throws an ArgumentException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests.Ctor_ValidParameters_InitializesObject">
+            <summary>Ctor: Passing [valid parameters] properly initializes an object.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests.GetPath_MethodCalled_ReturnsCorrectValue">
+            <summary>GetPath: Returns the proper value of the path property.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests.GetMessage_MethodCalled_ReturnsCorrectValue">
+            <summary>GetMessage: Returns the proper value of the message property.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanErrorTests.GetException_MethodCalled_ReturnsCorrectValue">
+            <summary>GetException: Returns the proper value of the exception property.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests">
+            <summary>
+            <p>
+            Ctor<br/>
+            - Initializes all collection properties.<br/>
+            </p>
+            <p>
+            GetScannedFiles (Property)<br/>
+            - Returns the proper value of the ScannedFiles property.<br/>
+            </p>
+            <p>
+            GetSkippedFiles (Property)<br/>
+            - Returns the proper value of the SkippedFiles property.<br/>
+            </p>
+            <p>
+            GetErrors (Property)<br/>
+            - Returns the proper value of the Errors property.<br/>
+            </p>
+            <p>
+            OperatorAddition<br/>
+            - Passing [a:null, b:null] throws ArgumentNullException.<br/>
+            - Passing [a:null, b:non-null] returns new ScanResult with values from b.<br/>
+            - Passing [a:non-null, b:null] returns new ScanResult with values from a.<br/>
+            - Passing [a:non-null, b:non-null] returns new ScanResult with combined values from both a and
+              b.<br/>
+            </p>
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.Ctor_MethodCalled_InitializesCollectionProperties">
+            <summary>Ctor: Initializes all collection properties.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.GetScannedFiles_MethodCalled_ReturnsCorrectValue">
+            <summary>GetScannedFiles: Returns the proper value of the ScannedFiles property.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.GetSkilledFiles_MethodCalled_ReturnsCorrectValue">
+            <summary>GetSkippedFiles: Returns the proper value of the SkippedFiles property.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.GetErrors_MethodCalled_ReturnsCorrectValue">
+            <summary>GetErrors: Returns the proper value of the Errors property.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.OperatorAddition_ANullBNull_ThrowsArgumentNullException">
+            <summary>OperatorAddition: Passing [a:null, b:null] throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.OperatorAddition_ANullBNonNull_ReturnsCorrectScanResult">
+            <summary>OperatorAddition: Passing [a:null, b:non-null] returns new ScanResult with values
+            from b.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.OperatorAddition_ANonNullBNull_ReturnsCorrectScanResult">
+            <summary>OperatorAddition: Passing [a:non-null, b:null] returns new ScanResult with values
+            from a.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.FileScanning.ScanResultTests.OperatorAddition_ANonNullBNonNull_ReturnsCorrectScanResult">
+            <summary>OperatorAddition: Passing [a:non-null, b:non-null] returns new ScanResult with
+            combined values from both a and b.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOptionsTests">
+            <summary>
+            <p> 
+            InitDirectory (Property)<br/>
+            - Sets Directory property.<br/>
+            </p>
+            <p> 
+            InitRecursive (property)<br/>
+            - Sets Recursive property.<br/>
+            </p>
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOptionsTests.InitDirectory_MethodCalled_SetsDirectoryProperty">
+            <summary>InitDirectory: Sets Directory property.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOptionsTests.InitRecursive_MethodCalled_SetsRecursiveProperty">
+            <summary>InitRecursive: Sets Recursive property.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests">
+            <summary>
+            <p> 
+            Ctor<br/>
+            - Passing [IFileScanOrchestrator:null] throws ArgumentNullException.<br/>
+            - Passing [IFileSystem:null] throws ArgumentNullException.<br/>
+            - Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.<br/>
+            - Passing [IOptions{DirectoryScanOptions} with null Value.Directory property] throws
+            ArgumentException.<br/>
+            - Passing [ILogger{DirectoryScanOrchestrator}:null] throws ArgumentNullException.<br/>
+            - Passing [valid parameters] creates a new object.<br/>
+            </p>
+            <p>
+            ScanDirectoryAsync<br/>
+            - When DirectoryScanOptions.Recursive is true, calls IFileScanOrchestrator.ScanFilesAsync with
+            all available files from the scan directory and its subdirectories, enumerated recursively.<br/> 
+            - When DirectoryScanOptions.Recursive is false, calls IFileScanOrchestrator.ScanFilesAsync with
+            all available files from the scan directory, ignoring any files in subdirectories.<br/> 
+            - When DirectoryScanOptions.Directory specifies an empty directory,
+            IFileScanOrchestrator.ScanFilesAsync is not called.<br/>
+            - Relevant messages are logged.<br/>
+            </p>
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.Ctor_IFileScanOrchestratorNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [IFileScanOrchestrator:null] throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.Ctor_IFileSystemNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [IFileSystem:null] throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.Ctor_IOptionsNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [IOptions{DirectoryScanOptions}:null] throws ArgumentNullException.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.Ctor_IOptionsValueDirectoryNull_ThrowsArgumentException">
+            <summary>Ctor: Passing [IOptions{DirectoryScanOptions} with null Value.Directory property]
+            throws ArgumentException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.Ctor_ILoggerNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [ILogger{DirectoryScanOrchestrator}:null] throws
+            ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.Ctor_ValidParameters_CreatesNewObject">
+            <summary>Passing [valid parameters] creates a new object.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.ScanDirectoryAsync_RecursiveScanOptionTrue_InitiatesRecursiveScan">
+            <summary>ScanDirectoryAsync: When DirectoryScanOptions.Recursive is true, calls
+            IFileScanOrchestrator.ScanFilesAsync with all available files from the scan directory and
+            its subdirectories, enumerated recursively.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.ScanDirectoryAsync_RecursiveScanOptionFalse_InitiatesNonRecursiveScan">
+            <summary>ScanDirectoryAsync: When DirectoryScanOptions.Recursive is false, calls
+            IFileScanOrchestrator.ScanFilesAsync with all available files from the scan directory,
+            ignoring any files in subdirectories.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.ScanDirectoryAsync_EmptyDirectory_DoesNotInitiateScan">
+            <summary>ScanDirectoryAsync: When DirectoryScanOptions.Directory specifies an empty
+            directory, IFileScanOrchestrator.ScanFilesAsync is not called.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.DirectoryScanOrchestratorTests.ScanDirectoryAsync_MethodCalled_LogsExpectedMessages">
+            <summary>ScanDirectoryAsync: Relevant messages are logged.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests">
+            <summary>
+            <p> 
+            Ctor<br/>
+            - Passing [IFileFingerprintRepository:null] throws ArgumentNullException.<br/>
+            - Passing [IFileHasher:null] throws ArgumentNullException.<br/>
+            - Passing [IFileSystem:null] throws ArgumentNullException.<br/>
+            - Passing [ILogger{FileScanOrchestrator}:null] throws ArgumentNullException.<br/>
+            - Passing [valid parameters] creates a new object.<br/>
+            </p>
+            <p>
+            ScanFilesAsync<br/>
+            - Passing [IEnumerable{string}:null] throws ArgumentNullException.<br/>
+            - Passing [IEnumerable{string}:containing set of file paths] calls
+              IFileHasher.ComputeHashFromStream and IFileFingerprintRepository.AddAsync for each file in the
+              collection.<br/>
+            - Passing [IEnumerable{string}:containing set of file paths] returns a ScanResult containing the
+              correct results of the scan.<br/>
+            - Passing [IEnumerable{string}:containing files that throw IOException or
+              UnauthorizedAccessException during scanning] skips the errored files and adds them to the
+              ScanResult.SkippedFiles collection.<br/>
+            - Passing [IEnumerable{string}:containing files that throw IOException or
+              UnauthorizedAccessException during scanning] skips the errored files and adds an error to the
+              ScanResult.Errors collection.<br/>
+            - Passing [IEnumerable{string}:containing files that throw IOException or
+              UnauthorizedAccessException during scanning] writes a properly formatted error message to the
+              log.<br/>  
+            - Completing the scan writes a properly formatted information message to the log.<br/>
+            - The method writes properly formatted information messages to the log for each file scanned.
+            <br/> 
+            </p>
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.Ctor_FileFingerprintRepositoryNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.Ctor_FileHasherNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [IFileHasher:null] throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.Ctor_FileSystemNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [IFileSystem:null] throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.Ctor_LoggerNull_ThrowsArgumentNullException">
+            <summary>Ctor: Passing [ILogger{FileScanOrchestrator}:null] throws ArgumentNullException.
+            </summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.Ctor_ValidParameters_CreatesNewObject">
+            <summary>Ctor: Passing [valid parameters] creates a new object.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.ScanFilesAsync_EnumerableNull_ThrowsArgumentNullException">
+            ScanFilesAsync<br/>
+            - <br/>
+            - Passing [IEnumerable{string}:containing set of file paths] returns a ScanResult containing the
+              correct results of the scan.<br/>
+            - Passing [IEnumerable{string}:containing files that throw IOException or
+              UnauthorizedAccessException during scanning] skips the errored files and adds them to the
+              ScanResult.SkippedFiles collection.<br/>
+            - Passing [IEnumerable{string}:containing files that throw IOException or
+              UnauthorizedAccessException during scanning] skips the errored files and adds an error to the
+              ScanResult.Errors collection.<br/>
+            - Passing [IEnumerable{string}:containing files that throw IOException or
+              UnauthorizedAccessException during scanning] writes a properly formatted error message to the
+              log.<br/>  
+            - Completing the scan writes a properly formatted information message to the log.<br/>
+            - The method writes properly formatted information messages to the log for each file scanned.
+            <summary>ScanFilesAsync: Passing [IEnumerable{string}:null] throws ArgumentNullException.
+            </summary> 
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.ScanFilesAsync_IEnumerableContainsValidFilePaths_AddsFilesToRepository">
+            <summary>ScanFilesAsync: Passing [IEnumerable{string}:containing set of file paths] calls
+            IFileFingerprintRepository.AddAsync for each file in the collection.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.ScanFilesAsync_IEnumerableContainsValidFilePaths_ComputesHashForFiles">
+            <summary>ScanFilesAsync: Passing [IEnumerable{string}:containing set of file paths] calls
+            IFileHasher.ComputeHashAsync for each file in the collection.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Services.Tests.Unit.Orchestration.FileScanOrchestratorTests.SaveStreamDataAndResetPosition(System.IO.Stream,System.Collections.Generic.List{System.Byte[]})">
+            <summary>ScanFilesAsync: Passing [IEnumerable{string}:containing set of file paths] calls
+            IFileHasher.ComputeHashFromStream and IFileFingerprintRepository.AddAsync for each file in
+            the collection.</summary>
         </member>
     </members>
 </doc>

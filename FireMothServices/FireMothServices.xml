@@ -69,9 +69,8 @@
             reference is null.</exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.AddManyAsync(System.Collections.Generic.IEnumerable{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
-            <summary>
-            Adds the provided collection of <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s to the data access layer.
-            </summary>
+            <summary> Adds the provided collection of <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s to the data access
+            layer.</summary>
             <param name="fileFingerprints">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing
             items to add.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when provided collection is null.</exception>
@@ -148,14 +147,10 @@
             <returns>An array of <c>byte</c> containing the value of the computed hash.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher">
-            <summary>
-            Provides file hashing services using the SHA256 algorithm.
-            </summary>
+            <summary>Provides file hashing services using the SHA256 algorithm.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher"/> class.
-            </summary>
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher"/> class.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.ComputeHashFromStream(System.IO.Stream)">
             <inheritdoc/>
@@ -164,9 +159,7 @@
             <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAnalysis.SHA256FileHasher.Dispose(System.Boolean)">
-            <summary>
-            Releases unmanaged and, optionally, managed resources.
-            </summary>
+            <summary>Releases unmanaged and, optionally, managed resources.</summary>
             <param name="disposing">If true, managed resources are freed.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Extensions.StringExtensions">
@@ -218,36 +211,6 @@
             <summary>
             Gets the exception related to this error.
             </summary>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.op_Equality(RiotClub.FireMoth.Services.FileScanning.ScanError,RiotClub.FireMoth.Services.FileScanning.ScanError)">
-            <summary>
-            Implements the equality operator.
-            </summary>
-            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for equality.</param>
-            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for equality.
-            </param>
-            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/>s are equal; false otherwise.
-            </returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.op_Inequality(RiotClub.FireMoth.Services.FileScanning.ScanError,RiotClub.FireMoth.Services.FileScanning.ScanError)">
-            <summary>
-            Implements the inequality operator.
-            </summary>
-            <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for inequality.
-            </param>
-            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/> to test for inequality.
-            </param>
-            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.FileScanning.ScanError"/>s are not equal; false otherwise.
-            </returns>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.Equals(System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.Equals(RiotClub.FireMoth.Services.FileScanning.ScanError)">
-            <inheritdoc/>
-        </member>
-        <member name="M:RiotClub.FireMoth.Services.FileScanning.ScanError.GetHashCode">
-            <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.FileScanning.ScanResult">
             <summary>
@@ -304,8 +267,8 @@
         </member>
         <member name="P:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions.Recursive">
             <summary>
-            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions.Directory"/> will
-            be recursively scanned.
+            Gets or sets a value indicating whether subdirectories of <see cref="P:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions.Directory"/> will be
+            recursively scanned.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator">
@@ -314,12 +277,14 @@
             hash to an <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
             </summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator,System.IO.Abstractions.IFileSystem,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.Orchestration.DirectoryScanOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator})">
             <summary>
             Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.DirectoryScanOrchestrator"/> class.
             </summary>
             <param name="fileScanOrchestrator">An <see cref="T:RiotClub.FireMoth.Services.Orchestration.IFileScanOrchestrator"/> that manages
             scanning of files.</param>
+            <param name="fileSystem">An <see cref="T:System.IO.Abstractions.IFileSystem"/> that provides file system I/O access.
+            </param>
             <param name="directoryScanOptions">An <see cref="T:Microsoft.Extensions.Options.IOptions`1"/>
             containing the configured options for this directory scan orchestrator.</param>
             <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output
@@ -329,21 +294,20 @@
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator">
-            <summary>
-            File scanner implementation that scans a collection of files and writes file fingerprint data to an
-            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
-            </summary>
+            <summary>File scanner implementation that scans a collection of files and writes file
+            fingerprint data to an <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/>.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,RiotClub.FireMoth.Services.DataAnalysis.IFileHasher,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator"/> class.
+        <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,RiotClub.FireMoth.Services.DataAnalysis.IFileHasher,System.IO.Abstractions.IFileSystem,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator})">
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator"/> class.
             </summary>
-            <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> that provides access to
-            the application backing store.</param>
-            <param name="fileHasher">An <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher"/> that is used to compute hash values for scanned files.
+            <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> that
+            provides access to the application backing store.</param>
+            <param name="fileHasher">An <see cref="T:RiotClub.FireMoth.Services.DataAnalysis.IFileHasher"/> that is used to compute hash values
+            for scanned files.</param>
+            <param name="fileSystem">An <see cref="T:System.IO.Abstractions.IFileSystem"/> that provides file system I/O access.
             </param>
-            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output will be written.
-            </param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output
+            will be written.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.ScanFilesAsync(System.Collections.Generic.IEnumerable{System.String})">
             <inheritdoc/>
@@ -453,13 +417,10 @@
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository">
-            <summary>
-            A repository that provides access to <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s.
-            </summary>
+            <summary>A repository that provides access to <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>s.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository.#ctor(RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository"/> class.
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprintRepository"/> class.
             </summary>
             <param name="dataAccessLayer">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>
             implementation used to persist data.</param>
@@ -566,31 +527,23 @@
             Deletes all file fingerprints from the repository.
             </summary>
         </member>
-        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler">
-            <summary>
-            A task handler that performs operations on files containing duplicate hash values.
-            </summary>
+        <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileDeleteHandler">
+            <summary>A task handler that performs file delete operations on files containing duplicate hash
+            values.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler})">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler"/> class.
+        <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileDeleteHandler.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,System.IO.Abstractions.IFileSystem,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.Tasks.DuplicateFileMoveHandler})">
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileDeleteHandler"/> class.
             </summary>
             <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> used to
-            retrieve duplicate records for handling and modify or delete records after handling.
+            retrieve duplicate records for handling and modify or delete records after handling.</param>
+            <param name="fileSystem">An <see cref="T:System.IO.Abstractions.IFileSystem"/> that provides file system I/O access.
             </param>
-            <param name="duplicateFileHandlingOptions">An
-            <see cref="T:Microsoft.Extensions.Options.IOptions`1"/> containing configured options for this
-            task handler.</param>
             <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging output
             will be written.</param>
         </member>
-        <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler.RunTaskAsync">
-            <summary>
-            Runs the duplicate file handler task by either deleting or moving files with duplicate
-            hashes in the <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> depending on the provided
-            <see cref="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler._duplicateFileHandlingOptions"/>.
-            </summary>
-            <returns><c>true</c></returns>
+        <member name="M:RiotClub.FireMoth.Services.Tasks.DuplicateFileDeleteHandler.RunTaskAsync">
+            <summary>Runs the duplicate file handler task by deleting files with duplicate hashes in the
+            <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/>.</summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod">
             <summary>
@@ -613,40 +566,27 @@
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions">
-            <summary>
-            Contains options pertaining to how duplicate files are handled by
-            <see cref="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandler"/>s.
-            </summary>
+            <summary>Contains options pertaining to how duplicate files are handled by
+            <see cref="!:DuplicateFileHandler"/>s.</summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod">
-            <summary>
-            A <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> used to indicate how duplicate files should be
-            handled.
-            </summary>
+            <summary>A <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> used to indicate how duplicate files
+            should be handled.</summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.Interactive">
-            <summary>
-            A flag indicating whether or not duplicate file deletion or moving should be
-            user-interactive or not.
-            </summary>
+            <summary>A flag indicating whether duplicate file deletion or moving should be
+            user-interactive or not.</summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.MoveDuplicateFilesToDirectory">
-            <summary>
-            The full path where duplicate files will be moved to when
+            <summary>The full path where duplicate files will be moved to when
             <see cref="P:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions.DuplicateFileHandlingMethod"/> is <see cref="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Move"/>.
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.ITaskHandler">
-            <summary>
-            Defines the public interface for a class that runs a task.
-            </summary>
+            <summary>Defines the public interface for a class that runs a task.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tasks.ITaskHandler.RunTaskAsync">
-            <summary>
-            Performs the task for this task handler.
-            </summary>
-            <returns>An asynchronous <see cref="T:System.Threading.Tasks.Task"/> with a <see cref="T:System.Boolean"/> result indicating
-            whether the task completed successfully (<c>true</c>) or failed (<c>false</c>).</returns>
+            <summary>Performs the task for this task handler.</summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar">
             <summary>

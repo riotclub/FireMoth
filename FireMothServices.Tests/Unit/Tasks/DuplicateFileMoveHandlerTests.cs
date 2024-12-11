@@ -61,8 +61,6 @@ public class DuplicateFileMoveHandlerTests
     private readonly Mock<IFileFingerprintRepository> _mockRepository = new();
     private readonly Mock<IOptions<DuplicateFileHandlingOptions>> _mockOptions = new();
     private readonly MockFileSystem _mockFileSystem = FileSystemTestHelpers.BuildMockFileSystem();
-    
-    private readonly AutoMocker _mocker = new();
 
     public DuplicateFileMoveHandlerTests()
     {
@@ -71,6 +69,7 @@ public class DuplicateFileMoveHandlerTests
             .Returns(BuildDuplicateFileHandlingOptions());
     }
     
+#region Ctor
     /// <summary>Ctor: Passing [IFileFingerprintRepository:null] throws ArgumentNullException.
     /// </summary> 
     [Fact]
@@ -135,8 +134,10 @@ public class DuplicateFileMoveHandlerTests
         
         // Assert
         result.Should().NotBeNull();
-    }   
-    
+    } 
+#endregion
+
+#region RunTaskAsync
     /// RunTaskAsync<br/>
 
     /// - Relevant messages are logged.<br/>
@@ -372,6 +373,7 @@ public class DuplicateFileMoveHandlerTests
         // var filesAfterMove = _mockFileSystem.AllFiles.ToList();
         // filesAfterMove.Should().BeEquivalentTo(allFiles);
     }
+#endregion
     
     private static DuplicateFileHandlingOptions BuildDuplicateFileHandlingOptions(
         bool interactive = false,
