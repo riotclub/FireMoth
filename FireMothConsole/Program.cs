@@ -208,9 +208,7 @@ public static class Program
 
                         var seqHost = context.Configuration["SeqHost"];
                         if (seqHost is not null)
-                        {
                             configuration.WriteTo.Seq(seqHost);
-                        }
                     })
                     .ConfigureServices((hostContext, services) =>
                     {
