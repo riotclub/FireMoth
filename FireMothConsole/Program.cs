@@ -201,10 +201,8 @@ public static class Program
                     .UseConsoleLifetime()
                     .UseSerilog((context, services, configuration) =>
                     {
-                        configuration
-                            .ReadFrom.Configuration(context.Configuration)
-                            .ReadFrom.Services(services)
-                            .WriteTo.Console();
+                        configuration.ReadFrom.Configuration(context.Configuration)
+                            .ReadFrom.Services(services);
 
                         var seqHost = context.Configuration["SeqHost"];
                         if (seqHost is not null)

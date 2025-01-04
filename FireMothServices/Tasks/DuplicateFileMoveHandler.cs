@@ -131,9 +131,9 @@ public class DuplicateFileMoveHandler : ITaskHandler
                 _duplicateFileHandlingOptions.MoveDuplicateFilesToDirectory!);
         }
         catch (Exception ex) when (ex is ArgumentNullException or
-                                       ArgumentException or
-                                       SecurityException or
-                                       PathTooLongException)
+                                         ArgumentException or
+                                         SecurityException or
+                                         PathTooLongException)
         {
             _logger.LogError(
                 "Duplicate file directory '{MoveDuplicateFilesToDirectory}' is invalid: " +
@@ -160,7 +160,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
         {
             _logger.LogError(
                 "Unable to create duplicate file directory '{MoveDuplicateFilesToDirectory}':" +
-                " {ExceptionMessage}",
+                    " {ExceptionMessage}",
                 _duplicateFileHandlingOptions.MoveDuplicateFilesToDirectory,
                 ex.Message);
             return false;
