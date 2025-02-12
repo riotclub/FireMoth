@@ -202,7 +202,7 @@ public static class Program
                     .UseSerilog((context, services, configuration) =>
                     {
                         configuration.ReadFrom.Configuration(context.Configuration)
-                            .ReadFrom.Services(services);
+                                     .ReadFrom.Services(services);
 
                         var seqHost = context.Configuration["SeqHost"];
                         if (seqHost is not null)
