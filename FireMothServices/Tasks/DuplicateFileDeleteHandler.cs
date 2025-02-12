@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
+using ByteSizeLib;
 
 /// <summary>A task handler that performs file delete operations on files containing duplicate hash
 /// values.</summary>
@@ -51,7 +52,7 @@ public class DuplicateFileDeleteHandler : ITaskHandler
             await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
 
         var deletedFilesCount = 0;
-        long deletedFilesSize = 0;
+        long deletedFilesSizeBytes = 0;
         
         foreach (var grouping in duplicateRecords)
         {
@@ -68,7 +69,7 @@ public class DuplicateFileDeleteHandler : ITaskHandler
                 {
                     _fileSystem.File.Delete(fingerprint.FullPath);
                     deletedFilesCount++;
-                    deletedFilesSize += fingerprint.FileSize;
+                    deletedFilesSizeBytes += fingerprint.FileSize;
                 }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                 {
@@ -79,10 +80,14 @@ public class DuplicateFileDeleteHandler : ITaskHandler
                 }
             }
         }
-        
+
+        var deletedFilesSizeHumanReadable =
+            ByteSize.FromBytes(deletedFilesSizeBytes).ToBinaryString();
         _logger.LogInformation(
-            "Deleted {DeletedFilesCount} files ({DeletedFilesSize} bytes).",
+            "Deleted {DeletedFilesCount} files, {DeletedFilesSizeBytes} bytes " +
+                "({DeletedFilesSizeHumanReadable}).",
             deletedFilesCount,
-            deletedFilesSize);
+            deletedFilesSizeBytes,
+            deletedFilesSizeHumanReadable);
     }
 }

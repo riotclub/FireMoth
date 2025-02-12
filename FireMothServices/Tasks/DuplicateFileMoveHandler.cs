@@ -11,6 +11,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
+using ByteSizeLib;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -69,13 +70,16 @@ public class DuplicateFileMoveHandler : ITaskHandler
             await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
 
         var movedFilesCount = 0;
-        long movedFilesSize = 0;
+        long movedFilesSizeBytes = 0;
         var destinationDirectory = _fileSystem.DirectoryInfo.New(
             _duplicateFileHandlingOptions.MoveDuplicateFilesToDirectory!);
+        _logger.LogInformation(
+            "Moving duplicate files to '{DuplicateFileMoveDirectory}'.",
+            destinationDirectory.FullName);
         
         foreach (var grouping in duplicateRecords)
         {
-            _logger.LogDebug("Moving duplicate records with hash {GroupHash}.", grouping.Key);
+            _logger.LogDebug("Moving duplicate files with hash {GroupHash}.", grouping.Key);
             var preservedFile = grouping.First();
             var filesToMove = grouping.TakeLast(grouping.Count() - 1);
             foreach (var fingerprint in filesToMove)
@@ -92,7 +96,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
                         _fileSystem.Path.GetFileName(fingerprint.FullPath));
                     _fileSystem.File.Move(fingerprint.FullPath, destinationFullPath);
                     movedFilesCount++;
-                    movedFilesSize += fingerprint.FileSize;
+                    movedFilesSizeBytes += fingerprint.FileSize;
                 }
                 catch (Exception ex) when (ex is IOException or
                                                  ArgumentException or
@@ -107,10 +111,13 @@ public class DuplicateFileMoveHandler : ITaskHandler
             }
         }
         
+        var movedFilesSizeHumanReadable = ByteSize.FromBytes(movedFilesSizeBytes).ToBinaryString();
         _logger.LogInformation(
-            "Moved {MovedFilesCount} duplicate files in total ({MovedFilesSize} bytes).",
+            "Moved {MovedFilesCount} duplicate files, {MovedFilesSizeBytes} bytes " +
+                "({MovedFilesSizeHumanReadable}).",
             movedFilesCount,
-            movedFilesSize);
+            movedFilesSizeBytes,
+            movedFilesSizeHumanReadable);
     }
     
     // Validate and create move directory
@@ -124,9 +131,9 @@ public class DuplicateFileMoveHandler : ITaskHandler
                 _duplicateFileHandlingOptions.MoveDuplicateFilesToDirectory!);
         }
         catch (Exception ex) when (ex is ArgumentNullException or
-                                       ArgumentException or
-                                       SecurityException or
-                                       PathTooLongException)
+                                         ArgumentException or
+                                         SecurityException or
+                                         PathTooLongException)
         {
             _logger.LogError(
                 "Duplicate file directory '{MoveDuplicateFilesToDirectory}' is invalid: " +
@@ -153,7 +160,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
         {
             _logger.LogError(
                 "Unable to create duplicate file directory '{MoveDuplicateFilesToDirectory}':" +
-                " {ExceptionMessage}",
+                    " {ExceptionMessage}",
                 _duplicateFileHandlingOptions.MoveDuplicateFilesToDirectory,
                 ex.Message);
             return false;

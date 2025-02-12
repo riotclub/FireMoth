@@ -39,7 +39,8 @@ public static class ServiceCollectionExtensions
     /// </param>
     /// <param name="config">An <see cref="IConfiguration"/> containing program runtime
     /// configuration.</param>
-    /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
+    /// <returns>The configured <see cref="IServiceCollection"/> to facilitate method chaining.
+    /// </returns>
     public static IServiceCollection AddFireMothServices(
         this IServiceCollection services, IConfiguration config)
     {
