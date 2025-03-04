@@ -98,7 +98,7 @@ public class SqliteDataAccessLayerTests : IClassFixture<SqliteFixture>, IDisposa
         ctorFunc.Should().ThrowExactly<ArgumentNullException>();
     }
 #endregion
-    
+
 #region GetAsync
     /// <summary>
     /// GetAsync: Call without filter or orderBy parameters returns all FileFingerprints.

@@ -6,6 +6,8 @@
 namespace RiotClub.FireMoth.Services.Tasks;
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -88,8 +90,18 @@ public class DuplicateFileMoveHandler : ITaskHandler
                     "Moving file '{DuplicateFile}'; duplicate of {PreservedFile}'.",
                     fingerprint.FullPath,
                     preservedFile.FullPath);
-                try                   
 
+                foreach (var fp in grouping)
+                {
+                    var processStartInfo = new ProcessStartInfo
+                    {
+                        FileName = fp.FullPath,
+                        UseShellExecute = true
+                    };
+                    Process.Start(processStartInfo);
+                }
+                
+                try                   
                 {
                     var destinationFullPath = GetUniqueFileName(
                         destinationDirectory.FullName,
