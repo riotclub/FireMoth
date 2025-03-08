@@ -95,8 +95,11 @@ public class DuplicateFileMoveHandler : ITaskHandler
                 {
                     var processStartInfo = new ProcessStartInfo
                     {
-                        FileName = fp.FullPath,
-                        UseShellExecute = true
+                        // FileName = fp.FullPath,
+                        // UseShellExecute = false
+                    
+                        FileName = "gwenview",
+                        Arguments = fp.FullPath
                     };
                     Process.Start(processStartInfo);
                 }
