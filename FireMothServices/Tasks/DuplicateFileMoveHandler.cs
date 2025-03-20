@@ -101,7 +101,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
                     Process.Start(processStartInfo);
                 }
                 
-                try                   
+                try
                 {
                     var destinationFullPath = GetUniqueFileName(
                         destinationDirectory.FullName,
