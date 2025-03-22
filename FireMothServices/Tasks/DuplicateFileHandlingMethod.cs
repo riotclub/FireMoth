@@ -5,23 +5,17 @@
 
 namespace RiotClub.FireMoth.Services.Tasks;
 
-/// <summary>
-/// Specifies the method for handling duplicates at the end of the scanning process.
+/// <summary>Specifies the method for handling duplicates at the end of the scanning process.
 /// </summary>
 public enum DuplicateFileHandlingMethod
 {
-    /// <summary>
-    /// Specifies that nothing should be done to duplicate files after scanning.
-    /// </summary>
+    /// <summary>Specifies that nothing should be done to duplicate files after scanning.</summary>
     NoAction,
     
-    /// <summary>
-    /// Specifies that duplicate files are deleted after scanning. 
-    /// </summary>
+    /// <summary>Specifies that duplicate files are deleted after scanning.</summary>
     Delete,
     
-    /// <summary>
-    /// Specifies that duplicate files should be moved to a separate directory after scanning.
-    /// </summary>
+    /// <summary>Specifies that duplicate files should be moved to a separate directory after
+    /// scanning.</summary>
     Move
 }

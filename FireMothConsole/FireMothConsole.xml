@@ -35,15 +35,11 @@
             </returns>
         </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
-            <summary>
-            Application entry point.
-            </summary>
+            <summary>Application entry point.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Console.Program.Main(System.String[])">
-            <summary>
-            Class and application entry point. Validates command-line arguments, performs startup
-            configuration, and invokes the directory scanning process.
-            </summary>
+            <summary>Class and application entry point. Validates command-line arguments, performs
+            startup configuration, and invokes the directory scanning process.</summary>
             <param name="args">Command-line arguments.</param>
             <returns>An <c>int</c> return code indicating invocation result.</returns>
         </member>

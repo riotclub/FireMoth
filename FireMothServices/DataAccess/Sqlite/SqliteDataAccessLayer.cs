@@ -15,22 +15,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RiotClub.FireMoth.Services.Repository;
 
-/// <summary>
-/// Implementation of a data access layer that persists data to a SQLite database.
+/// <summary>Implementation of a data access layer that persists data to a SQLite database.
 /// </summary>
-/// <remarks>
-/// SQLite does not support asynchronous I/O. All database operations in this class run
+/// <remarks>SQLite does not support asynchronous I/O. All database operations in this class run
 /// synchronously. Methods return <see cref="Task"/> objects as needed to properly implement
-/// <see cref="IDataAccessLayer{TValue}"/>.
-/// </remarks>
+/// <see cref="IDataAccessLayer{TValue}"/>.</remarks>
 /// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/async"/>
 public class SqliteDataAccessLayer : IDataAccessLayer<FileFingerprint>
 {
     private readonly ILogger<SqliteDataAccessLayer> _logger;
     private readonly FireMothContext _fireMothContext;
     
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SqliteDataAccessLayer"/> class.
+    /// <summary>Initializes a new instance of the <see cref="SqliteDataAccessLayer"/> class.
     /// </summary>
     /// <param name="logger">An <see cref="ILogger"/> used to log information.</param>
     /// <param name="context">A <see cref="FireMothContext"/> instance representing the database

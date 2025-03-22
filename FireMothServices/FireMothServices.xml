@@ -115,19 +115,15 @@
             <seealso cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FileFingerprintTypeConfiguration"/>
         </member>
         <member name="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer">
-            <summary>
-            Implementation of a data access layer that persists data to a SQLite database.
+            <summary>Implementation of a data access layer that persists data to a SQLite database.
             </summary>
-            <remarks>
-            SQLite does not support asynchronous I/O. All database operations in this class run
+            <remarks>SQLite does not support asynchronous I/O. All database operations in this class run
             synchronously. Methods return <see cref="T:System.Threading.Tasks.Task"/> objects as needed to properly implement
-            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.
-            </remarks>
+            <see cref="T:RiotClub.FireMoth.Services.DataAccess.IDataAccessLayer`1"/>.</remarks>
             <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/async"/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer.#ctor(Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer},RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer"/> class.
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.SqliteDataAccessLayer"/> class.
             </summary>
             <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger"/> used to log information.</param>
             <param name="context">A <see cref="T:RiotClub.FireMoth.Services.DataAccess.Sqlite.FireMothContext"/> instance representing the database
@@ -177,23 +173,16 @@
             <param name="disposing">If true, managed resources are freed.</param>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Extensions.StringExtensions">
-            <summary>
-            Contains extension methods for <see cref="T:System.String"/> objects.
-            </summary>
+            <summary>Contains extension methods for <see cref="T:System.String"/> objects.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Extensions.StringExtensions.IsEmptyOrWhiteSpace(System.String)">
-            <summary>
-            Returns <c>true</c> if the provided string is empty or contains only whitespace
-            characters.
-            </summary>
+            <summary>Returns <c>true</c> if the provided string is empty or contains only whitespace
+            characters.</summary>
             <param name="value">The string to check.</param>
-            <returns><c>true</c> if the provided string is empty or contains only whitespace.
-            </returns>
+            <returns><c>true</c> if the provided string is empty or contains only whitespace.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Extensions.StringExtensions.IsBase64String(System.String)">
-            <summary>
-            Returns <c>true</c> if the provided string is a valid base 64 string.
-            </summary>
+            <summary>Returns <c>true</c> if the provided string is a valid base 64 string.</summary>
             <param name="value">The string to check.</param>
             <returns><c>true</c> if the provided string is a valid base 64 string.</returns>
         </member>
@@ -540,24 +529,18 @@
             <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/>.</summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod">
-            <summary>
-            Specifies the method for handling duplicates at the end of the scanning process.
+            <summary>Specifies the method for handling duplicates at the end of the scanning process.
             </summary>
         </member>
         <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.NoAction">
-            <summary>
-            Specifies that nothing should be done to duplicate files after scanning.
-            </summary>
+            <summary>Specifies that nothing should be done to duplicate files after scanning.</summary>
         </member>
         <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Delete">
-            <summary>
-            Specifies that duplicate files are deleted after scanning. 
-            </summary>
+            <summary>Specifies that duplicate files are deleted after scanning.</summary>
         </member>
         <member name="F:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingMethod.Move">
-            <summary>
-            Specifies that duplicate files should be moved to a separate directory after scanning.
-            </summary>
+            <summary>Specifies that duplicate files should be moved to a separate directory after
+            scanning.</summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.DuplicateFileHandlingOptions">
             <summary>Contains options pertaining to how duplicate files are handled by
@@ -666,20 +649,14 @@
             </summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions">
-            <summary>
-            Specifies options that are used when performing a directory scan.
-            </summary>
+            <summary>Specifies options that are used when performing a directory scan.</summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions.OutputFile">
-            <summary>
-            Gets or sets the path of the file to output.
-            </summary>
+            <summary>Gets or sets the path of the file to output.</summary>
         </member>
         <member name="P:RiotClub.FireMoth.Services.Tasks.Output.ScanOutputOptions.OutputDuplicateInfoOnly">
-            <summary>
-            Gets or sets a value indicating whether only file fingerprint data for exact data duplicates
-            will be included in the output.
-            </summary>
+            <summary>Gets or sets a value indicating whether only file fingerprint data for exact data
+            duplicates will be included in the output.</summary>
         </member>
     </members>
 </doc>

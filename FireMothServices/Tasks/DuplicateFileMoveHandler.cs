@@ -91,6 +91,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
                     fingerprint.FullPath,
                     preservedFile.FullPath);
 
+                /*
                 foreach (var fp in grouping)
                 {
                     var processStartInfo = new ProcessStartInfo
@@ -100,6 +101,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
                     };
                     Process.Start(processStartInfo);
                 }
+                */
                 
                 try
                 {

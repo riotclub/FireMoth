@@ -6,7 +6,6 @@
 namespace RiotClub.FireMoth.Console;
 
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
@@ -15,24 +14,19 @@ using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using RiotClub.FireMoth.Console.Extensions;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Tasks.Output;
 using RiotClub.FireMoth.Services.Repository;
 using RiotClub.FireMoth.Services.Tasks;
-using RiotClub.FireMoth.Services.Tasks.Output.Csv;
 using Serilog;
 
-/// <summary>
-/// Application entry point.
-/// </summary>
+/// <summary>Application entry point.</summary>
 public static class Program
 {
     private const int BootstrapLogRetainedFileCountLimit = 2;
@@ -42,10 +36,8 @@ public static class Program
     
     private static readonly FileSystem FileSystem = new();
 
-    /// <summary>
-    /// Class and application entry point. Validates command-line arguments, performs startup
-    /// configuration, and invokes the directory scanning process.
-    /// </summary>
+    /// <summary>Class and application entry point. Validates command-line arguments, performs
+    /// startup configuration, and invokes the directory scanning process.</summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>An <c>int</c> return code indicating invocation result.</returns>
     public static int Main(string[] args)
@@ -62,8 +54,8 @@ public static class Program
         ProgramStartDateTime = DateTime.Now;
         var parser = BuildCommandLineParser(args);
         return parser.InvokeAsync(args).Result;
-    }    
-    
+    }
+
     private static Parser BuildCommandLineParser(string[] args)
     {
         // TODO: Per documentation, System.CommandLine should accept Option<DirectoryInfo> here, but
@@ -78,12 +70,12 @@ public static class Program
         scanDirectoryOption.AddValidator(result =>
         {
             var scanDirectory = result.GetValueForOption(scanDirectoryOption);
-            if (string.IsNullOrWhiteSpace(scanDirectory) ||
-                !FileSystem.Directory.Exists(scanDirectory))
-            {
-                Log.Fatal("Scan directory '{ScanDirectory}' does not exist.", scanDirectory);
-                result.ErrorMessage = $"Scan directory '{scanDirectory}' does not exist.";
-            }
+            if (!string.IsNullOrWhiteSpace(scanDirectory) &&
+                FileSystem.Directory.Exists(scanDirectory))
+                return;
+            
+            Log.Fatal("Scan directory '{ScanDirectory}' does not exist.", scanDirectory);
+            result.ErrorMessage = $"Scan directory '{scanDirectory}' does not exist.";
         });
 
         var recursiveScanOption = new Option<bool>(
@@ -96,43 +88,13 @@ public static class Program
             description: "File to write output to");
         outputFileOption.AddValidator(result =>
         {
-            var outputOptionValue = result.GetValueForOption(outputFileOption);
-            if (string.IsNullOrWhiteSpace(outputOptionValue))
-                return;
-
-            var outputFilePath = FileSystem.Path.GetFullPath(outputOptionValue);
-            string? errorText = null;
-            if (FileSystem.Directory.Exists(outputFilePath))
-            {
-                errorText = "Specified output path is an existing directory";
-            } 
-            else if (FileSystem.File.Exists(outputFilePath))
-            {
-                errorText = "Output file already exists";
-            }
-            else
-            {
-                try
-                {
-                    var outputFileName = FileSystem.Path.GetFileName(outputFilePath);
-                    var outputFileDirectory = FileSystem.Path.GetDirectoryName(outputFilePath);
-                    if (outputFileName.IndexOfAny(FileSystem.Path.GetInvalidFileNameChars()) >= 0
-                        || (outputFileDirectory is not null 
-                            && outputFileDirectory.IndexOfAny(FileSystem.Path.GetInvalidPathChars()) >= 0))
-                    {
-                        errorText = "Invalid output file";
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    errorText = $"Invalid output file: {e.Message}";
-                }
-            }
-
-            if (string.IsNullOrEmpty(errorText))
+            var isOutputFileValid =
+                ValidateOutputFileOption(
+                    result.GetValueForOption(outputFileOption), out var errorText);
+            if (isOutputFileValid) 
                 return;
             
-            Log.Fatal(errorText + ": '{OutputFilePath}'", outputFilePath);
+            Log.Fatal(errorText + ": '{OutputFilePath}'", errorText);
             result.ErrorMessage = errorText;
         });
         
@@ -149,11 +111,28 @@ public static class Program
         var moveDuplicateFilesToDirectoryOption = new Option<string?>(
             aliases: ["--move-duplicate-files-to-directory", "-M"],
             description: "Directory to move duplicate files to; ignored if " +
-                         "--duplicate-file-handling-method is not Move.",
+                         "--duplicate-file-handling-method is not Move",
             getDefaultValue: () =>
                 CommandLineConfigurationProvider.ScanDirectoryToken
                 + Path.DirectorySeparatorChar + "Duplicates");
 
+        var interactiveOption = new Option<bool?>(
+            aliases: ["--interactive", "-i"],
+            description: "Use interactive duplicate file handling (requires -m option)",
+            getDefaultValue: () => false);
+        interactiveOption.AddValidator(result =>
+        {
+            var duplicateOptionValue = result.GetValueForOption(duplicateFileHandlingMethodOption);
+            if (duplicateOptionValue is not null &&
+                duplicateOptionValue != DuplicateFileHandlingMethod.NoAction)
+                return;
+
+            const string errorText = "Interactive (-i) option requires a duplicate file handling " +
+                                     "method option (-m) of \"move\" or \"delete\""; 
+            Log.Fatal(errorText);
+            result.ErrorMessage = errorText;
+        });
+        
         var rootCommand =
             new RootCommand(description: "FireMoth file analysis and deduplication program.");
         rootCommand.AddOption(scanDirectoryOption);
@@ -162,6 +141,7 @@ public static class Program
         rootCommand.AddOption(outputDuplicateInfoOnlyOption);
         rootCommand.AddOption(duplicateFileHandlingMethodOption);
         rootCommand.AddOption(moveDuplicateFilesToDirectoryOption);
+        rootCommand.AddOption(interactiveOption);
         rootCommand.Handler = CommandHandler.Create<
                 IHost,
                 ParseResult,
@@ -170,7 +150,8 @@ public static class Program
                 string,
                 bool,
                 DuplicateFileHandlingMethod,
-                string>(
+                string,
+                bool>(
             async (
                 host,
                 parseResult,
@@ -182,7 +163,8 @@ public static class Program
                 outputFile,
                 outputDuplicateInfoOnly,
                 duplicateFileHandlingMethod,
-                moveDuplicateFilesToDirectory) =>
+                moveDuplicateFilesToDirectory,
+                interactive) =>
             {
                 Log.Debug("Command line parse result: {ParsedCommandLine}", parseResult);
                 await RunAsync(host);
@@ -274,6 +256,44 @@ public static class Program
             var disposableHandler = taskHandler as IDisposable;
             disposableHandler?.Dispose();
         }
+    }
+    
+    private static bool ValidateOutputFileOption(string? outputOptionValue, out string errorText)
+    {
+        errorText = string.Empty;
+        
+        if (string.IsNullOrWhiteSpace(outputOptionValue))
+            return false;
+
+        var outputFilePath = FileSystem.Path.GetFullPath(outputOptionValue);
+        if (FileSystem.Directory.Exists(outputFilePath))
+        {
+            errorText = "Specified output path is an existing directory";
+        }
+        else if (FileSystem.File.Exists(outputFilePath))
+        {
+            errorText = "Output file already exists";
+        }
+        else
+        {
+            try
+            {
+                var outputFileName = FileSystem.Path.GetFileName(outputFilePath);
+                var outputFileDirectory = FileSystem.Path.GetDirectoryName(outputFilePath);
+                if (outputFileName.IndexOfAny(FileSystem.Path.GetInvalidFileNameChars()) >= 0
+                    || (outputFileDirectory is not null 
+                        && outputFileDirectory.IndexOfAny(FileSystem.Path.GetInvalidPathChars()) >= 0))
+                {
+                    errorText = "Invalid output file";
+                }
+            }
+            catch (ArgumentException e)
+            {
+                errorText = $"Invalid output file: {e.Message}";
+            }
+        }
+
+        return string.IsNullOrEmpty(errorText);
     }
     
     private static async Task InitializeDatabaseAsync(IServiceScope scope)
