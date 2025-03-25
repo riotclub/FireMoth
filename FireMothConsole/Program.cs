@@ -91,7 +91,7 @@ public static class Program
             var isOutputFileValid =
                 ValidateOutputFileOption(
                     result.GetValueForOption(outputFileOption), out var errorText);
-            if (isOutputFileValid) 
+            if (isOutputFileValid)
                 return;
             
             Log.Fatal(errorText + ": '{OutputFilePath}'", errorText);

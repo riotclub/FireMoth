@@ -43,5 +43,23 @@
             <param name="args">Command-line arguments.</param>
             <returns>An <c>int</c> return code indicating invocation result.</returns>
         </member>
+        <member name="T:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler">
+            <summary>A task handler that performs interactive duplicate file handling for moving or deleting
+            files.</summary>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,System.IO.Abstractions.IFileSystem,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler})">
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler"/> class.
+            </summary>
+            <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> used to
+            retrieve duplicate records and modify or delete records after promping the user.</param>
+            <param name="fileSystem">An <see cref="T:System.IO.Abstractions.IFileSystem"/> that provides file system I/O access.
+            </param>
+            <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging
+            output will be written.</param>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler.RunTaskAsync">
+            <summary>Runs the interactive duplicate handler task by prompting the user for input
+            instructing how to handle all duplicate files in the repository.</summary>
+        </member>
     </members>
 </doc>

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using RiotClub.FireMoth.Console.Tasks;
 using RiotClub.FireMoth.Services.DataAccess;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.DataAnalysis;
@@ -32,7 +33,7 @@ public static class ServiceCollectionExtensions
     private const string DefaultFileDateTimeFormat = "yyyyMMdd-HHmmss";
     
     private static readonly FileSystem FileSystem = new FileSystem();
-    
+
     /// <summary>Adds services required to perform directory scanning via the FireMoth API.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to which services are added.
@@ -49,19 +50,20 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFileScanOrchestrator, FileScanOrchestrator>();
         services.AddTransient<IFileHasher, SHA256FileHasher>();
 
-#region UseInMemoryDataAccessLayer
-        // services.AddScoped<IDataAccessLayer<FileFingerprint>, MemoryDataAccessLayer>();
-#endregion
+        #region UseInMemoryDataAccessLayer
 
-#region UseSqliteDataAccessLayer
+        // services.AddScoped<IDataAccessLayer<FileFingerprint>, MemoryDataAccessLayer>();
+
+        #endregion
+
+        #region UseSqliteDataAccessLayer
+
         var connectionString = GetSqliteConnectionString(config.GetRequiredSection("Sqlite"));
-        services.AddDbContext<FireMothContext>(options =>
-        {
-            options.UseSqlite(connectionString);
-        });
-        
+        services.AddDbContext<FireMothContext>(options => { options.UseSqlite(connectionString); });
+
         services.AddTransient<IDataAccessLayer<FileFingerprint>, SqliteDataAccessLayer>();
-#endregion
+
+        #endregion
 
         services.AddTransient<IFileFingerprintRepository, FileFingerprintRepository>();
 
@@ -69,22 +71,29 @@ public static class ServiceCollectionExtensions
         var serviceProvider = services.BuildServiceProvider();
         var duplicateOptions = serviceProvider
             .GetRequiredService<IOptions<DuplicateFileHandlingOptions>>().Value;
-        switch (duplicateOptions.DuplicateFileHandlingMethod)
+        if (duplicateOptions.Interactive)
         {
-            case DuplicateFileHandlingMethod.Delete:
-                services.AddTransient<ITaskHandler, DuplicateFileDeleteHandler>();
-                break;
-            case DuplicateFileHandlingMethod.Move:
-                services.AddTransient<ITaskHandler, DuplicateFileMoveHandler>();
-                break;
-            case DuplicateFileHandlingMethod.NoAction:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(
-                    "Unrecognized DuplicateFileHandlingMethod option " +
-                        $"'{duplicateOptions.DuplicateFileHandlingMethod}'.");
+            services.AddTransient<ITaskHandler, InteractiveDuplicateHandler>();
         }
-        
+        else
+        {
+            switch (duplicateOptions.DuplicateFileHandlingMethod)
+            {
+                case DuplicateFileHandlingMethod.Delete:
+                    services.AddTransient<ITaskHandler, DuplicateFileDeleteHandler>();
+                    break;
+                case DuplicateFileHandlingMethod.Move:
+                    services.AddTransient<ITaskHandler, DuplicateFileMoveHandler>();
+                    break;
+                case DuplicateFileHandlingMethod.NoAction:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        "Unrecognized DuplicateFileHandlingMethod option " +
+                        $"'{duplicateOptions.DuplicateFileHandlingMethod}'.");
+            }
+        }
+
         services.AddTransient<ITaskHandler, CsvFileFingerprintWriter>();
         services.AddTransient<IFactory, Factory>();     // CSVHelper factory
         var outputOptions = serviceProvider.GetRequiredService<IOptions<ScanOutputOptions>>().Value;

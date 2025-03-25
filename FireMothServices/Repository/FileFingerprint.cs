@@ -8,20 +8,15 @@ namespace RiotClub.FireMoth.Services.Repository;
 using System;
 using Extensions;
 
-/// <summary>
-/// Contains data that uniquely identifies a file and its data.
-/// </summary>
+/// <summary>Contains data that uniquely identifies a file and its data.</summary>
 public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
 {
-    /// <summary>
-    /// Private, parameterless constructor required by Entity Framework ORM.
-    /// </summary>
+    /// <summary>Private, parameterless constructor required by Entity Framework ORM.</summary>
+    // ReSharper disable once UnusedMember.Local
     private FileFingerprint()
     { }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileFingerprint"/> class.
-    /// </summary>
+    /// <summary>Initializes a new instance of the <see cref="FileFingerprint"/> class.</summary>
     /// <param name="fileName">The name of the file.</param>
     /// <param name="directoryName">The full path of the directory containing the file.</param>
     /// <param name="fileSize">The size of the file in bytes.</param>
@@ -51,15 +46,13 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
     /// <inheritdoc/>
     public string FullPath => System.IO.Path.Combine(DirectoryName, FileName);
 
-    /// <summary>
-    /// Implements the equality operator.
-    /// </summary>
+    /// <summary>Implements the equality operator.</summary>
     /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for equality.
     /// </param>
-    /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for
-    /// equality.</param>
-    /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are equal; false
-    /// otherwise.</returns>
+    /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for equality.
+    /// </param>
+    /// <returns><c>true</c> if the two <see cref="FileFingerprint"/>s are equal; false otherwise.
+    /// </returns>
     public static bool operator ==(FileFingerprint? left, FileFingerprint? right)
     {
         if (ReferenceEquals(left, right))
@@ -74,9 +67,7 @@ public class FileFingerprint : IFileFingerprint, IEquatable<FileFingerprint>
         return left.Equals(right);
     }
 
-    /// <summary>
-    /// Implements the inequality operator.
-    /// </summary>
+    /// <summary>Implements the inequality operator.</summary>
     /// <param name="left">An instance of <see cref="FileFingerprint"/> to test for inequality.
     /// </param>
     /// <param name="right">A second instance of <see cref="FileFingerprint"/> to test for

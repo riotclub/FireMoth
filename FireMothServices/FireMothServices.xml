@@ -331,19 +331,13 @@
             <returns>A new <see cref="T:RiotClub.FireMoth.Services.Orchestration.ScanResult"/> containing the sum of the two operands.</returns>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Repository.FileFingerprint">
-            <summary>
-            Contains data that uniquely identifies a file and its data.
-            </summary>
+            <summary>Contains data that uniquely identifies a file and its data.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprint.#ctor">
-            <summary>
-            Private, parameterless constructor required by Entity Framework ORM.
-            </summary>
+            <summary>Private, parameterless constructor required by Entity Framework ORM.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprint.#ctor(System.String,System.String,System.Int64,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> class.
-            </summary>
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> class.</summary>
             <param name="fileName">The name of the file.</param>
             <param name="directoryName">The full path of the directory containing the file.</param>
             <param name="fileSize">The size of the file in bytes.</param>
@@ -366,20 +360,16 @@
             <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprint.op_Equality(RiotClub.FireMoth.Services.Repository.FileFingerprint,RiotClub.FireMoth.Services.Repository.FileFingerprint)">
-            <summary>
-            Implements the equality operator.
-            </summary>
+            <summary>Implements the equality operator.</summary>
             <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> to test for equality.
             </param>
-            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> to test for
-            equality.</param>
-            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>s are equal; false
-            otherwise.</returns>
+            <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> to test for equality.
+            </param>
+            <returns><c>true</c> if the two <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>s are equal; false otherwise.
+            </returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Repository.FileFingerprint.op_Inequality(RiotClub.FireMoth.Services.Repository.FileFingerprint,RiotClub.FireMoth.Services.Repository.FileFingerprint)">
-            <summary>
-            Implements the inequality operator.
-            </summary>
+            <summary>Implements the inequality operator.</summary>
             <param name="left">An instance of <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> to test for inequality.
             </param>
             <param name="right">A second instance of <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/> to test for
