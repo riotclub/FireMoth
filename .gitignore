@@ -341,3 +341,4 @@ healthchecksdb
 /results.xml
 
 launchSettings.json
+!/FireMothConsole/Properties/launchSettings.json

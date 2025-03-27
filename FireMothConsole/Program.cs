@@ -118,8 +118,7 @@ public static class Program
 
         var interactiveOption = new Option<bool?>(
             aliases: ["--interactive", "-i"],
-            description: "Use interactive duplicate file handling (requires -m option)",
-            getDefaultValue: () => false);
+            description: "Use interactive duplicate file handling (requires -m option)");
         interactiveOption.AddValidator(result =>
         {
             var duplicateOptionValue = result.GetValueForOption(duplicateFileHandlingMethodOption);
