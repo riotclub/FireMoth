@@ -1,18 +1,19 @@
+// <copyright file="ConsoleProgressBar.cs" company="Riot Club">
+// Copyright (c) Riot Club. All rights reserved.
+// Licensed under the GNU GPLv3 license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
 using System;
 using System.Security;
 
 namespace RiotClub.FireMoth.Services.Tasks.Output;
 
-/// <summary>
-/// Provides a method to display a progress bar in a console window.
-/// </summary>
+/// <summary>Provides a method to display a progress bar in a console window.</summary>
 public static class ConsoleProgressBar
 {
     private const int ProgressBarColumns = 72;
     
-    /// <summary>
-    /// Writes a progress bar to console standard output.
-    /// </summary>
+    /// <summary>Writes a progress bar to console standard output.</summary>
     /// <param name="progress">A <see cref="float"/> with the amount of progress to display.</param>
     /// <param name="resetCursorLocation">If <c>true</c>, attempts to reset the cursor to its
     /// original location after displaying the progress bar. This functionality is not supported in
@@ -29,10 +30,7 @@ public static class ConsoleProgressBar
             Console.WriteLine();
     }
 
-    
-    /// <summary>
-    /// Attempts to set console cursor visibility to the provided value.
-    /// </summary>
+    /// <summary>Attempts to set console cursor visibility to the provided value.</summary>
     /// <param name="visible"><c>true</c> to set the cursor visible; false otherwise.</param>
     /// <returns><c>true</c> if on Windows platform; false otherwise.</returns>
     public static bool TrySetCursorVisibility(bool visible)

@@ -577,23 +577,17 @@
             <summary>Performs the task for this task handler.</summary>
         </member>
         <member name="T:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar">
-            <summary>
-            Provides a method to display a progress bar in a console window.
-            </summary>
+            <summary>Provides a method to display a progress bar in a console window.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar.WriteProgressBar(System.Single,System.Boolean)">
-            <summary>
-            Writes a progress bar to console standard output.
-            </summary>
+            <summary>Writes a progress bar to console standard output.</summary>
             <param name="progress">A <see cref="T:System.Single"/> with the amount of progress to display.</param>
             <param name="resetCursorLocation">If <c>true</c>, attempts to reset the cursor to its
             original location after displaying the progress bar. This functionality is not supported in
             all environments.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Tasks.Output.ConsoleProgressBar.TrySetCursorVisibility(System.Boolean)">
-            <summary>
-            Attempts to set console cursor visibility to the provided value.
-            </summary>
+            <summary>Attempts to set console cursor visibility to the provided value.</summary>
             <param name="visible"><c>true</c> to set the cursor visible; false otherwise.</param>
             <returns><c>true</c> if on Windows platform; false otherwise.</returns>
         </member>

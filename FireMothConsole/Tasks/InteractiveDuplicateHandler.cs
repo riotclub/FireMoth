@@ -31,7 +31,10 @@ public class InteractiveDuplicateHandler : ITaskHandler
 
     private const int MinLineWidth = 80;
     private const int MaxLineWidth = 200;
+    private const int MaxFilesPerGroup = 9;
 
+    private const int TotalInterColumnSpacing = 14;
+    
     private static int _filePathColumnWidth;
     
     /// <summary>Initializes a new instance of the <see cref="InteractiveDuplicateHandler"/> class.
@@ -65,20 +68,65 @@ public class InteractiveDuplicateHandler : ITaskHandler
         foreach (var duplicateFiles in duplicateFileGroupings)
         {
             Console.WriteLine();
-            SetFilePathColumnWidth(duplicateFiles.Select(fp => fp.FullPath));
+            if (duplicateFiles.Count() > MaxFilesPerGroup)
+            {
+                Console.WriteLine("Maximum of {0} file comparisons in interactive mode; " +
+                                      "displaying first {0} files.",
+                                  MaxFilesPerGroup);
+            }
+
+            var duplicateFilesCulled = duplicateFiles.Take(MaxFilesPerGroup).ToList();
+            SetFilePathColumnWidth(duplicateFilesCulled.Select(fp => fp.FullPath));
             WriteHeader();
             var fileIndex = 1;
-            foreach (var fileFingerprint in duplicateFiles)
+            foreach (var fileFingerprint in duplicateFilesCulled)
             {
                 await Console.Out.WriteLineAsync(
                     FormatFileFingerprint(fileIndex++, fileFingerprint));
             }
+
+            PromptForOpInput(duplicateFiles.Count());
+        }
+    }
+
+    private static void ToggleFileSelection(int fileIndex, int numberOfFiles)
+    {
+        var (cursorX, cursorY) = Console.GetCursorPosition();
+        var consoleHeight = Console.WindowHeight;
+        var consoleWidth = Console.WindowWidth;
+        
+        Console.SetCursorPosition(0, consoleHeight - 2);
+        Console.CursorLeft = 1;
+        Console.CursorTop = numberOfFiles - fileIndex;
+
+    }
+    
+    private static void PromptForOpInput(int numberOfFiles)
+    {
+        Console.Out.Write(
+            $"(O) open files, (1-{numberOfFiles}) select/unselect file, (D) delete selected, (S) skip: ");
+        var consoleKeyIn = Console.ReadKey().KeyChar;
+        var isKeyDigit = int.TryParse(consoleKeyIn.ToString(), out var consoleKeyInInt);
+        switch (char.ToUpper(consoleKeyIn))
+        {
+            case 'D':
+                break;
+            case 'O':
+                break;
+            case 'S':
+                break;
+            default:
+                if (isKeyDigit && consoleKeyInInt is > 0 and <= MaxFilesPerGroup)
+                {
+                    ToggleFileSelection(consoleKeyInInt, numberOfFiles);
+                }
+
+                break;
         }
     }
     
     private static void SetFilePathColumnWidth(IEnumerable<string> fileNames)
     {
-        // Set the available line width based on the current console width.
         var availableLineWidth = Console.WindowWidth switch
         {
             < MinLineWidth => MinLineWidth,
@@ -86,11 +134,8 @@ public class InteractiveDuplicateHandler : ITaskHandler
             _ => Console.WindowWidth
         };
 
-        // Given the available line width, determine the max length of the file path column.
         var filePathMaxWidth = availableLineWidth - CreatedWidth - ModifiedWidth - SizeWidth -
-                               MatchWidth - 14;
-        
-        // Set file path column width depending on length of the file names in the grouping.
+                               MatchWidth - TotalInterColumnSpacing;
         var fileNamesMaxLength = fileNames.Select(fileName => fileName.Length).Max();
         _filePathColumnWidth = fileNamesMaxLength > filePathMaxWidth
             ? filePathMaxWidth
@@ -112,43 +157,10 @@ public class InteractiveDuplicateHandler : ITaskHandler
     
     private static string GetFileString(string filePath)
     {
-        // If the full path will fit, use it.
-        // "/DirectoryA/SubDirectory/ParentDirectory/File.ext"
         if (filePath.Length <= _filePathColumnWidth)
             return filePath;
 
         return "..." + Right(filePath, _filePathColumnWidth - 3);
-        
-        // // If the full path will not fit, try to at least get the root directory, parent
-        // // subdirectory, and filename.
-        // // "/.../ParentDirectory/File.ext"
-        // var parentDirectory = Directory.GetParent(filePath) is null 
-        //     ? string.Empty
-        //     : Directory.GetParent(filePath)!.Name + Path.DirectorySeparatorChar;
-        //
-        // var filePathString = Path.GetPathRoot(filePath) + "..." + Path.DirectorySeparatorChar +
-        //                      parentDirectory + Path.GetFileName(filePath);
-        // if (filePathString.Length <= _filePathColumnWidth)
-        //     return filePathString;
-        //
-        // // If that doesn't fit, try the parent subdirectory and filename.
-        // // "ParentDirectory/File.ext"
-        // filePathString = parentDirectory.Equals(string.Empty)
-        //     ? Path.GetPathRoot(filePath)
-        //     : parentDirectory;
-        // filePathString += Path.GetFileName(filePath);
-        // if (filePathString.Length <= _filePathColumnWidth)
-        //     return filePathString;
-        //
-        // // Finally, if none of the above fit, try just the filename.
-        // // "File.ext"
-        // if (Path.GetFileName(filePath).Length <= _filePathColumnWidth)
-        //     return Path.GetFileName(filePath);
-        //
-        // // And if THAT won't fit, then use as many characters of the filename will fit.
-        // // "...allyLongFileName.ext"
-        // filePathString = "..." + Right(filePathString, _filePathColumnWidth - 3);
-        // return filePathString;
     }
     
     private static string Right(string sValue, int iMaxLength)
