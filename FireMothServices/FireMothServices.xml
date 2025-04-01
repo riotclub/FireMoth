@@ -76,17 +76,14 @@
             <exception cref="T:System.ArgumentNullException">Thrown when provided collection is null.</exception>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.DeleteAsync(RiotClub.FireMoth.Services.Repository.FileFingerprint)">
-            <summary>
-            Deletes the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> from the data access layer.
+            <summary>Deletes the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> from the data access layer.
             </summary>
             <param name="fileFingerprint">A <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/> to delete.</param>
             <returns><c>true</c> if a file matching the provided <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprint"/>'s was
             deleted, <c>false</c> if no match could be found.</returns>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.InMemory.MemoryDataAccessLayer.DeleteAllAsync">
-            <summary>
-            Deletes all <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>s from the data access layer.
-            </summary>
+            <summary>Deletes all <see cref="T:RiotClub.FireMoth.Services.Repository.FileFingerprint"/>s from the data access layer.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Services.DataAccess.Sqlite.FileFingerprintTypeConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{RiotClub.FireMoth.Services.Repository.FileFingerprint})">
             <inheritdoc/>
@@ -256,9 +253,7 @@
             <inheritdoc/>
         </member>
         <member name="M:RiotClub.FireMoth.Services.Orchestration.FileScanOrchestrator.ProcessFiles(System.Collections.Generic.IEnumerable{System.String},RiotClub.FireMoth.Services.Orchestration.ScanResult)">
-            <summary>
-            Hashes a set of files and records the filename and hash string.
-            </summary>
+            <summary>Hashes a set of files and records the filename and hash string.</summary>
             <param name="files">The set of files to hash and record.</param>
             <param name="scanResult">A <see cref="T:RiotClub.FireMoth.Services.Orchestration.ScanResult"/> to which the names of scanned and
             skipped files will be added.</param>

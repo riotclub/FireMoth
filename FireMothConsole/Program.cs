@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RiotClub.FireMoth.Console.Extensions;
+using RiotClub.FireMoth.Console.Tasks;
 using RiotClub.FireMoth.Services.DataAccess.Sqlite;
 using RiotClub.FireMoth.Services.Orchestration;
 using RiotClub.FireMoth.Services.Tasks.Output;
@@ -197,6 +198,9 @@ public static class Program
                             hostContext.Configuration.GetSection("CommandLine"));
                         services.Configure<ScanOutputOptions>(
                             hostContext.Configuration.GetSection("CommandLine"));
+                        services.Configure<InteractiveDuplicateHandlerOptions>(
+                            hostContext.Configuration.GetSection(
+                                "InteractiveDuplicateHandler:OpenFiles"));
                         services.AddFireMothServices(hostContext.Configuration);
                     });
             });

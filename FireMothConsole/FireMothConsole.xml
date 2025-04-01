@@ -5,16 +5,14 @@
     </assembly>
     <members>
         <member name="T:RiotClub.FireMoth.Console.CommandLineConfigurationProvider">
-            <summary>
-            Handles configuration of command line parameters, converting kebab-cased parameters to
+            <summary>Handles configuration of command line parameters, converting kebab-cased parameters to
             PascalCase so they can be bound to options classes via
             <see cref="M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"/> 
             </summary>
         </member>
         <member name="M:RiotClub.FireMoth.Console.CommandLineConfigurationProvider.#ctor(System.CommandLine.Parsing.ParseResult)">
-            <summary>
-            Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.CommandLineConfigurationProvider"/> class.
-            </summary>
+            <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.CommandLineConfigurationProvider"/>
+            class.</summary>
             <param name="parseResult">A <see cref="T:System.CommandLine.Parsing.ParseResult"/> containing command line parse results.
             </param>
         </member>
@@ -34,6 +32,30 @@
             <returns>The configured <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to facilitate method chaining.
             </returns>
         </member>
+        <member name="T:RiotClub.FireMoth.Console.Extensions.StringExtensions">
+            <summary>A set of extension methods for string objects used to facilitate command line argument
+            parsing. Implementation by Daniel Earwicker via Stack Overflow.
+            </summary>
+            <seealso href="https://stackoverflow.com/a/298990">Stack Overflow thread: &quot;Split string
+            containing command-line parameters into string[] in C#&quot;</seealso>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Extensions.StringExtensions.Split(System.String,System.Func{System.Char,System.Boolean})">
+            <summary>Splits a string based on the provided controller function.</summary>
+            <param name="str">The <see cref="T:System.String"/> to split.</param>
+            <param name="controller">A method used the examine each character in the string and decide
+            when to yield a token.</param>
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the individual tokens from the
+            provided string.</returns>
+        </member>
+        <member name="M:RiotClub.FireMoth.Console.Extensions.StringExtensions.TrimMatchingQuotes(System.String,System.Char)">
+            <summary>Given a string, returns the same string with any single matching pair of characters
+            from the start and end of the string removed.</summary>
+            <param name="input">The <see cref="T:System.String"/> from which matching start and end characters
+            will be removed.</param>
+            <param name="quote">The character to remove from the input string.</param>
+            <returns>The provided string with single matching start and end characters specified by
+            <paramref name="quote"/> removed.</returns>
+        </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
             <summary>Application entry point.</summary>
         </member>
@@ -47,19 +69,37 @@
             <summary>A task handler that performs interactive duplicate file handling for moving or deleting
             files.</summary>
         </member>
-        <member name="M:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,System.IO.Abstractions.IFileSystem,Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler})">
+        <member name="M:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler.#ctor(RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository,System.IO.Abstractions.IFileSystem,Microsoft.Extensions.Options.IOptions{RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandlerOptions},Microsoft.Extensions.Logging.ILogger{RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler})">
             <summary>Initializes a new instance of the <see cref="T:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler"/> class.
             </summary>
             <param name="fileFingerprintRepository">An <see cref="T:RiotClub.FireMoth.Services.Repository.IFileFingerprintRepository"/> used to
             retrieve duplicate records and modify or delete records after promping the user.</param>
             <param name="fileSystem">An <see cref="T:System.IO.Abstractions.IFileSystem"/> that provides file system I/O access.
             </param>
+            <param name="options">An <see cref="T:Microsoft.Extensions.Options.IOptions`1"/>
+            containing options for this handler.</param>
             <param name="logger">An <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> to which logging
             output will be written.</param>
         </member>
         <member name="M:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler.RunTaskAsync">
             <summary>Runs the interactive duplicate handler task by prompting the user for input
             instructing how to handle all duplicate files in the repository.</summary>
+        </member>
+        <member name="T:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandlerOptions">
+            <summary>Specifies options used to define the behavior of
+            <see cref="T:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandler"/>.</summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandlerOptions.UseShellExecute">
+            <summary>Gets or sets a value indicating whether to use the operating system shell to start
+            the "open files" operation.</summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandlerOptions.Application">
+            <summary>Gets or sets a value specifying the application to use when using the "open files"
+            operation.</summary>
+        </member>
+        <member name="P:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandlerOptions.Arguments">
+            <summary>Gets or sets a value specifying arguments to the application specified in
+            <see cref="P:RiotClub.FireMoth.Console.Tasks.InteractiveDuplicateHandlerOptions.Application"/>.</summary>
         </member>
     </members>
 </doc>
