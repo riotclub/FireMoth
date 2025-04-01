@@ -91,21 +91,6 @@ public class DuplicateFileMoveHandler : ITaskHandler
                     fingerprint.FullPath,
                     preservedFile.FullPath);
 
-                /*
-                foreach (var fp in grouping)
-                {
-                    var processStartInfo = new ProcessStartInfo
-                    {
-                        // FileName = fp.FullPath,
-                        // UseShellExecute = false
-                    
-                        FileName = "gwenview",
-                        Arguments = fp.FullPath
-                    };
-                    Process.Start(processStartInfo);
-                }
-                */
-                
                 try
                 {
                     var destinationFullPath = GetUniqueFileName(

@@ -68,9 +68,7 @@ public class FileScanOrchestrator : IFileScanOrchestrator
         return scanResult;
     }
 
-    /// <summary>
-    /// Hashes a set of files and records the filename and hash string.
-    /// </summary>
+    /// <summary>Hashes a set of files and records the filename and hash string.</summary>
     /// <param name="files">The set of files to hash and record.</param>
     /// <param name="scanResult">A <see cref="ScanResult"/> to which the names of scanned and
     /// skipped files will be added.</param>
@@ -88,12 +86,10 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                     "Computing hash for file '{FileName}' using fileHasher {Hasher}",
                     fileInfo.Name,
                     _fileHasher.GetType().FullName);
-                
                 var hashString = GetBase64HashFromStream(fileStream);
                 _logger.LogDebug(
                     "Adding fingerprint for file '{FileName}' to data access provider",
                     fileInfo.Name);
-                
                 var fingerprint = new FileFingerprint(
                     fileInfo.Name,
                     fileInfo.DirectoryName ?? string.Empty,

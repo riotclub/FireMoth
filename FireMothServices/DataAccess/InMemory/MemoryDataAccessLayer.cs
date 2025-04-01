@@ -32,17 +32,11 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
     /// <param name="orderBy">A lambda expression that specifies an ordering.</param>
     /// <returns>IEnumerable collection of file fingerprints.</returns>
     public Task<IEnumerable<FileFingerprint>> GetAsync(
-        Func<FileFingerprint, bool>? filter = null,
-        Func<FileFingerprint, string>? orderBy = null)
+        Func<FileFingerprint, bool>? filter = null, Func<FileFingerprint, string>? orderBy = null)
     {
         var result = _fileFingerprints.AsEnumerable();
-
-        if (filter is not null)
-            result = result.Where(filter);
-
-        if (orderBy is not null)
-            result = result.OrderBy(orderBy);
-
+        if (filter is not null) result = result.Where(filter);
+        if (orderBy is not null) result = result.OrderBy(orderBy);
         return Task.FromResult(result);
     }
 
@@ -78,8 +72,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Deletes the provided <see cref="IFileFingerprint"/> from the data access layer.
+    /// <summary>Deletes the provided <see cref="IFileFingerprint"/> from the data access layer.
     /// </summary>
     /// <param name="fileFingerprint">A <see cref="IFileFingerprint"/> to delete.</param>
     /// <returns><c>true</c> if a file matching the provided <see cref="IFileFingerprint"/>'s was
@@ -93,9 +86,7 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
         return Task.FromResult(_fileFingerprints.Remove(fileFingerprint));
     }
 
-    /// <summary>
-    /// Deletes all <see cref="FileFingerprint"/>s from the data access layer.
-    /// </summary>
+    /// <summary>Deletes all <see cref="FileFingerprint"/>s from the data access layer.</summary>
     public Task<int> DeleteAllAsync()
     {
         var recordCount = _fileFingerprints.Count;
@@ -106,7 +97,6 @@ public class MemoryDataAccessLayer : IDataAccessLayer<FileFingerprint>
 
     private static void ThrowIfArgumentNull(object testArgument, string argumentName)
     {
-        if (testArgument is null)
-            throw new ArgumentNullException(argumentName);
+        if (testArgument is null) throw new ArgumentNullException(argumentName);
     }
 }

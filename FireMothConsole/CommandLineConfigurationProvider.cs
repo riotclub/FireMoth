@@ -12,8 +12,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-/// <summary>
-/// Handles configuration of command line parameters, converting kebab-cased parameters to
+/// <summary>Handles configuration of command line parameters, converting kebab-cased parameters to
 /// PascalCase so they can be bound to options classes via
 /// <see cref="OptionsConfigurationServiceCollectionExtensions.Configure{TOptions}(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"/> 
 /// </summary>
@@ -27,9 +26,8 @@ internal class CommandLineConfigurationProvider : ConfigurationProvider
     private const string ScanDirectoryKey = CommandLineOptionPrefix + "Directory";
     public const string ScanDirectoryToken = "<scan_directory>";
     
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CommandLineConfigurationProvider"/> class.
-    /// </summary>
+    /// <summary>Initializes a new instance of the <see cref="CommandLineConfigurationProvider"/>
+    /// class.</summary>
     /// <param name="parseResult">A <see cref="ParseResult"/> containing command line parse results.
     /// </param>
     public CommandLineConfigurationProvider(ParseResult parseResult) =>
@@ -45,15 +43,12 @@ internal class CommandLineConfigurationProvider : ConfigurationProvider
         var optionResults = parseResult.CommandResult.Children
             .Where(symbolResult => symbolResult is OptionResult)
             .ToList();
-
         var result = optionResults.ToDictionary(
             optionResult =>
                 CommandLineOptionPrefix + KebabCaseToPascalCase(optionResult.Symbol.Name),
             optionResult =>
                 parseResult.GetValueForOption(((OptionResult)optionResult).Option)!.ToString(),
-            StringComparer.OrdinalIgnoreCase
-        );
-        
+            StringComparer.OrdinalIgnoreCase);
         ReplaceScanDirectoryToken(result);
 
         return result;
@@ -64,7 +59,6 @@ internal class CommandLineConfigurationProvider : ConfigurationProvider
     {
         if (!optionResultsDictionary.TryGetValue(MoveDuplicateFilesToDirectoryKey, out var value))
             return;
-
         if (value is default(string?)
             || !optionResultsDictionary.TryGetValue(ScanDirectoryKey, out var scanDirectory))
             return;
