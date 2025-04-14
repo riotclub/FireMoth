@@ -52,7 +52,7 @@ public class DuplicateFileDeleteHandler : ITaskHandler
             await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync();
 
         var deletedFilesCount = 0;
-        long deletedFilesSizeBytes = 0;
+        long deletedFilesSize = 0;
         
         foreach (var grouping in duplicateRecords)
         {
@@ -69,7 +69,7 @@ public class DuplicateFileDeleteHandler : ITaskHandler
                 {
                     _fileSystem.File.Delete(fingerprint.FullPath);
                     deletedFilesCount++;
-                    deletedFilesSizeBytes += fingerprint.FileSize;
+                    deletedFilesSize += fingerprint.FileSize;
                 }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                 {
@@ -82,12 +82,12 @@ public class DuplicateFileDeleteHandler : ITaskHandler
         }
 
         var deletedFilesSizeHumanReadable =
-            ByteSize.FromBytes(deletedFilesSizeBytes).ToBinaryString();
+            ByteSize.FromBytes(deletedFilesSize).ToBinaryString();
         _logger.LogInformation(
             "Deleted {DeletedFilesCount} files, {DeletedFilesSizeBytes} bytes " +
                 "({DeletedFilesSizeHumanReadable}).",
             deletedFilesCount,
-            deletedFilesSizeBytes,
+            deletedFilesSize,
             deletedFilesSizeHumanReadable);
     }
 }

@@ -6,10 +6,9 @@
 namespace RiotClub.FireMoth.Console.Tasks;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,19 +29,29 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private readonly ILogger<InteractiveDuplicateHandler> _logger;
     private readonly InteractiveDuplicateHandlerOptions _options;
     
-    private const int CreatedWidth = 19;
-    private const int ModifiedWidth = 19;
-    private const int SizeWidth = 10;
-    private const int MatchWidth = 5;
+    private const int CreatedColumnWidth = 19;
+    private const int ModifiedColumnWidth = 19;
+    private const int SizeColumnWidth = 10;
+    private const int MatchColumnWidth = 5;
     private const int MinLineWidth = 80;
     private const int MaxLineWidth = 200;
     private const int MaxFilesPerGroup = 9;
     private const int TotalInterColumnSpacing = 14;
+    private const char SelectedFileChar = '*';
+    private const char UnselectedFileChar = ' ';
     private const string OpPrompt =
         "(O) open all files, (1-{0}) select/unselect file, (D) delete selected, (S) skip: ";
+    private const string DeleteConfirmation =
+        "Are you sure you want to delete the following file(s)?";
+    private const string DeletePrompt =
+        "(D) delete files, (B) back: ";
     
-    private static int _filePathColumnWidth;
     private static readonly bool[] SelectedFileIndexes = new bool[MaxFilesPerGroup];
+    private static int _filePathColumnWidth;
+    private int _cursorSaveX;
+    private int _cursorSaveY;
+    private int _deletedFilesCount;
+    private long _deletedFilesSize;
     
     /// <summary>Initializes a new instance of the <see cref="InteractiveDuplicateHandler"/> class.
     /// </summary>
@@ -74,85 +83,173 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// instructing how to handle all duplicate files in the repository.</summary>
     public async Task RunTaskAsync()
     {
-        var duplicateFileGroupings =
+        var duplicateFileGroups =
             (await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync()).ToList();
+        var groupIdx = 0;
 
-        foreach (var duplicateFiles in duplicateFileGroupings)
+        while (groupIdx < duplicateFileGroups.Count)
         {
+            var duplicateFileSet = duplicateFileGroups.ElementAt(groupIdx);
             Console.WriteLine();
-            if (duplicateFiles.Count() > MaxFilesPerGroup)
+            if (duplicateFileSet.Count() > MaxFilesPerGroup)
             {
                 Console.WriteLine("Maximum of {0} file comparisons in interactive mode; " +
                                       "displaying first {0} files.",
                                   MaxFilesPerGroup);
             }
 
-            var duplicateFilesCulled = duplicateFiles.Take(MaxFilesPerGroup).ToList();
+            var duplicateFilesCulled = duplicateFileSet.Take(MaxFilesPerGroup).ToList();
             SetFilePathColumnWidth(duplicateFilesCulled.Select(fp => fp.FullPath));
             WriteHeader();
             var fileIndex = 1;
             foreach (var fileFingerprint in duplicateFilesCulled)
             {
                 await Console.Out.WriteLineAsync(
-                    FormatFileFingerprint(fileIndex++, fileFingerprint));
+                    FormatFileFingerprint(
+                        fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
+                fileIndex++;
             }
 
-            PromptForOpInput(duplicateFiles.ToList());
+            var userPrompt = PromptForOpInput(duplicateFileSet.ToList());
             Console.WriteLine();
         }
+        
+        // foreach (var duplicateFileSet in duplicateFileGroups)
+        // {
+        //     Console.WriteLine();
+        //     if (duplicateFileSet.Count() > MaxFilesPerGroup)
+        //     {
+        //         Console.WriteLine("Maximum of {0} file comparisons in interactive mode; " +
+        //                               "displaying first {0} files.",
+        //                           MaxFilesPerGroup);
+        //     }
+        //
+        //     var duplicateFilesCulled = duplicateFileSet.Take(MaxFilesPerGroup).ToList();
+        //     SetFilePathColumnWidth(duplicateFilesCulled.Select(fp => fp.FullPath));
+        //     WriteHeader();
+        //     var fileIndex = 1;
+        //     foreach (var fileFingerprint in duplicateFilesCulled)
+        //     {
+        //         await Console.Out.WriteLineAsync(
+        //             FormatFileFingerprint(
+        //                 fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
+        //         fileIndex++;
+        //     }
+        //
+        //     PromptForOpInput(duplicateFileSet.ToList());
+        //     Console.WriteLine();
+        // }
+        
+        var deletedFilesSizeHumanReadable =
+            ByteSize.FromBytes(_deletedFilesSize).ToBinaryString();
+        _logger.LogInformation(
+            "Deleted {DeletedFilesCount} files, {DeletedFilesSizeBytes} bytes " +
+            "({DeletedFilesSizeHumanReadable}).",
+            _deletedFilesCount,
+            _deletedFilesSize,
+            deletedFilesSizeHumanReadable);
     }
 
+    // Toggle the SelectedFileIndex flag for the provided file index and update the console display
+    // to indicate the new flag status.
     private static void ToggleFileSelection(int fileIndex, int numberOfFiles)
     {
         SelectedFileIndexes[fileIndex - 1] = !SelectedFileIndexes[fileIndex - 1];
         var (_, cursorOriginY) = Console.GetCursorPosition();
         var selectedCursorY = cursorOriginY - (numberOfFiles - fileIndex + 1);
         Console.SetCursorPosition(0, selectedCursorY);
-        Console.Write(SelectedFileIndexes[fileIndex - 1] ? '*' : ' ');
+        Console.Write(SelectedFileIndexes[fileIndex - 1] ? SelectedFileChar : UnselectedFileChar);
     }
     
-    private void PromptForOpInput(List<FileFingerprint> files)
+    // Prompt the user for the action to take for the provided files.
+    private bool PromptForOpInput(List<FileFingerprint> files)
     {
         Console.Write(OpPrompt, files.Count);
-        Array.Fill(SelectedFileIndexes, false, 0, files.Count); 
-        var opSelected = false;
-        do
+        Array.Fill(SelectedFileIndexes, false, 0, files.Count);
+        while (true)
         {
             var consoleKeyIn = Console.ReadKey().KeyChar;
-            var isKeyDigit = int.TryParse(consoleKeyIn.ToString(), out var consoleKeyInInt);
+            var isKeyDigit = int.TryParse(consoleKeyIn.ToString(), out var consoleKeyInInt);            
             switch (char.ToUpper(consoleKeyIn))
             {
                 case 'D':
-                    HandleDeleteOp();
-                    opSelected = true;
+                    SaveCursorPosition();
+                    if (HandleDeleteOp(files)) return true;
+                    ResetCursor();
                     break;
                 case 'O':
+                    SaveCursorPosition();
                     HandleOpenOp(files);
-                    //ResetCursor
+                    ResetCursor();
                     break;
                 case 'S':
-                    return;
+                    return true;
                 default:
-                    var (cursorOriginX, cursorOriginY) = Console.GetCursorPosition();
+                    SaveCursorPosition();
                     if (isKeyDigit &&
                         consoleKeyInInt > 0 &&
                         consoleKeyInInt <= files.Count)
                     {
                         ToggleFileSelection(consoleKeyInInt, files.Count);
                     }
-                    Console.SetCursorPosition(cursorOriginX - 1, cursorOriginY);
-                    Console.Write(' ');
-                    Console.SetCursorPosition(cursorOriginX - 1, cursorOriginY);
+                    ResetCursor();
                     break;
             }
-        } while (!opSelected);
+        }
     }
-    
-    private static void HandleDeleteOp()
+
+    // Display a list of files provided and prompt the user to either (D)elete the listed files or
+    // go (B)ack to the original selection prompt.
+    private bool HandleDeleteOp(List<FileFingerprint> files)
     {
+        if (!SelectedFileIndexes.Take(files.Count).Any(b => b)) 
+            return false;
         
+        Console.WriteLine($"\n\n{DeleteConfirmation}");
+        foreach (var file in files)
+        {
+            if (SelectedFileIndexes[files.IndexOf(file)])
+                Console.WriteLine($"\t{file.FullPath}");
+        }
+        Console.Write(DeletePrompt);
+        
+        var consoleKeyIn = Console.ReadKey().KeyChar;
+        while (true)
+        {
+            switch (char.ToUpper(consoleKeyIn))
+            {
+                case 'D':
+                    foreach (var file in files) DeleteFile(file);
+                    return true;
+                case 'B':
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    // Delete the specified file, performing necessary logging and exception handling.
+    private void DeleteFile(FileFingerprint file)
+    {
+        _logger.LogInformation("Deleting file '{DuplicateFile}'.", file.FullPath);
+        try
+        {
+            // _fileSystem.File.Delete(file.FullPath);
+            _deletedFilesCount++;
+            _deletedFilesSize += file.FileSize;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogError(
+                "Unable to delete file '{FileFullPath}: {ExceptionMessage}'",
+                file.FullPath,
+                e.Message);
+        }
     }
     
+    // Attempt to open the provided files using either the platform default application or, if
+    // specified in _options, the specified application.
     private void HandleOpenOp(List<FileFingerprint> files)
     {
         foreach (var file in files)
@@ -204,23 +301,35 @@ public class InteractiveDuplicateHandler : ITaskHandler
             _ => Console.WindowWidth
         };
 
-        var filePathMaxWidth = availableLineWidth - CreatedWidth - ModifiedWidth - SizeWidth -
-                               MatchWidth - TotalInterColumnSpacing;
+        var filePathMaxWidth = availableLineWidth - CreatedColumnWidth - ModifiedColumnWidth -
+                               SizeColumnWidth - MatchColumnWidth - TotalInterColumnSpacing;
         var fileNamesMaxLength = fileNames.Select(fileName => fileName.Length).Max();
         _filePathColumnWidth = fileNamesMaxLength > filePathMaxWidth
             ? filePathMaxWidth
             : fileNamesMaxLength;
     }
+
+    private void SaveCursorPosition() =>
+        (_cursorSaveX, _cursorSaveY) = Console.GetCursorPosition();
     
-    private static string FormatFileFingerprint(int fileIndex, FileFingerprint fileFingerprint)
+    private void ResetCursor()
+    {
+        Console.SetCursorPosition(_cursorSaveX - 1, _cursorSaveY);
+        Console.Write(' ');
+        Console.SetCursorPosition(_cursorSaveX - 1, _cursorSaveY);
+    }    
+    
+    private static string FormatFileFingerprint(
+        int fileIndex, FileFingerprint fileFingerprint, bool selected)
     {
         var fileText =
-            $"  {fileIndex,2}  " + 
+            (selected ? SelectedFileChar : UnselectedFileChar) +
+            $" {fileIndex,2}  " + 
             $"{GetFileString(fileFingerprint.FullPath).PadRight(_filePathColumnWidth)}  " +
-            $"{"exact",MatchWidth}  " +
-            $"{DateTime.Now,-CreatedWidth:s}  " +
-            $"{DateTime.UtcNow,-ModifiedWidth:s}  " +
-            $"{ByteSize.FromBytes(fileFingerprint.FileSize).ToBinaryString(),SizeWidth}";            
+            $"{"exact",MatchColumnWidth}  " +
+            $"{DateTime.Now,-CreatedColumnWidth:s}  " +
+            $"{DateTime.UtcNow,-ModifiedColumnWidth:s}  " +
+            $"{ByteSize.FromBytes(fileFingerprint.FileSize).ToBinaryString(),SizeColumnWidth}";            
         return fileText;
     }
     
@@ -245,10 +354,10 @@ public class InteractiveDuplicateHandler : ITaskHandler
         var headerText =
             "*  #  " +
             $"{"File".PadRight(_filePathColumnWidth)}  " +
-            $"{"Match",MatchWidth}  " +
-            $"{"Created",-CreatedWidth}  " +
-            $"{"Modified",-ModifiedWidth}  " +
-            $"{"Size",SizeWidth}";
+            $"{"Match",MatchColumnWidth}  " +
+            $"{"Created",-CreatedColumnWidth}  " +
+            $"{"Modified",-ModifiedColumnWidth}  " +
+            $"{"Size",SizeColumnWidth}";
         Console.Out.WriteLine(headerText);
     }
 }
