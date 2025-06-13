@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "FireMothConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "-d \"/home/jason/FireMothTestData/\" -r -m move",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
