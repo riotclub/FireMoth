@@ -117,7 +117,8 @@ public class FileScanOrchestrator : IFileScanOrchestrator
                 scanResult.Errors.Add(
                     new ScanError(
                         fileInfo.FullName,
-                        "Could not add record for file '{fileInfo.FullName}': {ex.Message}; skipping file.",
+                        "Could not add record for file '{fileInfo.FullName}': {ex.Message}; " +
+                            "skipping file.",
                         ex));
             }
         }

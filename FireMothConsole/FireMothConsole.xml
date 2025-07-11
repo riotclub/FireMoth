@@ -22,19 +22,17 @@
             <inheritdoc/>
         </member>
         <member name="T:RiotClub.FireMoth.Console.Extensions.ServiceCollectionExtensions">
-            <summary>
-            Extensions to support service configuration.
-            </summary>
+            <summary>Extensions to support service configuration.</summary>
         </member>
         <member name="M:RiotClub.FireMoth.Console.Extensions.ServiceCollectionExtensions.AddFireMothServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Adds services required to perform directory scanning via the FireMoth API.
+            <summary>Adds services required to perform directory scanning via the FireMoth API.
             </summary>
             <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to which services are added.
             </param>
             <param name="config">An <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> containing program runtime
             configuration.</param>
-            <returns></returns>
+            <returns>The configured <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to facilitate method chaining.
+            </returns>
         </member>
         <member name="T:RiotClub.FireMoth.Console.Program">
             <summary>
