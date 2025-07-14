@@ -39,12 +39,14 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private const int TotalInterColumnSpacing = 14;
     private const char SelectedFileChar = '*';
     private const char UnselectedFileChar = ' ';
-    private const string OpPrompt =
+    private const string PrimaryPrompt =
         "(O) open all files, (1-{0}) select/unselect file, (D) delete selected, (S) skip: ";
     private const string DeleteConfirmation =
         "Are you sure you want to delete the following file(s)?";
     private const string DeletePrompt =
         "(D) delete files, (B) back: ";
+    private const string FilesPerGroupLimitExceededNotice =
+        "Maximum of {0} file comparisons in interactive mode; displaying first {0} files.";
     
     private static readonly bool[] SelectedFileIndexes = new bool[MaxFilesPerGroup];
     private static int _filePathColumnWidth;
@@ -83,22 +85,117 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// instructing how to handle all duplicate files in the repository.</summary>
     public async Task RunTaskAsync()
     {
-        var duplicateFileGroups =
+        
+        // Retrieve duplicate groups from repository. Enumerate immediately via ToList, possibly
+        // loading all duplicate elements into memory. Might need to perf test this. 
+        var duplicateFileSets =
             (await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync()).ToList();
-        var groupIdx = 0;
+        
+        // init groupIndex = 0
+        var groupIndex = 0;
 
-        while (groupIdx < duplicateFileGroups.Count)
+        // for each duplicate group = currentFileSet
+        while (groupIndex < duplicateFileSets.Count)
         {
-            var duplicateFileSet = duplicateFileGroups.ElementAt(groupIdx);
-            Console.WriteLine();
-            if (duplicateFileSet.Count() > MaxFilesPerGroup)
-            {
-                Console.WriteLine("Maximum of {0} file comparisons in interactive mode; " +
-                                      "displaying first {0} files.",
-                                  MaxFilesPerGroup);
-            }
+            // 	init groupComplete = false
+            var groupComplete = false;
 
-            var duplicateFilesCulled = duplicateFileSet.Take(MaxFilesPerGroup).ToList();
+            var currentGrouping = duplicateFileSets.ElementAt(groupIndex);
+            List<FileFingerprint>? currentFileSet;
+            
+            Console.WriteLine();
+            // if group item count > MAX_ITEM_COUNT
+            if (currentGrouping.Count() > MaxFilesPerGroup)
+            {
+                // display file list culled warning
+                Console.WriteLine(FilesPerGroupLimitExceededNotice, MaxFilesPerGroup);
+
+                // currentGroup = first MAX_ITEM_COUNT items from currentGroup
+                currentFileSet = currentGrouping.Take(MaxFilesPerGroup).ToList();
+            }
+            else
+            {
+                currentFileSet = currentGrouping.ToList();
+            }
+            
+            //
+            // 	display current group file list
+            //
+            // 	display primary prompt
+            // 	
+            // 	while (!groupComplete)
+            // 	
+                // 		primaryInput <- read input key
+                // 		
+                // 		switch (primaryInput)
+                // 		
+                    // 			case (S)kip
+                    // 			
+                        // 				groupComplete = true
+                    // 				
+                    // 			case (O)pen all files
+                    // 			
+                        // 				OpenFiles
+                    // 				
+                    // 			case (D)elete selected
+                    // 			
+                        // 				display delete confirmation prompt
+                        // 				
+                        // 				init deleteOpComplete = false
+                        // 				
+                        // 				while (!deleteOpComplete)
+                        //
+                            // 					deleteConfirmInput <- read input key
+                            //
+                            // 					switch (deleteConfirmInput)
+                            //
+                            // 						case (D)elete
+                            //
+                            // 							delete selected files
+                            //
+                            // 							deleteOpComplete = true
+                            //
+                            // 							groupComplete = true
+                            // 							
+                            // 						case (B)ack
+                            //
+                            // 							deleteOpComplete = true
+                            // 						
+                            // 						case default   // bad input
+                            //
+                            // 							reset cursor position
+                            // 							
+                            // 					end switch (deleteConfirmInput)
+                            // 					
+                        // 				end while (!deleteOpComplete)
+                    // 				
+                    // 			case default
+                    // 			
+                    // 				if (primaryInput is integer)
+                    // 				
+                    // 					update selected items
+                    // 					
+                    // 				else   // bad input
+                    // 				
+                    // 					reset cursor position
+                // 					
+                // 		end switch (primaryInput)
+                // 					
+                // 		if (groupComplete)
+                // 		
+                // 			groupIndex++
+                // 			
+                // 		reset cursor position
+            // 		
+            // 	end while (!groupComplete)
+        // 	
+        // end for each duplicate group
+		
+		
+        
+
+
+
             SetFilePathColumnWidth(duplicateFilesCulled.Select(fp => fp.FullPath));
             WriteHeader();
             var fileIndex = 1;
@@ -164,7 +261,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
     // Prompt the user for the action to take for the provided files.
     private bool PromptForOpInput(List<FileFingerprint> files)
     {
-        Console.Write(OpPrompt, files.Count);
+        Console.Write(PrimaryPrompt, files.Count);
         Array.Fill(SelectedFileIndexes, false, 0, files.Count);
         while (true)
         {
