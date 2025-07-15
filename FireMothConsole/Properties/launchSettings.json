@@ -3,7 +3,7 @@
   "profiles": {
     "FireMothConsole": {
       "commandName": "Project",
-      "commandLineArgs": "-d \"/home/jason/FireMothTestData/\" -r -m move",
+      "commandLineArgs": "-d \"/home/jason/FireMothTestData/\" -r -m move -i",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

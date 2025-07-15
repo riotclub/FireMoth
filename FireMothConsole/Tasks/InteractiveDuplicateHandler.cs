@@ -41,7 +41,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private const char UnselectedFileChar = ' ';
     private const string PrimaryPrompt =
         "(O) open all files, (1-{0}) select/unselect file, (D) delete selected, (S) skip: ";
-    private const string DeleteConfirmation =
+    private const string DeleteConfirmationPrompt =
         "Are you sure you want to delete the following file(s)?";
     private const string DeletePrompt =
         "(D) delete files, (B) back: ";
@@ -58,7 +58,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// <summary>Initializes a new instance of the <see cref="InteractiveDuplicateHandler"/> class.
     /// </summary>
     /// <param name="fileFingerprintRepository">An <see cref="IFileFingerprintRepository"/> used to
-    /// retrieve duplicate records and modify or delete records after promping the user.</param>
+    /// retrieve duplicate records and modify or delete records after prompting the user.</param>
     /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
     /// </param>
     /// <param name="options">An <see cref="IOptions{InteractiveDuplicateHandlerOptions}"/>
@@ -80,12 +80,24 @@ public class InteractiveDuplicateHandler : ITaskHandler
         _options = options.Value;
         _logger = logger;
     }
+
+    private static void DisplayFileList(List<FileFingerprint> fileSet)
+    {
+        SetFilePathColumnWidth(fileSet.Select(fp => fp.FullPath));
+        WriteHeader();
+        var fileIndex = 1;
+        foreach (var fileFingerprint in fileSet)
+        {
+            Console.Out.WriteLine(FormatFileFingerprint(
+                fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
+            fileIndex++;
+        }
+    }
     
     /// <summary>Runs the interactive duplicate handler task by prompting the user for input
     /// instructing how to handle all duplicate files in the repository.</summary>
     public async Task RunTaskAsync()
-    {
-        
+    {   
         // Retrieve duplicate groups from repository. Enumerate immediately via ToList, possibly
         // loading all duplicate elements into memory. Might need to perf test this. 
         var duplicateFileSets =
@@ -94,33 +106,37 @@ public class InteractiveDuplicateHandler : ITaskHandler
         // init groupIndex = 0
         var groupIndex = 0;
 
-        // for each duplicate group = currentFileSet
+        // while (groupIndex < duplicate group count)
         while (groupIndex < duplicateFileSets.Count)
         {
             // 	init groupComplete = false
             var groupComplete = false;
-
             var currentGrouping = duplicateFileSets.ElementAt(groupIndex);
-            List<FileFingerprint>? currentFileSet;
-            
+            List<FileFingerprint> currentFileSet;
             Console.WriteLine();
+
             // if group item count > MAX_ITEM_COUNT
             if (currentGrouping.Count() > MaxFilesPerGroup)
             {
                 // display file list culled warning
                 Console.WriteLine(FilesPerGroupLimitExceededNotice, MaxFilesPerGroup);
 
-                // currentGroup = first MAX_ITEM_COUNT items from currentGroup
+                // currentGroup = first MAX_ITEM_COUNT items from currentFileSet
                 currentFileSet = currentGrouping.Take(MaxFilesPerGroup).ToList();
             }
             else
             {
                 currentFileSet = currentGrouping.ToList();
             }
+       
+            // display current group file list
+            DisplayFileList(currentFileSet);
+
+            // display primary prompt
+            var primaryPromptInput = PromptForOpInput(currentFileSet.ToList());
+            Console.WriteLine();
             
-            //
-            // 	display current group file list
-            //
+
             // 	display primary prompt
             // 	
             // 	while (!groupComplete)
@@ -190,25 +206,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
             // 	end while (!groupComplete)
         // 	
         // end for each duplicate group
-		
-		
-        
-
-
-
-            SetFilePathColumnWidth(duplicateFilesCulled.Select(fp => fp.FullPath));
-            WriteHeader();
-            var fileIndex = 1;
-            foreach (var fileFingerprint in duplicateFilesCulled)
-            {
-                await Console.Out.WriteLineAsync(
-                    FormatFileFingerprint(
-                        fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
-                fileIndex++;
-            }
-
-            var userPrompt = PromptForOpInput(duplicateFileSet.ToList());
-            Console.WriteLine();
         }
         
         // foreach (var duplicateFileSet in duplicateFileGroups)
@@ -302,7 +299,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
         if (!SelectedFileIndexes.Take(files.Count).Any(b => b)) 
             return false;
         
-        Console.WriteLine($"\n\n{DeleteConfirmation}");
+        Console.WriteLine($"\n\n{DeleteConfirmationPrompt}");
         foreach (var file in files)
         {
             if (SelectedFileIndexes[files.IndexOf(file)])
