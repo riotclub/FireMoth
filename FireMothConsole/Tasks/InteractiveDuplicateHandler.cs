@@ -108,7 +108,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// <summary>Runs the interactive duplicate handler task by prompting the user for input
     /// instructing how to handle all duplicate files in the repository.</summary>
     public async Task RunTaskAsync()
-    {   
+    {
         // Retrieve duplicate groups from repository. Enumerate immediately via ToList, possibly
         // loading all duplicate elements into memory. Might need to perf test this. 
         var duplicateFileSets =
@@ -137,18 +137,18 @@ public class InteractiveDuplicateHandler : ITaskHandler
             {
                 currentFileSet = currentGrouping.ToList();
             }
-       
-            // display currentFileSet file list
-            DisplayFileList(currentFileSet);
-
-            // display primary prompt
-            Console.Write(PrimaryPrompt, currentFileSet.Count);
             
             // reset SelectedFileIndexes
             Array.Fill(SelectedFileIndexes, false, 0, currentFileSet.Count);
             
             // 	init groupComplete = false
             var groupComplete = false;
+            
+            // display currentFileSet file list
+            DisplayFileList(currentFileSet);
+
+            // display primary prompt
+            Console.Write(PrimaryPrompt, currentFileSet.Count);
             
             // while (!groupComplete)
             while (!groupComplete)
@@ -157,12 +157,14 @@ public class InteractiveDuplicateHandler : ITaskHandler
                 var primaryPromptInput = Console.ReadKey().KeyChar;
                 var isInputNumeric = int.TryParse(
                     primaryPromptInput.ToString(), out var primaryPromptInputInt);            
+                var deleteOpBackSelected = false;
                 
                 // switch (primaryInput)
                 switch (char.ToUpper(primaryPromptInput))
                 {
                     // case (S)kip
                     case 'S':
+                        Console.WriteLine();
                         // groupComplete = true
                         groupComplete = true;
                         break;
@@ -178,10 +180,16 @@ public class InteractiveDuplicateHandler : ITaskHandler
                     // case (D)elete selected
                     case 'D':
                         SaveCursorPosition();
-
+                        // verify that one or more file is selected for deletion
+                        if (!SelectedFileIndexes.Take(currentFileSet.Count).Any(index => index))
+                        {
+                            ResetCursor();
+                            break;
+                        }
+                        
                         // display delete confirmation prompt
                         DisplayDeleteConfirmation(currentFileSet);
-
+                        
                         // init deleteOpComplete = false
                         var deleteOpComplete = false;
                         
@@ -190,15 +198,21 @@ public class InteractiveDuplicateHandler : ITaskHandler
                         {
                             // deleteConfirmInput <- read input key
                             var deleteConfirmInput = Console.ReadKey().KeyChar;
+                            SaveCursorPosition();
                             
                             // switch (deleteConfirmInput)
                             switch (char.ToUpper(deleteConfirmInput))
                             {
                                 // case (D)elete
                                 case 'D':
+                                    Console.WriteLine();
+                                    
                                     // delete selected files
                                     foreach (var file in currentFileSet)
-                                        DeleteFile(file);
+                                    {
+                                        if (SelectedFileIndexes[currentFileSet.IndexOf(file)])
+                                            DeleteFile(file);
+                                    }
                                     
                                     // deleteOpComplete = true
                                     deleteOpComplete = true;
@@ -209,8 +223,11 @@ public class InteractiveDuplicateHandler : ITaskHandler
  							    
                                 // case (B)ack
                                 case 'B':
-                                    // deleteOpComplete = true
+                                    // deleteOpComplete = true 
+                                    // If user selects back option, we need to re-print the file list and primary prompt.
+                                    groupComplete = true;
                                     deleteOpComplete = true;
+                                    deleteOpBackSelected = true;
                                     break;
  						    
                                 // case default (bad input)
@@ -221,7 +238,8 @@ public class InteractiveDuplicateHandler : ITaskHandler
                             } // end switch (deleteConfirmInput)
  					
                         } // end while (!deleteOpComplete)
-
+                        
+                        Console.WriteLine();
                         break;
 
                     // case default
@@ -235,19 +253,13 @@ public class InteractiveDuplicateHandler : ITaskHandler
                         {
                             // update SelectedFileIndexes
                             ToggleFileSelection(primaryPromptInputInt, currentFileSet.Count);
-
                         }
-                        // else (bad input)
-                        else
-                        {
-                            // reset cursor position
-                            ResetCursor();
-                        }
+                        ResetCursor();
                         break;
                 } // end switch (primaryInput)
 
                 // 	if (groupComplete), groupIndex++
-                if (groupComplete)
+                if (groupComplete && !deleteOpBackSelected)
                     groupIndex++;
                 
             } // end while (!groupComplete)
@@ -274,43 +286,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
         
         Console.SetCursorPosition(0, selectedCursorY);
         Console.Write(SelectedFileIndexes[fileIndex - 1] ? SelectedFileChar : UnselectedFileChar);
-    }
-    
-    // Prompt the user for the action to take for the provided files.
-    private bool PromptForOpInput(List<FileFingerprint> files)
-    {
-        Console.Write(PrimaryPrompt, files.Count);
-        Array.Fill(SelectedFileIndexes, false, 0, files.Count);
-        while (true)
-        {
-            var consoleKeyIn = Console.ReadKey().KeyChar;
-            var isKeyDigit = int.TryParse(consoleKeyIn.ToString(), out var consoleKeyInInt);            
-            switch (char.ToUpper(consoleKeyIn))
-            {
-                case 'D':
-                    SaveCursorPosition();
-                    if (HandleDeleteOp(files)) return true;
-                    ResetCursor();
-                    break;
-                case 'O':
-                    SaveCursorPosition();
-                    OpenWithSystemApplication(files);
-                    ResetCursor();
-                    break;
-                case 'S':
-                    return true;
-                default:
-                    SaveCursorPosition();
-                    if (isKeyDigit &&
-                        consoleKeyInInt > 0 &&
-                        consoleKeyInInt <= files.Count)
-                    {
-                        ToggleFileSelection(consoleKeyInInt, files.Count);
-                    }
-                    ResetCursor();
-                    break;
-            }
-        }
     }
 
     // Display a list of files provided and prompt the user to either (D)elete the listed files or
