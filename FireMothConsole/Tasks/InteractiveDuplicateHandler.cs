@@ -41,9 +41,9 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private const char UnselectedFileChar = ' ';
     private const string PrimaryPrompt =
         "(O) open all files, (1-{0}) select/unselect file, (D) delete selected, (S) skip: ";
-    private const string DeleteConfirmationPrompt =
+    private const string DeleteConfirmationNotice =
         "Are you sure you want to delete the following file(s)?";
-    private const string DeletePrompt =
+    private const string DeleteConfirmationPrompt =
         "(D) delete files, (B) back: ";
     private const string FilesPerGroupLimitExceededNotice =
         "Maximum of {0} file comparisons in interactive mode; displaying first {0} files.";
@@ -93,6 +93,17 @@ public class InteractiveDuplicateHandler : ITaskHandler
             fileIndex++;
         }
     }
+
+    private static void DisplayDeleteConfirmation(List<FileFingerprint> fileSet)
+    {
+        Console.WriteLine($"\n\n{DeleteConfirmationNotice}");
+        foreach (var file in fileSet)
+        {
+            if (SelectedFileIndexes[fileSet.IndexOf(file)])
+                Console.WriteLine($"\t{file.FullPath}");
+        }
+        Console.Write(DeleteConfirmationPrompt);
+    }
     
     /// <summary>Runs the interactive duplicate handler task by prompting the user for input
     /// instructing how to handle all duplicate files in the repository.</summary>
@@ -109,8 +120,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
         // while (groupIndex < duplicate group count)
         while (groupIndex < duplicateFileSets.Count)
         {
-            // 	init groupComplete = false
-            var groupComplete = false;
             var currentGrouping = duplicateFileSets.ElementAt(groupIndex);
             List<FileFingerprint> currentFileSet;
             Console.WriteLine();
@@ -129,110 +138,121 @@ public class InteractiveDuplicateHandler : ITaskHandler
                 currentFileSet = currentGrouping.ToList();
             }
        
-            // display current group file list
+            // display currentFileSet file list
             DisplayFileList(currentFileSet);
 
             // display primary prompt
-            var primaryPromptInput = PromptForOpInput(currentFileSet.ToList());
-            Console.WriteLine();
+            Console.Write(PrimaryPrompt, currentFileSet.Count);
             
+            // reset SelectedFileIndexes
+            Array.Fill(SelectedFileIndexes, false, 0, currentFileSet.Count);
+            
+            // 	init groupComplete = false
+            var groupComplete = false;
+            
+            // while (!groupComplete)
+            while (!groupComplete)
+            {
+                // primaryInput <- read input key
+                var primaryPromptInput = Console.ReadKey().KeyChar;
+                var isInputNumeric = int.TryParse(
+                    primaryPromptInput.ToString(), out var primaryPromptInputInt);            
+                
+                // switch (primaryInput)
+                switch (char.ToUpper(primaryPromptInput))
+                {
+                    // case (S)kip
+                    case 'S':
+                        // groupComplete = true
+                        groupComplete = true;
+                        break;
 
-            // 	display primary prompt
-            // 	
-            // 	while (!groupComplete)
-            // 	
-                // 		primaryInput <- read input key
-                // 		
-                // 		switch (primaryInput)
-                // 		
-                    // 			case (S)kip
-                    // 			
-                        // 				groupComplete = true
-                    // 				
-                    // 			case (O)pen all files
-                    // 			
-                        // 				OpenFiles
-                    // 				
-                    // 			case (D)elete selected
-                    // 			
-                        // 				display delete confirmation prompt
-                        // 				
-                        // 				init deleteOpComplete = false
-                        // 				
-                        // 				while (!deleteOpComplete)
-                        //
-                            // 					deleteConfirmInput <- read input key
-                            //
-                            // 					switch (deleteConfirmInput)
-                            //
-                            // 						case (D)elete
-                            //
-                            // 							delete selected files
-                            //
-                            // 							deleteOpComplete = true
-                            //
-                            // 							groupComplete = true
-                            // 							
-                            // 						case (B)ack
-                            //
-                            // 							deleteOpComplete = true
-                            // 						
-                            // 						case default   // bad input
-                            //
-                            // 							reset cursor position
-                            // 							
-                            // 					end switch (deleteConfirmInput)
-                            // 					
-                        // 				end while (!deleteOpComplete)
-                    // 				
-                    // 			case default
-                    // 			
-                    // 				if (primaryInput is integer)
-                    // 				
-                    // 					update selected items
-                    // 					
-                    // 				else   // bad input
-                    // 				
-                    // 					reset cursor position
-                // 					
-                // 		end switch (primaryInput)
-                // 					
-                // 		if (groupComplete)
-                // 		
-                // 			groupIndex++
-                // 			
-                // 		reset cursor position
-            // 		
-            // 	end while (!groupComplete)
-        // 	
-        // end for each duplicate group
-        }
-        
-        // foreach (var duplicateFileSet in duplicateFileGroups)
-        // {
-        //     Console.WriteLine();
-        //     if (duplicateFileSet.Count() > MaxFilesPerGroup)
-        //     {
-        //         Console.WriteLine("Maximum of {0} file comparisons in interactive mode; " +
-        //                               "displaying first {0} files.",
-        //                           MaxFilesPerGroup);
-        //     }
-        //
-        //     var duplicateFilesCulled = duplicateFileSet.Take(MaxFilesPerGroup).ToList();
-        //     SetFilePathColumnWidth(duplicateFilesCulled.Select(fp => fp.FullPath));
-        //     WriteHeader();
-        //     var fileIndex = 1;
-        //     foreach (var fileFingerprint in duplicateFilesCulled)
-        //     {
-        //         await Console.Out.WriteLineAsync(
-        //             FormatFileFingerprint(
-        //                 fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
-        //         fileIndex++;
-        //     }
-        //
-        //     PromptForOpInput(duplicateFileSet.ToList());
-        //     Console.WriteLine();
-        // }
+                    // case (O)pen all files
+                    case 'O':
+                        SaveCursorPosition();
+                        // open all files using default system application
+                        OpenWithSystemApplication(currentFileSet);
+                        ResetCursor();
+                        break;
+
+                    // case (D)elete selected
+                    case 'D':
+                        SaveCursorPosition();
+
+                        // display delete confirmation prompt
+                        DisplayDeleteConfirmation(currentFileSet);
+
+                        // init deleteOpComplete = false
+                        var deleteOpComplete = false;
+                        
+                        // while (!deleteOpComplete)
+                        while (!deleteOpComplete)
+                        {
+                            // deleteConfirmInput <- read input key
+                            var deleteConfirmInput = Console.ReadKey().KeyChar;
+                            
+                            // switch (deleteConfirmInput)
+                            switch (char.ToUpper(deleteConfirmInput))
+                            {
+                                // case (D)elete
+                                case 'D':
+                                    // delete selected files
+                                    foreach (var file in currentFileSet)
+                                        DeleteFile(file);
+                                    
+                                    // deleteOpComplete = true
+                                    deleteOpComplete = true;
+
+                                    // groupComplete = true
+                                    groupComplete = true;
+                                    break;
+ 							    
+                                // case (B)ack
+                                case 'B':
+                                    // deleteOpComplete = true
+                                    deleteOpComplete = true;
+                                    break;
+ 						    
+                                // case default (bad input)
+                                default:
+                                    // reset cursor position
+                                    ResetCursor();
+                                    break;
+                            } // end switch (deleteConfirmInput)
+ 					
+                        } // end while (!deleteOpComplete)
+
+                        break;
+
+                    // case default
+                    default:
+                        SaveCursorPosition();
+
+                        // if (primaryInput is integer)
+                        if (isInputNumeric &&
+                            primaryPromptInputInt > 0 &&
+                            primaryPromptInputInt <= currentFileSet.Count)
+                        {
+                            // update SelectedFileIndexes
+                            ToggleFileSelection(primaryPromptInputInt, currentFileSet.Count);
+
+                        }
+                        // else (bad input)
+                        else
+                        {
+                            // reset cursor position
+                            ResetCursor();
+                        }
+                        break;
+                } // end switch (primaryInput)
+
+                // 	if (groupComplete), groupIndex++
+                if (groupComplete)
+                    groupIndex++;
+                
+            } // end while (!groupComplete)
+
+        } // end while (groupIndex < duplicate group count)
         
         var deletedFilesSizeHumanReadable =
             ByteSize.FromBytes(_deletedFilesSize).ToBinaryString();
@@ -251,6 +271,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
         SelectedFileIndexes[fileIndex - 1] = !SelectedFileIndexes[fileIndex - 1];
         var (_, cursorOriginY) = Console.GetCursorPosition();
         var selectedCursorY = cursorOriginY - (numberOfFiles - fileIndex + 1);
+        
         Console.SetCursorPosition(0, selectedCursorY);
         Console.Write(SelectedFileIndexes[fileIndex - 1] ? SelectedFileChar : UnselectedFileChar);
     }
@@ -273,7 +294,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
                     break;
                 case 'O':
                     SaveCursorPosition();
-                    HandleOpenOp(files);
+                    OpenWithSystemApplication(files);
                     ResetCursor();
                     break;
                 case 'S':
@@ -299,13 +320,13 @@ public class InteractiveDuplicateHandler : ITaskHandler
         if (!SelectedFileIndexes.Take(files.Count).Any(b => b)) 
             return false;
         
-        Console.WriteLine($"\n\n{DeleteConfirmationPrompt}");
+        Console.WriteLine($"\n\n{DeleteConfirmationNotice}");
         foreach (var file in files)
         {
             if (SelectedFileIndexes[files.IndexOf(file)])
                 Console.WriteLine($"\t{file.FullPath}");
         }
-        Console.Write(DeletePrompt);
+        Console.Write(DeleteConfirmationPrompt);
         
         var consoleKeyIn = Console.ReadKey().KeyChar;
         while (true)
@@ -344,7 +365,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
     
     // Attempt to open the provided files using either the platform default application or, if
     // specified in _options, the specified application.
-    private void HandleOpenOp(List<FileFingerprint> files)
+    private void OpenWithSystemApplication(List<FileFingerprint> files)
     {
         foreach (var file in files)
         {
