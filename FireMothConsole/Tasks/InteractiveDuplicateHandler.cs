@@ -41,10 +41,16 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private const char UnselectedFileChar = ' ';
     private const string PrimaryPrompt =
         "(O) open all files, (1-{0}) select/unselect file, (D) delete selected, (S) skip: ";
+    private const char PrimaryPromptOpenAllOpChar =        'O';
+    private const char PrimaryPromptDeleteSelectedOpChar = 'D';
+    private const char PrimaryPromptSkipOpChar =           'S';
     private const string DeleteConfirmationNotice =
         "Are you sure you want to delete the following file(s)?";
     private const string DeleteConfirmationPrompt =
-        "(D) delete files, (B) back: ";
+        "(D) delete files, (C) cancel: ";
+    private const char DeleteConfirmationPromptDeleteOpChar = 'D';
+    private const char DeleteConfirmationPromptCancelOpChar = 'C';
+    
     private const string FilesPerGroupLimitExceededNotice =
         "Maximum of {0} file comparisons in interactive mode; displaying first {0} files.";
     
@@ -80,30 +86,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
         _options = options.Value;
         _logger = logger;
     }
-
-    private static void DisplayFileList(List<FileFingerprint> fileSet)
-    {
-        SetFilePathColumnWidth(fileSet.Select(fp => fp.FullPath));
-        WriteHeader();
-        var fileIndex = 1;
-        foreach (var fileFingerprint in fileSet)
-        {
-            Console.Out.WriteLine(FormatFileFingerprint(
-                fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
-            fileIndex++;
-        }
-    }
-
-    private static void DisplayDeleteConfirmation(List<FileFingerprint> fileSet)
-    {
-        Console.WriteLine($"\n\n{DeleteConfirmationNotice}");
-        foreach (var file in fileSet)
-        {
-            if (SelectedFileIndexes[fileSet.IndexOf(file)])
-                Console.WriteLine($"\t{file.FullPath}");
-        }
-        Console.Write(DeleteConfirmationPrompt);
-    }
     
     /// <summary>Runs the interactive duplicate handler task by prompting the user for input
     /// instructing how to handle all duplicate files in the repository.</summary>
@@ -114,23 +96,15 @@ public class InteractiveDuplicateHandler : ITaskHandler
         var duplicateFileSets =
             (await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync()).ToList();
         
-        // init groupIndex = 0
         var groupIndex = 0;
-
-        // while (groupIndex < duplicate group count)
         while (groupIndex < duplicateFileSets.Count)
         {
             var currentGrouping = duplicateFileSets.ElementAt(groupIndex);
             List<FileFingerprint> currentFileSet;
             Console.WriteLine();
-
-            // if group item count > MAX_ITEM_COUNT
             if (currentGrouping.Count() > MaxFilesPerGroup)
             {
-                // display file list culled warning
                 Console.WriteLine(FilesPerGroupLimitExceededNotice, MaxFilesPerGroup);
-
-                // currentGroup = first MAX_ITEM_COUNT items from currentFileSet
                 currentFileSet = currentGrouping.Take(MaxFilesPerGroup).ToList();
             }
             else
@@ -138,133 +112,86 @@ public class InteractiveDuplicateHandler : ITaskHandler
                 currentFileSet = currentGrouping.ToList();
             }
             
-            // reset SelectedFileIndexes
             Array.Fill(SelectedFileIndexes, false, 0, currentFileSet.Count);
-            
-            // 	init groupComplete = false
             var groupComplete = false;
-            
-            // display currentFileSet file list
-            DisplayFileList(currentFileSet);
 
-            // display primary prompt
+            DisplayFileList(currentFileSet);
             Console.Write(PrimaryPrompt, currentFileSet.Count);
             
-            // while (!groupComplete)
             while (!groupComplete)
             {
-                // primaryInput <- read input key
                 var primaryPromptInput = Console.ReadKey().KeyChar;
                 var isInputNumeric = int.TryParse(
                     primaryPromptInput.ToString(), out var primaryPromptInputInt);            
                 var deleteOpBackSelected = false;
                 
-                // switch (primaryInput)
                 switch (char.ToUpper(primaryPromptInput))
                 {
-                    // case (S)kip
-                    case 'S':
+                    case PrimaryPromptSkipOpChar:
                         Console.WriteLine();
-                        // groupComplete = true
                         groupComplete = true;
                         break;
-
-                    // case (O)pen all files
-                    case 'O':
+                    case PrimaryPromptOpenAllOpChar:
                         SaveCursorPosition();
-                        // open all files using default system application
                         OpenWithSystemApplication(currentFileSet);
                         ResetCursor();
                         break;
-
-                    // case (D)elete selected
-                    case 'D':
+                    case PrimaryPromptDeleteSelectedOpChar:
                         SaveCursorPosition();
-                        // verify that one or more file is selected for deletion
                         if (!SelectedFileIndexes.Take(currentFileSet.Count).Any(index => index))
                         {
                             ResetCursor();
                             break;
                         }
                         
-                        // display delete confirmation prompt
                         DisplayDeleteConfirmation(currentFileSet);
-                        
-                        // init deleteOpComplete = false
                         var deleteOpComplete = false;
-                        
-                        // while (!deleteOpComplete)
+
                         while (!deleteOpComplete)
                         {
-                            // deleteConfirmInput <- read input key
                             var deleteConfirmInput = Console.ReadKey().KeyChar;
                             SaveCursorPosition();
-                            
-                            // switch (deleteConfirmInput)
                             switch (char.ToUpper(deleteConfirmInput))
                             {
-                                // case (D)elete
-                                case 'D':
+                                case DeleteConfirmationPromptDeleteOpChar:
                                     Console.WriteLine();
-                                    
-                                    // delete selected files
                                     foreach (var file in currentFileSet)
                                     {
                                         if (SelectedFileIndexes[currentFileSet.IndexOf(file)])
                                             DeleteFile(file);
                                     }
                                     
-                                    // deleteOpComplete = true
                                     deleteOpComplete = true;
-
-                                    // groupComplete = true
                                     groupComplete = true;
                                     break;
- 							    
-                                // case (B)ack
-                                case 'B':
-                                    // deleteOpComplete = true 
-                                    // If user selects back option, we need to re-print the file list and primary prompt.
+                                case DeleteConfirmationPromptCancelOpChar:
+                                    Console.WriteLine();
                                     groupComplete = true;
                                     deleteOpComplete = true;
                                     deleteOpBackSelected = true;
                                     break;
- 						    
-                                // case default (bad input)
                                 default:
-                                    // reset cursor position
                                     ResetCursor();
                                     break;
-                            } // end switch (deleteConfirmInput)
- 					
-                        } // end while (!deleteOpComplete)
-                        
-                        Console.WriteLine();
+                            }
+                        }
                         break;
-
-                    // case default
                     default:
                         SaveCursorPosition();
-
-                        // if (primaryInput is integer)
                         if (isInputNumeric &&
                             primaryPromptInputInt > 0 &&
                             primaryPromptInputInt <= currentFileSet.Count)
                         {
-                            // update SelectedFileIndexes
                             ToggleFileSelection(primaryPromptInputInt, currentFileSet.Count);
                         }
                         ResetCursor();
                         break;
-                } // end switch (primaryInput)
+                }
 
-                // 	if (groupComplete), groupIndex++
                 if (groupComplete && !deleteOpBackSelected)
                     groupIndex++;
-                
-            } // end while (!groupComplete)
-
-        } // end while (groupIndex < duplicate group count)
+            }
+        }
         
         var deletedFilesSizeHumanReadable =
             ByteSize.FromBytes(_deletedFilesSize).ToBinaryString();
@@ -311,7 +238,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
                 case 'D':
                     foreach (var file in files) DeleteFile(file);
                     return true;
-                case 'B':
+                case 'C':
                     return false;
                 default:
                     return false;
@@ -325,7 +252,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
         _logger.LogInformation("Deleting file '{DuplicateFile}'.", file.FullPath);
         try
         {
-            // _fileSystem.File.Delete(file.FullPath);
+            _fileSystem.File.Delete(file.FullPath);
             _deletedFilesCount++;
             _deletedFilesSize += file.FileSize;
         }
@@ -382,6 +309,8 @@ public class InteractiveDuplicateHandler : ITaskHandler
         }
     }
     
+    // Sets the allowed width of the filepath column in a FileFingerprint information string based
+    // on the current width of the console.
     private static void SetFilePathColumnWidth(IEnumerable<string> fileNames)
     {
         var availableLineWidth = Console.WindowWidth switch
@@ -402,6 +331,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private void SaveCursorPosition() =>
         (_cursorSaveX, _cursorSaveY) = Console.GetCursorPosition();
     
+    // Resets the currently focused console character by overwriting it with whitespace. 
     private void ResetCursor()
     {
         Console.SetCursorPosition(_cursorSaveX - 1, _cursorSaveY);
@@ -409,13 +339,14 @@ public class InteractiveDuplicateHandler : ITaskHandler
         Console.SetCursorPosition(_cursorSaveX - 1, _cursorSaveY);
     }    
     
+    // Returns a string containing formatted data from a FileFingerprint.
     private static string FormatFileFingerprint(
         int fileIndex, FileFingerprint fileFingerprint, bool selected)
     {
         var fileText =
             (selected ? SelectedFileChar : UnselectedFileChar) +
             $" {fileIndex,2}  " + 
-            $"{GetFileString(fileFingerprint.FullPath).PadRight(_filePathColumnWidth)}  " +
+            $"{GetFileString(fileFingerprint).PadRight(_filePathColumnWidth)}  " +
             $"{"exact",MatchColumnWidth}  " +
             $"{DateTime.Now,-CreatedColumnWidth:s}  " +
             $"{DateTime.UtcNow,-ModifiedColumnWidth:s}  " +
@@ -423,12 +354,42 @@ public class InteractiveDuplicateHandler : ITaskHandler
         return fileText;
     }
     
-    private static string GetFileString(string filePath)
+    // Returns a formatted file path string from a FileFingerprint, abbreviated if it won't fit
+    // within the current _filePathColumnWidth. 
+    private static string GetFileString(FileFingerprint filePath)
     {
-        if (filePath.Length <= _filePathColumnWidth) return filePath;
-        return "..." + Right(filePath, _filePathColumnWidth - 3);
+        if (filePath.FullPath.Length <= _filePathColumnWidth) return filePath.FullPath;
+        return "..." + Right(filePath.FullPath, _filePathColumnWidth - 3);
+    }
+ 
+
+    // Outputs a formatted list of the provided collection of FileFingerprints to the console.
+    private static void DisplayFileList(List<FileFingerprint> fileSet)
+    {
+        SetFilePathColumnWidth(fileSet.Select(fp => fp.FullPath));
+        WriteHeader();
+        var fileIndex = 1;
+        foreach (var fileFingerprint in fileSet)
+        {
+            Console.Out.WriteLine(FormatFileFingerprint(
+                fileIndex, fileFingerprint, SelectedFileIndexes[fileIndex - 1]));
+            fileIndex++;
+        }
+    }
+
+    // Outputs a delete confirmation prompt for the provided collection of FileFingeprints.
+    private static void DisplayDeleteConfirmation(List<FileFingerprint> fileSet)
+    {
+        Console.WriteLine($"\n\n{DeleteConfirmationNotice}");
+        foreach (var file in fileSet)
+        {
+            if (SelectedFileIndexes[fileSet.IndexOf(file)])
+                Console.WriteLine($"\t{file.FullPath}");
+        }
+        Console.Write(DeleteConfirmationPrompt);
     }
     
+    // Given a string return a new string containing the rightmost iMaxLength characters.
     private static string Right(string sValue, int iMaxLength)
     {
         if (string.IsNullOrEmpty(sValue))
@@ -439,6 +400,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
         return sValue;
     }
     
+    // Output file set header text to console.
     private static void WriteHeader()
     {
         var headerText =
