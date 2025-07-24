@@ -27,7 +27,8 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private readonly IFileFingerprintRepository _fileFingerprintRepository;
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<InteractiveDuplicateHandler> _logger;
-    private readonly InteractiveDuplicateHandlerOptions _options;
+    private readonly InteractiveDuplicateHandlerOptions _interactiveDuplicateHandlerOptions;
+    private readonly DuplicateFileHandlingOptions _duplicateFileHandlingOptions;
     
     private const int CreatedColumnWidth = 19;
     private const int ModifiedColumnWidth = 19;
@@ -67,23 +68,26 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// retrieve duplicate records and modify or delete records after prompting the user.</param>
     /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
     /// </param>
-    /// <param name="options">An <see cref="IOptions{InteractiveDuplicateHandlerOptions}"/>
+    /// <param name="interactiveDuplicateHandlerOptions">An <see cref="IOptions{InteractiveDuplicateHandlerOptions}"/>
     /// containing options for this handler.</param>
     /// <param name="logger">An <see cref="ILogger{InteractiveDuplicateHandler}"/> to which logging
     /// output will be written.</param>
     public InteractiveDuplicateHandler(
         IFileFingerprintRepository fileFingerprintRepository,
         IFileSystem fileSystem,
-        IOptions<InteractiveDuplicateHandlerOptions> options,
+        IOptions<InteractiveDuplicateHandlerOptions> interactiveDuplicateHandlerOptions,
+        IOptions<DuplicateFileHandlingOptions> duplicateFileHandlingOptions,
         ILogger<InteractiveDuplicateHandler> logger)
     {
         Guard.IsNotNull(fileFingerprintRepository);
         Guard.IsNotNull(fileSystem);
-        Guard.IsNotNull(options.Value);
+        Guard.IsNotNull(interactiveDuplicateHandlerOptions.Value);
+        Guard.IsNotNull(duplicateFileHandlingOptions.Value);
         Guard.IsNotNull(logger);
         _fileFingerprintRepository = fileFingerprintRepository;
         _fileSystem = fileSystem;
-        _options = options.Value;
+        _interactiveDuplicateHandlerOptions = interactiveDuplicateHandlerOptions.Value;
+        _duplicateFileHandlingOptions = duplicateFileHandlingOptions.Value;
         _logger = logger;
     }
     
@@ -91,8 +95,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// instructing how to handle all duplicate files in the repository.</summary>
     public async Task RunTaskAsync()
     {
-        // Retrieve duplicate groups from repository. Enumerate immediately via ToList, possibly
-        // loading all duplicate elements into memory. Might need to perf test this. 
         var duplicateFileSets =
             (await _fileFingerprintRepository.GetGroupingsWithDuplicateHashesAsync()).ToList();
         
@@ -215,37 +217,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
         Console.Write(SelectedFileIndexes[fileIndex - 1] ? SelectedFileChar : UnselectedFileChar);
     }
 
-    // Display a list of files provided and prompt the user to either (D)elete the listed files or
-    // go (B)ack to the original selection prompt.
-    private bool HandleDeleteOp(List<FileFingerprint> files)
-    {
-        if (!SelectedFileIndexes.Take(files.Count).Any(b => b)) 
-            return false;
-        
-        Console.WriteLine($"\n\n{DeleteConfirmationNotice}");
-        foreach (var file in files)
-        {
-            if (SelectedFileIndexes[files.IndexOf(file)])
-                Console.WriteLine($"\t{file.FullPath}");
-        }
-        Console.Write(DeleteConfirmationPrompt);
-        
-        var consoleKeyIn = Console.ReadKey().KeyChar;
-        while (true)
-        {
-            switch (char.ToUpper(consoleKeyIn))
-            {
-                case 'D':
-                    foreach (var file in files) DeleteFile(file);
-                    return true;
-                case 'C':
-                    return false;
-                default:
-                    return false;
-            }
-        }
-    }
-
     // Delete the specified file, performing necessary logging and exception handling.
     private void DeleteFile(FileFingerprint file)
     {
@@ -272,7 +243,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
         foreach (var file in files)
         {
             ProcessStartInfo processStartInfo;
-            if (string.IsNullOrWhiteSpace(_options.Application))
+            if (string.IsNullOrWhiteSpace(_interactiveDuplicateHandlerOptions.Application))
             {
                 processStartInfo = new ProcessStartInfo
                 {
@@ -284,16 +255,16 @@ public class InteractiveDuplicateHandler : ITaskHandler
             {
                 processStartInfo = new ProcessStartInfo
                 {
-                    FileName = _options.Application,
+                    FileName = _interactiveDuplicateHandlerOptions.Application,
                     ArgumentList = { file.FullPath },
                     UseShellExecute = false
                 };
 
-                if (_options.Arguments is not null &&
-                    !string.IsNullOrWhiteSpace(_options.Arguments))
+                if (_interactiveDuplicateHandlerOptions.Arguments is not null &&
+                    !string.IsNullOrWhiteSpace(_interactiveDuplicateHandlerOptions.Arguments))
                 {
                     var inQuotes = false;
-                    var splitArguments = _options.Arguments.Split(c =>
+                    var splitArguments = _interactiveDuplicateHandlerOptions.Arguments.Split(c =>
                         {
                             if (c == '\"') inQuotes = !inQuotes;
                             return !inQuotes && c == ' ';
@@ -362,7 +333,6 @@ public class InteractiveDuplicateHandler : ITaskHandler
         return "..." + Right(filePath.FullPath, _filePathColumnWidth - 3);
     }
  
-
     // Outputs a formatted list of the provided collection of FileFingerprints to the console.
     private static void DisplayFileList(List<FileFingerprint> fileSet)
     {
