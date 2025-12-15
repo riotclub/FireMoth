@@ -41,16 +41,18 @@ public class InteractiveDuplicateHandler : ITaskHandler
     private const char SelectedFileChar = '*';
     private const char UnselectedFileChar = ' ';
     private const string PrimaryPrompt =
-        "(O) open all files, (1-{0}) select/unselect file, (D) delete selected, (S) skip: ";
+        "(O) open all files, (1-{0}) select/unselect file, ({1}) {2} selected, (S) skip: ";
     private const char PrimaryPromptOpenAllOpChar =        'O';
     private const char PrimaryPromptDeleteSelectedOpChar = 'D';
+    private const char PrimaryPromptMoveSelectedOpChar =   'M';
     private const char PrimaryPromptSkipOpChar =           'S';
-    private const string DeleteConfirmationNotice =
-        "Are you sure you want to delete the following file(s)?";
-    private const string DeleteConfirmationPrompt =
-        "(D) delete files, (C) cancel: ";
-    private const char DeleteConfirmationPromptDeleteOpChar = 'D';
-    private const char DeleteConfirmationPromptCancelOpChar = 'C';
+    private const string FileOpConfirmationNotice =
+        "Are you sure you want to {0} the following file(s)?";
+    private const string FileOpDeleteWord = "delete";
+    private const string FileOpMoveWord = "move";
+    private const string FileOpConfirmationPrompt = "(Y) yes, {0} files; (N) no, cancel: ";
+    private const char FileOpConfirmationPromptOpChar = 'Y';
+    private const char FileOpConfirmationPromptNoOpChar = 'N';
     
     private const string FilesPerGroupLimitExceededNotice =
         "Maximum of {0} file comparisons in interactive mode; displaying first {0} files.";
@@ -68,8 +70,13 @@ public class InteractiveDuplicateHandler : ITaskHandler
     /// retrieve duplicate records and modify or delete records after prompting the user.</param>
     /// <param name="fileSystem">An <see cref="IFileSystem"/> that provides file system I/O access.
     /// </param>
-    /// <param name="interactiveDuplicateHandlerOptions">An <see cref="IOptions{InteractiveDuplicateHandlerOptions}"/>
-    /// containing options for this handler.</param>
+    /// <param name="interactiveDuplicateHandlerOptions">An
+    /// <see cref="IOptions{InteractiveDuplicateHandlerOptions}"/> containing options for this
+    /// handler.</param>
+    /// <param name="duplicateFileHandlingOptions">An
+    /// <see cref="IOptions{DuplicateFileHandlingOptions}"/> used to determine whether the requested
+    /// duplicate file handling method is <see cref="DuplicateFileHandlingMethod.Move"/> or
+    /// <see cref="DuplicateFileHandlingMethod.Delete"/>.</param>
     /// <param name="logger">An <see cref="ILogger{InteractiveDuplicateHandler}"/> to which logging
     /// output will be written.</param>
     public InteractiveDuplicateHandler(
@@ -90,7 +97,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
         _duplicateFileHandlingOptions = duplicateFileHandlingOptions.Value;
         _logger = logger;
     }
-    
+
     /// <summary>Runs the interactive duplicate handler task by prompting the user for input
     /// instructing how to handle all duplicate files in the repository.</summary>
     public async Task RunTaskAsync()
@@ -118,14 +125,15 @@ public class InteractiveDuplicateHandler : ITaskHandler
             var groupComplete = false;
 
             DisplayFileList(currentFileSet);
-            Console.Write(PrimaryPrompt, currentFileSet.Count);
+            Console.Write(
+                PrimaryPrompt, currentFileSet.Count, GetFileOpPromptChar(), GetFileOpWord());
             
             while (!groupComplete)
             {
                 var primaryPromptInput = Console.ReadKey().KeyChar;
                 var isInputNumeric = int.TryParse(
-                    primaryPromptInput.ToString(), out var primaryPromptInputInt);            
-                var deleteOpBackSelected = false;
+                    primaryPromptInput.ToString(), out var primaryPromptInputInt);
+                var fileOpBackSelected = false;
                 
                 switch (char.ToUpper(primaryPromptInput))
                 {
@@ -139,44 +147,15 @@ public class InteractiveDuplicateHandler : ITaskHandler
                         ResetCursor();
                         break;
                     case PrimaryPromptDeleteSelectedOpChar:
+                    case PrimaryPromptMoveSelectedOpChar:
                         SaveCursorPosition();
                         if (!SelectedFileIndexes.Take(currentFileSet.Count).Any(index => index))
                         {
                             ResetCursor();
                             break;
                         }
-                        
-                        DisplayDeleteConfirmation(currentFileSet);
-                        var deleteOpComplete = false;
 
-                        while (!deleteOpComplete)
-                        {
-                            var deleteConfirmInput = Console.ReadKey().KeyChar;
-                            SaveCursorPosition();
-                            switch (char.ToUpper(deleteConfirmInput))
-                            {
-                                case DeleteConfirmationPromptDeleteOpChar:
-                                    Console.WriteLine();
-                                    foreach (var file in currentFileSet)
-                                    {
-                                        if (SelectedFileIndexes[currentFileSet.IndexOf(file)])
-                                            DeleteFile(file);
-                                    }
-                                    
-                                    deleteOpComplete = true;
-                                    groupComplete = true;
-                                    break;
-                                case DeleteConfirmationPromptCancelOpChar:
-                                    Console.WriteLine();
-                                    groupComplete = true;
-                                    deleteOpComplete = true;
-                                    deleteOpBackSelected = true;
-                                    break;
-                                default:
-                                    ResetCursor();
-                                    break;
-                            }
-                        }
+                        HandleFileOp(currentFileSet, ref groupComplete, ref fileOpBackSelected);
                         break;
                     default:
                         SaveCursorPosition();
@@ -190,7 +169,7 @@ public class InteractiveDuplicateHandler : ITaskHandler
                         break;
                 }
 
-                if (groupComplete && !deleteOpBackSelected)
+                if (groupComplete && !fileOpBackSelected)
                     groupIndex++;
             }
         }
@@ -205,6 +184,43 @@ public class InteractiveDuplicateHandler : ITaskHandler
             deletedFilesSizeHumanReadable);
     }
 
+    private void HandleFileOp(
+        List<FileFingerprint> fileFingerprints,
+        ref bool groupCompleteFlag,
+        ref bool fileOpBackSelectedFlag)
+    {
+        DisplayFileOpConfirmation(fileFingerprints);
+        var fileOpComplete = false;
+        while (!fileOpComplete)
+        {
+            var fileOpConfirmInput = Console.ReadKey().KeyChar;
+            SaveCursorPosition();
+            switch (char.ToUpper(fileOpConfirmInput))
+            {
+                case FileOpConfirmationPromptOpChar:
+                    Console.WriteLine();
+                    foreach (var file in fileFingerprints)
+                    {
+                        if (SelectedFileIndexes[fileFingerprints.IndexOf(file)])
+                            DeleteFile(file);
+                    }
+                                    
+                    fileOpComplete = true;
+                    groupCompleteFlag = true;
+                    break;
+                case FileOpConfirmationPromptNoOpChar:
+                    Console.WriteLine();
+                    groupCompleteFlag = true;
+                    fileOpComplete = true;
+                    fileOpBackSelectedFlag = true;
+                    break;
+                default:
+                    ResetCursor();
+                    break;
+            }
+        }
+    }
+    
     // Toggle the SelectedFileIndex flag for the provided file index and update the console display
     // to indicate the new flag status.
     private static void ToggleFileSelection(int fileIndex, int numberOfFiles)
@@ -236,6 +252,29 @@ public class InteractiveDuplicateHandler : ITaskHandler
         }
     }
     
+    // Delete the specified file, performing necessary logging and exception handling.
+    private void PerformFileSystemOp(FileFingerprint file)
+    {
+        _logger.LogInformation(
+            "Performing file system op [{FileSystemOp}] on file '{DuplicateFile}'.",
+            GetFileOpWord(),
+            file.FullPath);
+        
+        try
+        {
+            _fileSystem.File.Delete(file.FullPath);
+            _deletedFilesCount++;
+            _deletedFilesSize += file.FileSize;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogError(
+                "Unable to delete file '{FileFullPath}: {ExceptionMessage}'",
+                file.FullPath,
+                e.Message);
+        }
+    }    
+    
     // Attempt to open the provided files using either the platform default application or, if
     // specified in _options, the specified application.
     private void OpenWithSystemApplication(List<FileFingerprint> files)
@@ -264,11 +303,12 @@ public class InteractiveDuplicateHandler : ITaskHandler
                     !string.IsNullOrWhiteSpace(_interactiveDuplicateHandlerOptions.Arguments))
                 {
                     var inQuotes = false;
-                    var splitArguments = _interactiveDuplicateHandlerOptions.Arguments.Split(c =>
-                        {
-                            if (c == '\"') inQuotes = !inQuotes;
-                            return !inQuotes && c == ' ';
-                        })
+                    var splitArguments = _interactiveDuplicateHandlerOptions.Arguments
+                        .Split(c =>
+                            {
+                                if (c == '\"') inQuotes = !inQuotes;
+                                return !inQuotes && c == ' ';
+                            })
                         .Select(str => str.Trim().TrimMatchingQuotes('\"'))
                         .Where(str => !string.IsNullOrEmpty(str));
                         
@@ -347,16 +387,26 @@ public class InteractiveDuplicateHandler : ITaskHandler
         }
     }
 
-    // Outputs a delete confirmation prompt for the provided collection of FileFingeprints.
-    private static void DisplayDeleteConfirmation(List<FileFingerprint> fileSet)
+    private string GetFileOpWord() => _duplicateFileHandlingOptions.DuplicateFileHandlingMethod ==
+                                      DuplicateFileHandlingMethod.Delete
+                                      ? FileOpDeleteWord
+                                      : FileOpMoveWord;
+
+    private char GetFileOpPromptChar() => _duplicateFileHandlingOptions.DuplicateFileHandlingMethod ==
+                                          DuplicateFileHandlingMethod.Delete
+                                          ? PrimaryPromptDeleteSelectedOpChar
+                                          : PrimaryPromptMoveSelectedOpChar;
+    
+    // Outputs a delete confirmation prompt for the provided collection of FileFingerprints.
+    private void DisplayFileOpConfirmation(List<FileFingerprint> fileSet)
     {
-        Console.WriteLine($"\n\n{DeleteConfirmationNotice}");
+        Console.WriteLine($"\n\n{FileOpConfirmationNotice}", GetFileOpWord());
         foreach (var file in fileSet)
         {
             if (SelectedFileIndexes[fileSet.IndexOf(file)])
                 Console.WriteLine($"\t{file.FullPath}");
         }
-        Console.Write(DeleteConfirmationPrompt);
+        Console.Write(FileOpConfirmationPrompt, GetFileOpWord());
     }
     
     // Given a string return a new string containing the rightmost iMaxLength characters.

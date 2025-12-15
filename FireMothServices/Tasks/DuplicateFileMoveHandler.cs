@@ -61,9 +61,7 @@ public class DuplicateFileMoveHandler : ITaskHandler
     {
         if (_duplicateFileHandlingOptions.DuplicateFileHandlingMethod !=
             DuplicateFileHandlingMethod.Move)
-        {
             return;
-        }
 
         if (!ValidateAndCreateMoveDirectory())
             return;
